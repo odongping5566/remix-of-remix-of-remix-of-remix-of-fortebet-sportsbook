@@ -26,7 +26,7 @@ body {
   color: var(--color-font-main);
   height: 100%;
 }
-*{scrollbar-width:thin;scrollbar-color:#d7d7d9 transparent}*::-webkit-scrollbar{width:calc(4px * var(--factor))}*::-webkit-scrollbar-track{background:transparent}*::-webkit-scrollbar-thumb{background-color:#d7d7d9;border-radius:calc(10px * var(--factor));border:calc(3px * var(--factor)) solid transparent}@media (max-width: 3000px){:root{--factor:1;--resolution:"resolution Full HD"}}@media (min-width: 3000px){:root{--factor:2;--resolution:"resolution 4K"}}@media only screen and (max-width: 992px){:root{--mobileDisplayBlock:block}}:root{--brand-500:#10b981;--brand-600:#e45a00;--brand-700:#cc4f00;--brand-800:#a24200;--brand-900:#7a3300;--brand-glow:rgba(16, 185, 129, .35)}
+*{scrollbar-width:thin;scrollbar-color:#d7d7d9 transparent}*::-webkit-scrollbar{width:calc(4px * var(--factor))}*::-webkit-scrollbar-track{background:transparent}*::-webkit-scrollbar-thumb{background-color:#d7d7d9;border-radius:calc(10px * var(--factor));border:calc(3px * var(--factor)) solid transparent}@media (max-width: 3000px){:root{--factor:1;--resolution:"resolution Full HD"}}@media (min-width: 3000px){:root{--factor:2;--resolution:"resolution 4K"}}@media only screen and (max-width: 992px){:root{--mobileDisplayBlock:block}}:root{--brand-500:#10b981;--brand-600:#059669;--brand-700:#cc4f00;--brand-800:#a24200;--brand-900:#7a3300;--brand-glow:rgba(16, 185, 129, .35)}
 
 
 .devBumpContainer > div { display: none; font-size: 11px; }
@@ -861,7 +861,7 @@ icon[href="#icoTicketCircleBar"] > svg.p85 { stroke-dashoffset: 37.5; }
 icon[href="#icoTicketCircleBar"] > svg.p90 { stroke-dashoffset: 25; }
 icon[href="#icoTicketCircleBar"] > svg.p95 { stroke-dashoffset: 12.5; }
 icon[href="#icoTicketCircleBar"] > svg.p100 { stroke-dashoffset: 0; }
-icon[href="#icoTicketCircleBar"] > svg.lost { stroke: rgb(245, 55, 0); stroke-dashoffset: 0; }
+icon[href="#icoTicketCircleBar"] > svg.lost { stroke: rgb(5, 150, 105); stroke-dashoffset: 0; }
 icon[href="#icoTicketCircleBar"] > svg.win { stroke: rgb(0, 176, 80); stroke-dashoffset: 0; }
 icon[href="#icoTicketCircleBar"] > svg.cancel { stroke: rgb(92, 167, 255); stroke-dashoffset: 0; }
 icon.deadSpace { position: relative; }
@@ -1736,7 +1736,7 @@ icon.deadSpace > svg { position: relative; z-index: 2; }
 .header .buttons.register > a { text-transform: uppercase; background-color: rgb(255, 255, 255); color: rgb(16, 185, 129); }
 .header .buttons.login > a { text-transform: uppercase; background-color: rgb(206, 166, 66); border-color: rgb(206, 166, 66); color: rgb(23, 25, 33); }
 .header .buttons.login > a > span { margin-right: calc(6px * var(--factor)); }
-.header .buttons.logout > a { background-color: rgb(223, 50, 0); border-color: transparent; }
+.header .buttons.logout > a { background-color: rgb(4, 120, 87); border-color: transparent; }
 .header .buttons.logout > a > span::after { filter: invert(99%) sepia(18%) saturate(2%) hue-rotate(301deg) brightness(116%) contrast(100%); }
 .header .buttons.hover > a:hover { background: rgb(255, 255, 255); color: rgb(16, 185, 129); }
 .header > div { display: flex; align-items: center; }
@@ -2603,7 +2603,7 @@ icon.deadSpace > svg { position: relative; z-index: 2; }
 
 .ticket > div.ticketBetResult > div .ticketInfo.progress, .virtual-ticket > div.ticketBetResult > div .ticketInfo.progress { animation-name: animTicketProgress; animation-duration: 1.5s; animation-iteration-count: infinite; }
 .ticket > div.ticketBetResult > div .ticketInfo.largeNumber, .virtual-ticket > div.ticketBetResult > div .ticketInfo.largeNumber { width: calc(210px * var(--factor)); }
-.ticket > div.ticketHead, .virtual-ticket > div.ticketHead { color: rgb(245, 55, 0); font-size: calc(14px * var(--factor)); font-weight: 700; position: relative; line-height: calc(22px * var(--factor)); height: calc(40px * var(--factor)); padding: 0px; margin: 0px calc(10px * var(--factor)) 0px; border-bottom: calc(1px * var(--factor)) solid #D8D8D8; text-transform: uppercase; }
+.ticket > div.ticketHead, .virtual-ticket > div.ticketHead { color: rgb(5, 150, 105); font-size: calc(14px * var(--factor)); font-weight: 700; position: relative; line-height: calc(22px * var(--factor)); height: calc(40px * var(--factor)); padding: 0px; margin: 0px calc(10px * var(--factor)) 0px; border-bottom: calc(1px * var(--factor)) solid #D8D8D8; text-transform: uppercase; }
 .ticket > div.ticketHead > div, .virtual-ticket > div.ticketHead > div { position: absolute; height: inherit; padding: inherit; right: 0px; top: calc(-2px * var(--factor)); cursor: pointer; }
 .ticket > div.ticketHead icon, .virtual-ticket > div.ticketHead icon { margin-left: calc(6px * var(--factor)); }
 .ticket > div.betSlipMenu, .virtual-ticket > div.betSlipMenu { position: relative; }
@@ -5272,7 +5272,7 @@ icon.deadSpace > svg { position: relative; z-index: 2; }
 .clientProfile > form > div > div > div > div > div.mobile > div > input { width: calc(256px * var(--factor)); }
 .clientProfile > form > div > div > div > div > div.passStrength { display: block; text-align: right; }
 .clientProfile > form > div > div > div > div > div.passStrength > span { display: inline-block; width: calc(330px * var(--factor)); text-align: center; border-radius: calc(4px * var(--factor)); line-height: calc(30px * var(--factor)); font-size: calc(12px * var(--factor)); font-weight: 500; }
-.clientProfile > form > div > div > div > div > div.passStrength > span.weak { background: rgb(223, 50, 0); }
+.clientProfile > form > div > div > div > div > div.passStrength > span.weak { background: rgb(4, 120, 87); }
 .clientProfile > form > div > div > div > div > div.passStrength > span.middle { background: rgb(206, 166, 66); }
 .clientProfile > form > div > div > div > div > div.passStrength > span.strong { background: rgb(61, 106, 61); }
 .clientProfile > form > div > div > div > div > div.errorMessage { display: block; margin-bottom: calc(10px * var(--factor)); }
@@ -6862,7 +6862,7 @@ span.green { color: rgb(27, 188, 17); }
 .virtual-ticket > :nth-child(1) > * { display: flex; justify-content: flex-end; align-items: center; }
 .virtual-ticket > :nth-child(1) > * > icon { position: relative; right: calc(4px * var(--factor)); }
 .virtual-ticket icon { cursor: pointer; }
-.virtual-ticket > :nth-child(1) > :nth-child(1) { color: rgb(245, 55, 0); justify-content: flex-start; padding-left: calc(7px * var(--factor)); }
+.virtual-ticket > :nth-child(1) > :nth-child(1) { color: rgb(5, 150, 105); justify-content: flex-start; padding-left: calc(7px * var(--factor)); }
 .virtual-ticket > :nth-child(1) > :nth-child(3) { grid-column: span 2; }
 .virtual-ticket > :nth-child(1) > :nth-child(4) { color: rgb(66, 68, 74); }
 .virtual-ticket .virtual-ticket-content-empty { margin-top: calc(10px * var(--factor)); text-align: center; font-size: calc(14px * var(--factor)); color: rgb(255, 255, 255); font-weight: 400; background-size: calc(28px * var(--factor)); padding-top: calc(40px * var(--factor)); border-bottom: calc(20px * var(--factor)) solid #ffffff; min-height: calc(10px * var(--factor)); padding-bottom: calc(10px * var(--factor)) !important; }
@@ -7071,17 +7071,17 @@ span.green { color: rgb(27, 188, 17); }
 
 .keno-info-odds-row > * > * { margin: calc(10px * var(--factor)) 0px; }
 .keno-info-odds-row > :nth-child(1) { width: calc(60px * var(--factor)); text-align: right; }
-.keno-info-odds-row > :nth-child(1) > :nth-child(2) { color: rgb(245, 55, 0); padding: calc(2px * var(--factor)) 0; }
+.keno-info-odds-row > :nth-child(1) > :nth-child(2) { color: rgb(5, 150, 105); padding: calc(2px * var(--factor)) 0; }
 .keno-info-odds-row > :not(:nth-child(1)) { width: calc(50px * var(--factor)); text-align: center; margin-left: calc(5px * var(--factor)); }
 .keno-info-odds-row > :not(:nth-child(1)) > :nth-child(2) { background: rgb(79, 81, 94); border-radius: calc(4px * var(--factor)); color: rgb(255, 135, 58); padding: calc(2px * var(--factor)) 0; }
 
 .keno-info-color-row > div { background: rgb(40, 43, 51); display: flex; flex-flow: column; padding: calc(10px * var(--factor)) 0; }
 .keno-info-color-row > div > :nth-child(1) { background: rgb(40, 43, 51); display: flex; justify-content: center; align-items: center; margin-bottom: calc(10px * var(--factor)); }
 .keno-info-color-row > div > :nth-child(2) { display: flex; flex-flow: row; }
-.keno-info-color-row > div > :nth-child(2) > :nth-child(1) { color: rgb(245, 55, 0); padding: calc(2px * var(--factor)) 0; width: calc(60px * var(--factor)); text-align: right; }
+.keno-info-color-row > div > :nth-child(2) > :nth-child(1) { color: rgb(5, 150, 105); padding: calc(2px * var(--factor)) 0; width: calc(60px * var(--factor)); text-align: right; }
 .keno-info-color-row > div > :nth-child(2) > :nth-child(2) { background: rgb(79, 81, 94); border-radius: calc(4px * var(--factor)); color: rgb(255, 135, 58); padding: calc(2px * var(--factor)) 0; width: calc(40px * var(--factor)); margin-left: calc(5px * var(--factor)); text-align: center; }
 
-.keno-match > :first-child { background-color: rgb(245, 55, 0); color: rgb(255, 255, 255); font-size: calc(20px * var(--factor)); font-weight: 700; display: flex; justify-content: center; align-items: center; padding: calc(5px * var(--factor)) 0px; margin-bottom: calc(15px * var(--factor)); }
+.keno-match > :first-child { background-color: rgb(5, 150, 105); color: rgb(255, 255, 255); font-size: calc(20px * var(--factor)); font-weight: 700; display: flex; justify-content: center; align-items: center; padding: calc(5px * var(--factor)) 0px; margin-bottom: calc(15px * var(--factor)); }
 .keno-match > :not(:first-child) { display: flex; flex-flow: row; }
 
 .keno-match-ball > * { background-size: cover; display: flex; justify-content: center; align-items: center; height: 100%; }
@@ -8403,7 +8403,7 @@ span.green { color: rgb(27, 188, 17); }
 
 .dw_phone > div.dw_phone_filed > div:nth-of-type(2) ol { margin: 0px; padding: calc(5px * var(--factor)) 0 0 calc(12px * var(--factor)); }
 .dw_phone > div.dw_phone_filed > div:nth-of-type(2) ol > li::before { color: rgb(255, 255, 255); }
-.dw_phone > div.dw_phone_filed > div:nth-of-type(2) ol > li.dw_orange::before { color: rgb(243, 57, 0); }
+.dw_phone > div.dw_phone_filed > div:nth-of-type(2) ol > li.dw_orange::before { color: rgb(5, 150, 105); }
 .dw_phone > div.dw_phone_filed > div:nth-of-type(2) ol > li.blurred { filter: blur(2px); }
 .dw_phone > div.dw_phone_filed > div:nth-of-type(2) ol > li.nolist { margin-left: calc(-13px * var(--factor)); }
 .dw_phone > div.dw_phone_filed > div:nth-of-type(2) ol > li.nolist::before { display: none; }
@@ -8909,7 +8909,7 @@ span.green { color: rgb(27, 188, 17); }
 .depositwithdraw .payrequest-ftbzm > :nth-child(1) > :nth-child(4) input { border-radius: calc(4px * var(--factor)); border: 1px solid rgb(16, 185, 129); background-color: rgb(239, 239, 239); width: calc(420px * var(--factor)); box-sizing: border-box; color: rgb(0, 0, 0); margin: 0 calc(5px * var(--factor)); padding-right: calc(15px * var(--factor)); text-align: right; height: 100%; }
 .depositwithdraw .payrequest-ftbzm > :nth-child(1) > :nth-child(4) input::placeholder { text-align: center; color: rgb(232, 109, 45); }
 .depositwithdraw .payrequest-ftbzm > :nth-child(2) { display: flex; flex-flow: row; align-items: flex-end; justify-content: center; }
-.depositwithdraw .payrequest-ftbzm > :nth-child(2) button { width: calc(221px * var(--factor)); height: calc(30px * var(--factor)); border-radius: calc(4px * var(--factor)); background-color: rgb(245, 55, 0); padding: 0px; margin: 0px; font-weight: 400; font-size: calc(14px * var(--factor)); user-select: none; cursor: pointer; vertical-align: middle; text-align: center; border: 0px; color: rgb(255, 255, 255); text-transform: uppercase; transition: background-color 0.5s; }
+.depositwithdraw .payrequest-ftbzm > :nth-child(2) button { width: calc(221px * var(--factor)); height: calc(30px * var(--factor)); border-radius: calc(4px * var(--factor)); background-color: rgb(5, 150, 105); padding: 0px; margin: 0px; font-weight: 400; font-size: calc(14px * var(--factor)); user-select: none; cursor: pointer; vertical-align: middle; text-align: center; border: 0px; color: rgb(255, 255, 255); text-transform: uppercase; transition: background-color 0.5s; }
 .depositwithdraw .payrequest-ftbzm > :nth-child(2) button:hover { background-color: rgba(255, 255, 255, 0.2); }
 .depositwithdraw .payrequest-ftbzm .money { color: rgb(232, 109, 45); font-weight: 400; background: rgb(79, 81, 94); width: calc(102px * var(--factor)); display: inline-block; text-align: center; border-radius: calc(4px * var(--factor)); margin: 0 calc(5px * var(--factor)); }
 .depositwithdraw .payrequest-ftbzm .currency { font-weight: 700; }
@@ -8951,7 +8951,7 @@ span.green { color: rgb(27, 188, 17); }
 .dw_cardChoose > div > div.newOne, .dw_cardChoose > div > label.newOne { width: calc(380px * var(--factor)); text-transform: uppercase; font-weight: 500; }
 .dw_cardChoose > div > div:hover, .dw_cardChoose > div > label:hover { color: rgb(16, 185, 129); }
 .dw_cardChoose > div > label { cursor: pointer; }
-:root { --brand-500: #10b981; --brand-600: #e45a00; --brand-700: #cc4f00; --brand-800: #a24200; --brand-900: #7a3300; --brand-glow: rgba(16, 185, 129, .35); }
+:root { --brand-500: #10b981; --brand-600: #059669; --brand-700: #cc4f00; --brand-800: #a24200; --brand-900: #7a3300; --brand-glow: rgba(16, 185, 129, .35); }
 
 
 
