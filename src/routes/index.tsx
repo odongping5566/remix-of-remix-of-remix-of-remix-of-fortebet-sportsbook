@@ -4,7 +4,14 @@ import capturedCSS from "../styles/site.css?raw";
 const ImportedNativeTag0 = "sbticket" as import("react").ElementType;
 
 export const Route = createFileRoute("/")({
-  head: () => ({ meta: [{ title: "Fortebet - Play for million now!" }] }),
+  head: () => ({ meta: [
+    { title: "Fortebet - Play for million now!" },
+    { name: "description", content: "Sports betting, live odds, virtual soccer and games at Fortebet Uganda." },
+    { property: "og:title", content: "Fortebet - Play for million now!" },
+    { property: "og:description", content: "Sports betting, live odds, virtual soccer and games at Fortebet Uganda." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary_large_image" },
+  ] }),
   staticData: { importedDocument: { html: { "lang": "en" }, body: { "data-site-import-responsive-incomplete": "scroll" } } },
   component: Index,
 });
