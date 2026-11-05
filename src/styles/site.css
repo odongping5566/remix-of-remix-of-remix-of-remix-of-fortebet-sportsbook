@@ -26,7 +26,7 @@ body {
   color: var(--color-font-main);
   height: 100%;
 }
-*{scrollbar-width:thin;scrollbar-color:#d7d7d9 transparent}*::-webkit-scrollbar{width:calc(4px * var(--factor))}*::-webkit-scrollbar-track{background:transparent}*::-webkit-scrollbar-thumb{background-color:#d7d7d9;border-radius:calc(10px * var(--factor));border:calc(3px * var(--factor)) solid transparent}@media (max-width: 3000px){:root{--factor:1;--resolution:"resolution Full HD"}}@media (min-width: 3000px){:root{--factor:2;--resolution:"resolution 4K"}}@media only screen and (max-width: 992px){:root{--mobileDisplayBlock:block}}:root{--brand-500:#00a65a;--brand-600:#006e42;--brand-700:#cc4f00;--brand-800:#a24200;--brand-900:#7a3300;--brand-glow:rgba(0, 166, 90, .35)}
+*{scrollbar-width:thin;scrollbar-color:#d7d7d9 transparent}*::-webkit-scrollbar{width:calc(4px * var(--factor))}*::-webkit-scrollbar-track{background:transparent}*::-webkit-scrollbar-thumb{background-color:#d7d7d9;border-radius:calc(10px * var(--factor));border:calc(3px * var(--factor)) solid transparent}@media (max-width: 3000px){:root{--factor:1;--resolution:"resolution Full HD"}}@media (min-width: 3000px){:root{--factor:2;--resolution:"resolution 4K"}}@media only screen and (max-width: 992px){:root{--mobileDisplayBlock:block}}:root{--brand-500:#00a65a;--brand-600:#006e42;--brand-700:#00894a;--brand-800:#006b3a;--brand-900:#004d2a;--brand-glow:rgba(0, 166, 90, .35)}
 
 
 .devBumpContainer > div { display: none; font-size: 11px; }
@@ -8951,7 +8951,7 @@ span.green { color: rgb(27, 188, 17); }
 .dw_cardChoose > div > div.newOne, .dw_cardChoose > div > label.newOne { width: calc(380px * var(--factor)); text-transform: uppercase; font-weight: 500; }
 .dw_cardChoose > div > div:hover, .dw_cardChoose > div > label:hover { color: rgb(0, 166, 90); }
 .dw_cardChoose > div > label { cursor: pointer; }
-:root { --brand-500: #00a65a; --brand-600: #006e42; --brand-700: #cc4f00; --brand-800: #a24200; --brand-900: #7a3300; --brand-glow: rgba(0, 166, 90, .35); }
+:root { --brand-500: #00a65a; --brand-600: #006e42; --brand-700:#00894a; --brand-800:#006b3a; --brand-900:#004d2a; --brand-glow: rgba(0, 166, 90, .35); }
 
 
 
@@ -9474,3 +9474,5 @@ svg.leaflet-zoom-animated { will-change: transform; }
 
 [_nghost-oky-c201] { display: none; }
 
+
+.odds, .odds *{color:#22d47e}
