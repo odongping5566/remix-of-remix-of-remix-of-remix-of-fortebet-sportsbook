@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { queryOptions, useQuery } from "@tanstack/react-query";
-import { Link } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 import { getHomeData, getLiveData, getEventDetail, type Match } from "@/lib/fortebet.functions";
 
 // ---------- Live data (Fortebet feeds) ----------
@@ -246,6 +246,8 @@ export function useSels() {
 
 export function LivePreviewList({ sels, toggle }: { sels: Sel[]; toggle: (s: Sel) => void }) {
   const q = useQuery(liveQuery);
+  const nav = useNavigate();
+  const go = (id: string) => nav({ to: "/live/event/$id", params: { id } });
   const [statsId, setStatsId] = useState<string | null>(null);
   const list: Match[] = q.data?.matches ?? [];
   const groups: [string, Match[]][] = [];
@@ -278,14 +280,14 @@ export function LivePreviewList({ sels, toggle }: { sels: Sel[]; toggle: (s: Sel
             </div>
             {ms.map((m) => (
               <div key={m.id} className="data match [font-weight:700]">
-                <Link to="/live/event/$id" params={{ id: m.id }} className="matchInfo curPointer" style={{ color: "inherit" }}>
+                <div className="matchInfo curPointer" onClick={() => go(m.id)}>
                   <div className="app-widget-event-set">
                     <div className="starFavorite"><span className="ico chart h13 opa06 curPointer" role="button" aria-label="Match statistics" style={{ display: "inline-block", minWidth: 14, minHeight: 13 }} onClick={(e) => { e.preventDefault(); e.stopPropagation(); setStatsId(m.id); }} /></div>
                     <div className="teamsName"><span> {m.home} </span><span> {m.away} </span></div>
                     <div className="teamsScore"><div>{m.score ?? "0 : 0"}</div><div /></div>
                     <div className="status"><i>{m.status ?? "Live"}</i></div>
                   </div>
-                </Link>
+                </div>
                 <div className="app-widget-market-set">
                   {[0, 1].map((g) => (
                     <div className="odds" key={g}>
@@ -303,13 +305,25 @@ export function LivePreviewList({ sels, toggle }: { sels: Sel[]; toggle: (s: Sel
                     </div>
                   ))}
                 </div>
-                <Link to="/live/event/$id" params={{ id: m.id }} className="curPointer" style={{ color: "inherit" }}> +{m.extra} </Link>
+                <div className="curPointer" onClick={() => go(m.id)}> +{m.extra} </div>
               </div>
             ))}
           </div>
         ))}
       </div>
       {statsId && <StatsModal id={statsId} live onClose={() => setStatsId(null)} />}
+    </div>
+  );
+}
+
+export function LiveEventHeader({ id, onBack }: { id: string; onBack: () => void }) {
+  const q = useQuery(liveQuery);
+  const m = q.data?.matches.find((x) => x.id === id);
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 14, padding: "10px 12px", background: "rgba(255,255,255,0.08)", color: "#e6e6e8", fontWeight: 700, fontSize: 13 }}>
+      <a className="curPointer" onClick={onBack} style={{ color: "#22d47e" }}>← Back</a>
+      <span style={{ flex: 1 }}>{m ? `${m.home} - ${m.away}` : "Live match"}</span>
+      {m && <span><span style={{ color: "#22d47e" }}>{m.score ?? "0:0"}</span> · {m.status ?? "Live"}</span>}
     </div>
   );
 }

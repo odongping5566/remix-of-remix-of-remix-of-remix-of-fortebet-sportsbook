@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { LiveShell } from "@/components/live-shell";
-import { EventDetail, BetSlip, useSels } from "@/components/fortebet-live";
+import { EventDetail, LiveEventHeader, BetSlip, useSels } from "@/components/fortebet-live";
 
 export const Route = createFileRoute("/live_/event_/$id")({
   head: () => ({ meta: [
@@ -20,6 +20,7 @@ function LiveEventPage() {
   const s = useSels();
   return (
     <LiveShell slip={<BetSlip title="Live" sels={s.sels} remove={s.remove} clear={s.clear} />}>
+      <LiveEventHeader id={id} onBack={() => nav({ to: "/live/preview" })} />
       <EventDetail id={id} live onClose={() => nav({ to: "/live/preview" })} sels={s.sels} toggle={s.toggle} />
     </LiveShell>
   );
