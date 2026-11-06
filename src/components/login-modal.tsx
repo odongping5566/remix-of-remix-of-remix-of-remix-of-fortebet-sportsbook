@@ -65,6 +65,7 @@ export function LoginModal() {
           type="button"
           aria-label="Close"
           onClick={closeLogin}
+          style={{ background: "transparent", border: 0 }}
           className="absolute right-3 top-3 grid border-0 bg-transparent size-8 cursor-pointer place-items-center rounded text-site-import-muted-foreground hover:bg-white/10 hover:text-white"
         >
           <X size={18} />
@@ -114,6 +115,7 @@ export function LoginModal() {
                 autoComplete="off"
                 placeholder="07XXXXXXXX"
                 aria-invalid={!!errors.username}
+                style={{ boxSizing: "border-box", width: "100%" }}
               />
               {errors.username && <p className="mt-1 text-xs text-red-400">{errors.username}</p>}
             </div>
@@ -132,11 +134,13 @@ export function LoginModal() {
                   autoComplete="off"
                   placeholder="Password"
                   aria-invalid={!!errors.password}
+                  style={{ boxSizing: "border-box", width: "100%" }}
                 />
                 <button
                   type="button"
                   aria-label={show ? "Hide password" : "Show password"}
                   onClick={() => setShow((s) => !s)}
+                  style={{ background: "transparent", border: 0 }}
                   className="absolute right-2 top-1/2 grid border-0 bg-transparent size-8 -translate-y-1/2 cursor-pointer place-items-center text-site-import-muted-foreground hover:text-white"
                 >
                   {show ? <EyeOff size={18} /> : <Eye size={18} />}
@@ -147,6 +151,7 @@ export function LoginModal() {
 
             <button
               type="submit"
+              style={{ border: 0 }}
               className="h-11 w-full cursor-pointer rounded-md border-0 bg-brand-500 text-sm font-black uppercase text-white hover:bg-brand-700"
             >
               Login
@@ -156,7 +161,7 @@ export function LoginModal() {
               <a href={OFFICIAL} target="_blank" rel="noopener noreferrer" className="text-site-import-muted-foreground underline hover:text-white">
                 Forgot password?
               </a>
-              <a href={OFFICIAL} target="_blank" rel="noopener noreferrer" className="font-bold !text-brand-500 hover:underline">
+              <a href={OFFICIAL} target="_blank" rel="noopener noreferrer" style={{ color: "var(--brand-500)" }} className="font-bold hover:underline">
                 Register
               </a>
             </div>
