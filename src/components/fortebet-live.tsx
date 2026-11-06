@@ -186,7 +186,7 @@ export function MatchesPanel({ mode, sels, toggle }: { mode: "home" | "live"; se
   );
 }
 
-export function BetSlip({ sels, remove, clear, title = "Sportsbook" }: { sels: Sel[]; remove: (k: string) => void; clear: () => void; title?: string }) {
+export function BetSlip({ sels, remove, clear, title = "Sportsbook", active = 0, setActive, counts }: { sels: Sel[]; remove: (k: string) => void; clear: () => void; title?: string; active?: number; setActive?: (i: number) => void; counts?: number[] }) {
   const [stake, setStake] = useState(2000);
   const total = sels.reduce((a, s) => a * s.odds, 1);
   const G = "rgb(0,166,90)";
@@ -201,7 +201,7 @@ export function BetSlip({ sels, remove, clear, title = "Sportsbook" }: { sels: S
     <div className="ticket">
       <div className="ticketHead"> Bet slip - {title} <div /></div>
       <div className="betSlipMenu" style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <div><a className="active"> 1 <span>{sels.length}</span></a><a> 2 <span>0</span></a><a> 3 <span>0</span></a><a> 4 <span>0</span></a></div>
+        <div>{[0, 1, 2, 3].map((i) => <a key={i} className={`curPointer ${i === active ? "active" : ""}`} onClick={() => setActive?.(i)}> {i + 1} <span>{counts?.[i] ?? (i === active ? sels.length : 0)}</span></a>)}</div>
         {sels.length > 0 && <a className="curPointer" onClick={clear} aria-label="Clear ticket" style={{ fontSize: 18, color: "#777", paddingRight: 6 }}>🗑</a>}
       </div>
       {sels.length === 0 ? (
@@ -275,10 +275,15 @@ export function StatsModal({ id, onClose }: { id: string; live?: boolean; onClos
 }
 
 export function useSels() {
-  const [sels, setSels] = useState<Sel[]>([]);
+  const [tickets, setTickets] = useState<Sel[][]>([[], [], [], []]);
+  const [active, setActive] = useState(0);
+  const upd = (fn: (s: Sel[]) => Sel[]) => setTickets((t) => t.map((x, i) => (i === active ? fn(x) : x)));
   const toggle = (sel: Sel) =>
-    setSels((s) => (s.some((x) => x.key === sel.key) ? s.filter((x) => x.key !== sel.key) : [...s.filter((x) => x.eventId !== sel.eventId), sel]));
-  return { sels, toggle, remove: (k: string) => setSels((s) => s.filter((x) => x.key !== k)), clear: () => setSels([]) };
+    upd((s) => (s.some((x) => x.key === sel.key) ? s.filter((x) => x.key !== sel.key) : [...s.filter((x) => x.eventId !== sel.eventId), sel]));
+  return {
+    sels: tickets[active] ?? [], toggle, active, setActive, counts: tickets.map((t) => t.length),
+    remove: (k: string) => upd((s) => s.filter((x) => x.key !== k)), clear: () => upd(() => []),
+  };
 }
 
 export function LivePreviewList({ sels, toggle }: { sels: Sel[]; toggle: (s: Sel) => void }) {
