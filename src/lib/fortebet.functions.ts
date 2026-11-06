@@ -462,6 +462,21 @@ export const getCasinoJackpots = createServerFn({ method: "GET" }).handler(async
   }
 });
 
+export type CasinoWinner = { nickname: string; game: string; image: string; win: number };
+
+/** Latest big casino wins (nicknames already masked by Fortebet). Fortebet caches this list for 60 s. */
+export const getCasinoWinners = createServerFn({ method: "GET" }).handler(async (): Promise<{ winners: CasinoWinner[] }> => {
+  try {
+    const j = await postJson("/casino/winners", {}, 60_000);
+    return {
+      winners: (j?.data ?? []).map((x: Raw) => ({ nickname: String(x.nickname ?? ""), game: String(x.game ?? ""), image: String(x.image ?? ""), win: Number(x.win) || 0 })),
+    };
+  } catch (e) {
+    console.error("casino winners failed", e);
+    return { winners: [] };
+  }
+});
+
 /** Starts a game exactly like Fortebet's "play-game" call. Without a signed-in Fortebet session only fun (demo) mode is allowed. */
 export const playCasinoGame = createServerFn({ method: "POST" })
   .inputValidator((d: { gameId: number; mode: "fun" | "real"; backUrl: string }) => {
