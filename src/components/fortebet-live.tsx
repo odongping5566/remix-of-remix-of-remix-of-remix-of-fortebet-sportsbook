@@ -94,21 +94,23 @@ export function OddBtn({ cell, at, mk, sels, toggle, info, variant = "grid", lab
   const usable = !!cell && !locked && !!v;
   const click = () => usable && toggle({ key: String(cell!.id), oddsId: cell!.id, odds: v!, at: Date.now(), ...info });
   const arrow = dir ? <span style={{ color: on ? "#fff" : dir === "up" ? UP : DOWN, fontSize: "0.75em", marginLeft: 2 }}>{dir === "up" ? "▲" : "▼"}</span> : null;
-  const text = !cell ? " - " : locked ? <LockIcon size={12} /> : v ? v.toFixed(2) : " - ";
-  const flash: CSSProperties | undefined = dir && !on ? { boxShadow: `inset 0 0 0 1px ${dir === "up" ? UP : DOWN}` } : undefined;
+  // Any odd without a usable price ("-") is shown as suspended with the padlock.
+  const shut = !usable;
+  const text = shut ? <LockIcon size={12} /> : v!.toFixed(2);
+  const flash: CSSProperties | undefined = dir && !on && !shut ? { boxShadow: `inset 0 0 0 1px ${dir === "up" ? UP : DOWN}` } : undefined;
   if (variant === "chip") {
     return (
-      <div className="curPointer" onClick={click}
-        style={{ display: "flex", justifyContent: "space-between", gap: 8, padding: "6px 10px", background: on ? G : locked ? "#25262c" : "#2a2c33", color: on ? "#fff" : locked ? "#8b8d96" : "#e6e6e8", fontWeight: 700, textTransform: "uppercase", cursor: usable ? "pointer" : "not-allowed", ...flash }}>
-        <span>{label}</span><b style={{ color: on ? "#fff" : UP, whiteSpace: "nowrap" }}>{text}{arrow}</b>
+      <div className="curPointer" onClick={click} aria-label={shut ? "Suspended" : undefined}
+        style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8, padding: "6px 10px", background: on ? G : shut ? "#25262c" : "#2a2c33", color: on ? "#fff" : shut ? "#8b8d96" : "#e6e6e8", fontWeight: 700, textTransform: "uppercase", cursor: usable ? "pointer" : "not-allowed", ...flash }}>
+        <span>{label}</span><b style={{ color: on ? "#fff" : UP, whiteSpace: "nowrap", display: "inline-flex", alignItems: "center" }}>{text}{!shut && arrow}</b>
       </div>
     );
   }
   return (
-    <div className={`curPointer ${favorite && !on ? "favorite" : ""} ${on ? "selected" : ""}`}
-      style={{ ...(on ? { background: G, color: "#fff" } : {}), ...flash, ...(locked ? { background: "#25262c", cursor: "not-allowed", display: "flex", alignItems: "center", justifyContent: "center" } : {}) }}
+    <div className={`curPointer ${favorite && !on ? "favorite" : ""} ${on ? "selected" : ""}`} aria-label={shut ? "Suspended" : undefined}
+      style={{ ...(on ? { background: G, color: "#fff" } : {}), ...flash, ...(shut ? { background: "#25262c", cursor: "not-allowed", display: "flex", alignItems: "center", justifyContent: "center" } : {}) }}
       onClick={click}>
-      {cell ? <> {text}{arrow} </> : " - "}
+      {shut ? text : <> {text}{arrow} </>}
     </div>
   );
 }
