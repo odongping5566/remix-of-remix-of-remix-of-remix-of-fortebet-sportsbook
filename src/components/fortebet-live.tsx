@@ -1,6 +1,5 @@
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState, type CSSProperties } from "react";
 import { queryOptions, useQuery } from "@tanstack/react-query";
-import { useNavigate } from "@tanstack/react-router";
 import { getHomeData, getLiveData, getEventDetail, type Match } from "@/lib/fortebet.functions";
 
 // ---------- Live data (Fortebet feeds) ----------
@@ -163,7 +162,6 @@ export function MatchesPanel({ mode, sels, toggle }: { mode: "home" | "live"; se
   const [open, setOpen] = useState<string | null>(null);
   const [statsId, setStatsId] = useState<string | null>(null);
   useEffect(() => setOpen(null), [mode]);
-  if (open) return <EventDetail id={open} live={mode === "live"} onClose={() => setOpen(null)} sels={sels} toggle={toggle} />;
   const tabs = mode === "live" ? ["LIVE MATCHES"] : ["MOST POPULAR MATCHES", "SOCCER ODDS UNDER 1.30", "LOW SOCCER ODDS (1.31 - 1.50)"];
   const q = mode === "live" ? live : home;
   const list: Match[] = mode === "live" ? live.data?.matches ?? [] : home.data ? [home.data.popular, home.data.under130, home.data.low][tab] ?? [] : [];
@@ -179,7 +177,7 @@ export function MatchesPanel({ mode, sels, toggle }: { mode: "home" | "live"; se
       {q.isLoading && <div className="offerHead"><div>Loading matches…</div></div>}
       {q.isError && <div className="offerHead"><div>Could not load matches. Retrying…</div></div>}
       {!q.isLoading && list.length === 0 && !q.isError && <div className="offerHead"><div>No matches right now.</div></div>}
-      {list.slice(0, limit).map((m) => <MatchRow key={m.id} m={m} sels={sels} toggle={toggle} open={setOpen} stats={setStatsId} />)}
+      {list.slice(0, limit).map((m) => <Fragment key={m.id}><MatchRow m={m} sels={sels} toggle={toggle} open={(id) => setOpen((o) => (o === id ? null : id))} stats={setStatsId} />{open === m.id && <MarketsDropdown id={m.id} live={mode === "live"} sels={sels} toggle={toggle} />}</Fragment>)}
       {statsId && <StatsModal id={statsId} live={mode === "live"} onClose={() => setStatsId(null)} />}
       <div className="offerButtons">
         {limit < list.length && <div className="buttons empty"><a className="curPointer" onClick={() => setLimit((l) => l + 10)}>SHOW MORE</a></div>}
@@ -246,8 +244,8 @@ export function useSels() {
 
 export function LivePreviewList({ sels, toggle }: { sels: Sel[]; toggle: (s: Sel) => void }) {
   const q = useQuery(liveQuery);
-  const nav = useNavigate();
-  const go = (id: string) => nav({ to: "/live/event/$id", params: { id } });
+  const [open, setOpen] = useState<string | null>(null);
+  const go = (id: string) => setOpen((o) => (o === id ? null : id));
   const [statsId, setStatsId] = useState<string | null>(null);
   const list: Match[] = q.data?.matches ?? [];
   const groups: [string, Match[]][] = [];
@@ -279,7 +277,8 @@ export function LivePreviewList({ sels, toggle }: { sels: Sel[]; toggle: (s: Sel
               <div />
             </div>
             {ms.map((m) => (
-              <div key={m.id} className="data match [font-weight:700]">
+              <div key={m.id} style={{ display: "contents" }}>
+              <div className="data match [font-weight:700]">
                 <div className="matchInfo curPointer" onClick={() => go(m.id)}>
                   <div className="app-widget-event-set">
                     <div className="starFavorite"><span className="ico chart h13 opa06 curPointer" role="button" aria-label="Match statistics" style={{ display: "inline-block", minWidth: 14, minHeight: 13 }} onClick={(e) => { e.preventDefault(); e.stopPropagation(); setStatsId(m.id); }} /></div>
@@ -307,6 +306,8 @@ export function LivePreviewList({ sels, toggle }: { sels: Sel[]; toggle: (s: Sel
                 </div>
                 <div className="curPointer" onClick={() => go(m.id)}> +{m.extra} </div>
               </div>
+              {open === m.id && <MarketsDropdown id={m.id} live sels={sels} toggle={toggle} />}
+              </div>
             ))}
           </div>
         ))}
@@ -324,6 +325,46 @@ export function LiveEventHeader({ id, onBack }: { id: string; onBack: () => void
       <a className="curPointer" onClick={onBack} style={{ color: "#22d47e" }}>← Back</a>
       <span style={{ flex: 1 }}>{m ? `${m.home} - ${m.away}` : "Live match"}</span>
       {m && <span><span style={{ color: "#22d47e" }}>{m.score ?? "0:0"}</span> · {m.status ?? "Live"}</span>}
+    </div>
+  );
+}
+
+export function MarketsDropdown({ id, live, sels, toggle }: { id: string; live: boolean; sels: Sel[]; toggle: (s: Sel) => void }) {
+  const q = useQuery({ queryKey: ["fb-ev", id, live], queryFn: () => getEventDetail({ data: { id, live } }), refetchInterval: live ? 10_000 : 20_000 });
+  const ev = q.data;
+  const [closed, setClosed] = useState<number[]>([]);
+  const box: CSSProperties = { display: "block", height: "auto", gridColumn: "1 / -1", width: "100%", background: "#2e3139", color: "#e6e6e8", fontSize: 12, padding: "4px 6px 8px", marginBottom: 2 };
+  if (q.isLoading) return <div style={box}>Loading odds…</div>;
+  if (q.isError || !ev) return <div style={box}>Odds for this match are not available right now.</div>;
+  return (
+    <div style={box}>
+      {ev.markets.map((mk, mi) => {
+        const isClosed = closed.includes(mi);
+        const cols = mk.outcomes.length % 3 === 0 && mk.outcomes.length <= 9 ? 3 : 2;
+        return (
+          <div key={mi} style={{ display: "block", height: "auto", background: "#3a3d47", marginTop: 6, borderRadius: 2 }}>
+            <div className="curPointer" onClick={() => setClosed((c) => (isClosed ? c.filter((x) => x !== mi) : [...c, mi]))}
+              style={{ display: "flex", justifyContent: "space-between", padding: "8px 10px", fontWeight: 700, textTransform: "uppercase" }}>
+              <span>{mk.name}</span><span>{isClosed ? "▾" : "▴"}</span>
+            </div>
+            {!isClosed && (
+              <div style={{ display: "grid", gridTemplateColumns: `repeat(${cols}, 1fr)`, gap: 3, padding: "0 10px 10px" }}>
+                {mk.outcomes.map((o, oi) => {
+                  const key = `${id}-m${mi}-${oi}`;
+                  const on = sels.some((x) => x.key === key);
+                  return (
+                    <div key={oi} className="curPointer"
+                      onClick={() => o.odds && toggle({ key, eventId: id, match: `${ev.home} - ${ev.away}`, pick: `${mk.name}: ${o.name}`, odds: o.odds })}
+                      style={{ display: "flex", justifyContent: "space-between", gap: 8, padding: "6px 10px", background: on ? "rgb(0,166,90)" : "#2a2c33", color: on ? "#fff" : "#e6e6e8", fontWeight: 700, textTransform: "uppercase" }}>
+                      <span>{o.name}</span><b style={{ color: on ? "#fff" : "#22d47e" }}>{o.odds ? o.odds.toFixed(2) : "-"}</b>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 }
