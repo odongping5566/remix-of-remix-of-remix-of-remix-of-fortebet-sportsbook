@@ -739,27 +739,27 @@ function EventDetail({ id, live, onClose, sels, toggle }: { id: string; live: bo
         <div className="active"><a>{ev ? `${ev.home} - ${ev.away}` : "Loading…"}</a></div>
         <div><a onClick={onClose} className="curPointer">← BACK</a></div>
       </div>
-      <iframe
-        title="Match tracker"
-        src={`https://fortebet-ug.24liveresults.com/match-widget/${num}?displayMode=kiosk&utm_source=fortebet&utm_medium=web&utm_campaign=match_detail&language=en&lang=en`}
-        style={{ width: "100%", height: 420, border: 0, display: "block" }}
-      />
+      <div className="offerHead" style={{ justifyContent: "space-between" }}>
+        <div>{ev ? `${ev.league} · ${fmtTime(ev.startTs).day} ${fmtTime(ev.startTs).time}` : ""}</div>
+        <div><a href={`https://fortebet-ug.24liveresults.com/match-widget/${num}?displayMode=kiosk&utm_source=fortebet&utm_medium=web&utm_campaign=match_detail&language=en&lang=en`} target="_blank" rel="noopener noreferrer" className="textOrange">Match statistics ↗</a></div>
+      </div>
       {q.isError && <div className="offerHead"><div>Odds for this match are not available right now.</div></div>}
       {ev?.markets.map((mk, mi) => (
         <div key={mi}>
           <div className="offerHead"><div>{mk.name}</div></div>
-          <div className="offerMatch" style={{ flexWrap: "wrap" }}>
-            <div className="app-widget-market-set" style={{ flexWrap: "wrap", width: "100%" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(170px, 1fr))", gap: 6, padding: 8 }}>
+            <div style={{ display: "contents" }}>
               {mk.outcomes.map((o, oi) => {
                 const key = `${id}-m${mi}-${oi}`;
                 const on = sels.some((s) => s.key === key);
                 return (
-                  <div className="odds" key={oi} style={{ width: "auto", minWidth: 120 }}>
+                  <div key={oi}>
                     <div
-                      style={on ? { background: "rgb(0,166,90)", color: "#fff" } : undefined}
+                      className="curPointer"
+                      style={{ display: "flex", justifyContent: "space-between", gap: 8, padding: "8px 10px", borderRadius: 3, background: on ? "rgb(0,166,90)" : "rgba(255,255,255,0.06)", color: on ? "#fff" : "#c9c9cb", fontSize: 13 }}
                       onClick={() => o.odds && toggle({ key, eventId: id, match: `${ev.home} - ${ev.away}`, pick: `${mk.name}: ${o.name}`, odds: o.odds })}
                     >
-                      {o.name} <b>{o.odds ? o.odds.toFixed(2) : "-"}</b>
+                      <span>{o.name}</span> <b style={{ color: on ? "#fff" : "#22d47e" }}>{o.odds ? o.odds.toFixed(2) : "-"}</b>
                     </div>
                   </div>
                 );

@@ -60,7 +60,7 @@ function buildMatches(d: Raw, ids: string[]): Match[] {
       extra: Math.max(0, (e.marketCount ?? 1) - 1),
       odds,
       score: sb && sb.h != null ? `${sb.hg ?? sb.h}:${sb.ag ?? sb.a}` : undefined,
-      status: e.scoreboard?.status?.status ?? undefined,
+      status: e.scoreboard?.status?.status ? String(e.scoreboard.status.status).replace(/_/g, " ") : undefined,
     });
   }
   return out;
@@ -124,13 +124,13 @@ export const getEventDetail = createServerFn({ method: "GET" })
     const f = full.data;
     const home = f.competitors?.[e.competitors?.[0]]?.name ?? "Home";
     const away = f.competitors?.[e.competitors?.[1]]?.name ?? "Away";
-    const fill = (s: string) =>
-      s.replace(/\{\$competitor1\}/g, home).replace(/\{\$competitor2\}/g, away).replace(/\{\$?(\w+)\}/g, "$1");
     const t = f.tournament?.[e.tournamentId];
     const c = t ? f.category?.[t.categoryId] : null;
+    const fill = (s: string) =>
+      s.replace(/\{\$competitor1\}/g, home).replace(/\{\$competitor2\}/g, away).replace(/\{\$?(\w+)\}/g, "$1");
     const markets: (MarketDTO & { order: number })[] = Object.values<Raw>(e.markets ?? {}).map((m) => {
-      const def = f.market_list?.[m.marketId] ?? {};
-      const spec = m.specifiers ? ` (${String(m.specifiers).split("|").map((p: string) => p.split("=")[1]).join(", ")})` : "";
+      const def = f.market_list?.[String(c?.sportId ?? 1)]?.[m.marketId] ?? {};
+      const spec = m.specifiers ? ` (${String(m.specifiers).split("|").map((p: string) => (p.split("=")[1] ?? "").replace(/^sr:[a-z_]+:/, "").replace(/_/g, " ")).join(", ")})` : "";
       const outcomes = Object.values<Raw>(m.odds)
         .map((o) => {
           const od = def.outcome?.[o.outcomeId];
