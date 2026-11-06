@@ -293,6 +293,10 @@ export type TicketItemDTO = {
   result: string | null;
   status: string; // WIN | LOST | VOID | OPEN ...
   live: boolean;
+  /** Match was still running when the ticket was cashed out. */
+  cashedOut: boolean;
+  /** Odds this pick counted at the cashout moment. */
+  cashoutOdds: number | null;
 };
 export type TicketDTO = {
   number: string;
@@ -312,7 +316,7 @@ export type TicketDTO = {
   shortNumber: number;
   vipPoints: number;
   /** Set when the ticket was cashed out; type "FCO" means Fair Cashout. */
-  cashout: { type: string; fee: number; feeRate: number } | null;
+  cashout: { type: string; fee: number; feeRate: number; totalOdds: number | null } | null;
   items: TicketItemDTO[];
 };
 export type TicketResult = { ok: true; ticket: TicketDTO } | { ok: false; error: "SHORT" | "NOT_FOUND" | "UNAVAILABLE" };
@@ -342,10 +346,12 @@ export const checkTicket = createServerFn({ method: "POST" })
         league: [i.category, i.tournament].filter(Boolean).join(" / "),
         market: String(i.market ?? "").replace(/\s+/g, " ").trim(),
         outcome: String(i.outcome ?? "").replace(/\s+/g, " ").trim(),
-        odds: Number(i.oddsPayout ?? i.odds) || 0,
+        odds: Number(i.odds ?? i.oddsPayout) || 0,
         result: i.result ? String(i.result) : null,
         status: String(i.statusReal ?? i.status ?? "OPEN").toUpperCase(),
         live: !!i.live || i.offer?.offerMode === "live",
+        cashedOut: String(i.status ?? "").toUpperCase() === "CASHOUT",
+        cashoutOdds: i.oddsInCashoutTime != null ? Number(i.oddsInCashoutTime) : null,
       }));
       const lives = items.filter((i) => i.live).length;
       const mode: TicketDTO["mode"] = virtual ? "VIRTUAL" : lives === 0 ? "PREMATCH" : lives === items.length ? "LIVE" : "MIXED";
@@ -370,7 +376,7 @@ export const checkTicket = createServerFn({ method: "POST" })
           shortNumber: Number(d.shortNumber) || 0,
           vipPoints: Number(f.bonus_vip_points ?? d.bonuses?.vip_points?.value) || 0,
           cashout: f.cashout || String(d.status ?? "").toUpperCase() === "CASHOUT"
-            ? { type: String(f.cashout_type ?? ""), fee: Number(f.cashout_fee) || 0, feeRate: Number(f.cashout_fee_rate ?? f.casouht_fee_rate ?? d.cashout?.fco?.feeRate) || 0 }
+            ? { type: String(f.cashout_type ?? ""), fee: Number(f.cashout_fee) || 0, feeRate: Number(f.cashout_fee_rate ?? f.casouht_fee_rate ?? d.cashout?.fco?.feeRate) || 0, totalOdds: d.totalOddsInCashoutTime != null ? Number(d.totalOddsInCashoutTime) : null }
             : null,
           items,
         },
