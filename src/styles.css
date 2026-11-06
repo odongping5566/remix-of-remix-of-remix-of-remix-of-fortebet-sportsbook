@@ -329,7 +329,27 @@
 body:has(.virtual-viewer) #app-header .header { background: var(--brand-500); }
 .virtual-ticket > div:first-child { color: var(--brand-600); }
 .virtual-ticket .virtual-ticket-content-empty { color: var(--account-ink); }
+body:has(.virtual-viewer) .virtual-header-clock { display: flex; align-items: center; gap: 6px; white-space: nowrap; font-variant-numeric: tabular-nums; margin-left: 24px; margin-right: 12px; }
+body:has(.virtual-viewer) .virtual-soccer-offer-header > div:first-child > span:last-child { min-width: 54px; font-size: 20px; font-variant-numeric: tabular-nums; }
+#app-content-main button.virtual-odd-display { height: 30px; border: 1px solid transparent; border-radius: 0; font-size: 12px; font-weight: 400; background: var(--virtual-field); color: var(--virtual-text); }
+#app-content-main button.virtual-odd-display:hover { border-color: var(--brand-500); }
+#app-content-main button.virtual-odd-display[aria-pressed="true"] { background: var(--brand-500); color: var(--virtual-text); }
+#app-content-main button.virtual-odd-display[aria-pressed="true"] strong { color: var(--virtual-text); }
+.virtual-view-stage { width: 277px; height: 242px; position: relative; }
+.virtual-view-stage .virtual-view-frame { width: 277px; height: 242px; transform-origin: top left; }
+.virtual-viewer.is-expanded { position: relative; z-index: 20; }
+.virtual-viewer.is-expanded .virtual-view-stage { width: 554px; height: 484px; margin-left: -277px; }
+.virtual-viewer.is-expanded .virtual-view-frame { transform: scale(2); }
+.virtual-slip-preview { padding: 10px; color: var(--account-ink); font-size: 12px; }
+.virtual-slip-pick { border-bottom: 1px solid var(--account-line); padding: 6px 0; }
+.virtual-slip-pick button { border: 0; background: transparent; color: var(--account-ink); width: 24px; height: 24px; padding: 3px; }
+.virtual-slip-pick svg { fill: none; stroke: currentColor; }
+.virtual-stake { width: 110px; box-sizing: border-box; border: 1px solid var(--account-line); border-radius: 4px; background: var(--account-field); color: var(--account-ink); padding: 6px; }
+.virtual-slip-preview .virtual-clear { width: 100%; border: 1px solid var(--account-line); background: var(--account-field); color: var(--account-ink); }
 @media (max-width: 800px) {
+  .virtual-view-stage { width: 100%; overflow: hidden; }
+  .virtual-viewer.is-expanded .virtual-view-stage { width: 100%; height: 242px; margin-left: 0; }
+  .virtual-viewer.is-expanded .virtual-view-frame { transform: none; }
   body:has(.virtual-viewer) #mainContainer { grid-template-columns: 8px minmax(0, 1fr) 8px; grid-template-rows: auto 50px 1fr auto; }
   body:has(.virtual-viewer) #app-header .header { flex-wrap: wrap; height: auto; gap: 8px; padding: 10px 8px; }
   body:has(.virtual-viewer) #app-header .header > div:first-of-type { display: none; }
