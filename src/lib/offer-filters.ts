@@ -1,12 +1,12 @@
 import type { Cell, Offer, OfferEvent } from "./fortebet.functions";
 
-export type DateKey = "ALL" | "TODAY" | "TOMORROW" | "H3" | "H6" | "CAL";
+export type DateKey = "ALL" | "TODAY" | "TOMORROW" | "H1" | "H3" | "H6" | "CAL";
 export const DATE_FILTERS: { key: DateKey; label: string }[] = [
   { key: "TODAY", label: "Today" },
   { key: "TOMORROW", label: "Tomorrow" },
   { key: "ALL", label: "All" },
+  { key: "H1", label: "1 Hour" },
   { key: "H3", label: "3 Hours" },
-  { key: "H6", label: "6 Hours" },
 ];
 export const ODDS_MIN = 1;
 export const ODDS_MAX = 1000;
@@ -37,6 +37,8 @@ export function passDate(startIso: string, date: DateKey, cal: string, now = Dat
       return t < today + DAY;
     case "TOMORROW":
       return t >= today + DAY && t < today + 2 * DAY;
+    case "H1":
+      return t <= now + 36e5;
     case "H3":
       return t <= now + 3 * 36e5;
     case "H6":
