@@ -308,6 +308,11 @@ export type TicketDTO = {
   tax: number;
   payout: number;
   possible: number;
+  /** Short number printed on the ticket (e.g. 609); 0 when none. */
+  shortNumber: number;
+  vipPoints: number;
+  /** Set when the ticket was cashed out; type "FCO" means Fair Cashout. */
+  cashout: { type: string; fee: number; feeRate: number } | null;
   items: TicketItemDTO[];
 };
 export type TicketResult = { ok: true; ticket: TicketDTO } | { ok: false; error: "SHORT" | "NOT_FOUND" | "UNAVAILABLE" };
@@ -362,6 +367,11 @@ export const checkTicket = createServerFn({ method: "POST" })
           tax: Number(f.tax_out_value) || 0,
           payout: Number(f.to_pay ?? d.amountOut) || 0,
           possible: Number(d.amountPossible) || win,
+          shortNumber: Number(d.shortNumber) || 0,
+          vipPoints: Number(f.bonus_vip_points ?? d.bonuses?.vip_points?.value) || 0,
+          cashout: f.cashout || String(d.status ?? "").toUpperCase() === "CASHOUT"
+            ? { type: String(f.cashout_type ?? ""), fee: Number(f.cashout_fee) || 0, feeRate: Number(f.cashout_fee_rate ?? f.casouht_fee_rate ?? d.cashout?.fco?.feeRate) || 0 }
+            : null,
           items,
         },
       };
