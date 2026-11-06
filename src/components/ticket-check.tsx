@@ -237,7 +237,7 @@ export function TicketDetailModal({ ticket, onClose }: { ticket: TicketDTO; onCl
     <TicketSheet
       title={`${MODE_LABEL[ticket.mode]} | ${type} ${ticket.items.length} event${ticket.items.length === 1 ? "" : "s"} | ${fmtStamp(ticket.placedAt)}`}
       status={co ? (fair ? "FAIR CASHOUT" : "CASHOUT") : ticket.status}
-      shortNumber={ticket.shortNumber || undefined}
+      shortNumber={ticket.shortNumber ? String(ticket.shortNumber) : undefined}
       rows={rows}
       note={note}
       number={ticket.number}
