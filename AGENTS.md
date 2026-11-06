@@ -28,3 +28,5 @@ use the editor.
   own key and store it in Secrets.
 - **Secrets.** Lovable manages them. Do not put secret values in the repo.
 <!-- LOVABLE:END -->
+
+- Live betting data comes from the public Fortebet feeds, fetched through server functions in src/lib/fortebet.functions.ts (with a short cache) because the browser cannot call those feeds directly.
