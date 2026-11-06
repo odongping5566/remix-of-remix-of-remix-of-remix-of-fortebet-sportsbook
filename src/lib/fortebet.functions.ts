@@ -147,11 +147,11 @@ function normalise(d: Raw, at: number, live: boolean): Offer {
     for (const [mid, def] of Object.entries<Raw>(ml[sid]).sort((a, b) => (a[1].order ?? 0) - (b[1].order ?? 0))) {
       if (!def.quickFilter) continue;
       const outs = Object.entries<Raw>(def.outcome ?? {}).sort((a, b) => (a[1].order ?? 0) - (b[1].order ?? 0));
-      const short = (o: Raw, p?: string) => String(o.short ?? o.name ?? "").replace(/\{\$?total\}/g, p ?? "").trim();
+      const short = (o: Raw) => String(o.short ?? o.name ?? "").replace(/\{\$?total\}/g, "").trim();
       const label = (p?: string) => fillName(String(def.short ?? def.name), "Home", "Away").replace(/\{\$?total\}/g, "").trim() + (p ? ` ${p}` : "");
       if (def.spec?.params?.length) {
         for (const p of def.spec.params as string[]) {
-          list.push({ key: `${mid}|${def.spec.type}=${p}`, marketId: Number(mid), spec: `${def.spec.type}=${p}`, label: label(p), cols: outs.map(([, o]) => short(o, p)), outcomes: outs.map(([o]) => Number(o)) });
+          list.push({ key: `${mid}|${def.spec.type}=${p}`, marketId: Number(mid), spec: `${def.spec.type}=${p}`, label: label(p), cols: outs.map(([, o]) => short(o)), outcomes: outs.map(([o]) => Number(o)) });
         }
       } else {
         list.push({ key: mid, marketId: Number(mid), spec: "", label: label(), cols: outs.map(([, o]) => short(o)), outcomes: outs.map(([o]) => Number(o)) });
@@ -238,8 +238,9 @@ export const getEventDetail = createServerFn({ method: "GET" })
     const away = f.competitors?.[e.competitors?.[1]]?.name ?? "Away";
     const t = f.tournament?.[e.tournamentId];
     const c = t ? f.category?.[t.categoryId] : null;
-    const fill = (s: string) => fillName(s, home, away).replace(/\{\$?(\w+)\}/g, "$1");
     const markets: (MarketDTO & { order: number })[] = Object.entries<Raw>(e.markets ?? {}).map(([mid, m]) => {
+      const specs = Object.fromEntries(String(m.specifiers ?? "").split("|").filter(Boolean).map((p: string) => { const [k = "", v = ""] = p.split("="); return [k, v.replace(/^sr:[a-z_]+:/, "").replace(/_/g, " ")]; }));
+      const fill = (s: string) => fillName(s, home, away).replace(/\{[$+-]?(\w+)\}/g, (_x: string, k: string) => specs[k] ?? k);
       const def = f.market_list?.[String(c?.sportId ?? 1)]?.[m.marketId] ?? {};
       const spec = m.specifiers ? ` (${String(m.specifiers).split("|").map((p: string) => (p.split("=")[1] ?? "").replace(/^sr:[a-z_]+:/, "").replace(/_/g, " ")).join(", ")})` : "";
       const outcomes = Object.entries<Raw>(m.odds)

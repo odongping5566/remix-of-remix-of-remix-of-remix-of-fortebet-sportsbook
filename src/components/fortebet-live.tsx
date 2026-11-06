@@ -323,7 +323,7 @@ export function SportsView({ slip }: { slip: Slip }) {
         const cols = useQf ? qf!.cols : sport?.cols ?? ["1", "X", "2"];
         const favL = favs.leagues.includes(g.t.id);
         return (
-          <div key={g.t.id} data-ce="offer-tournament-detail">
+          <div key={g.t.id} data-ce="offer-tournament-detail" style={{ display: "block" }}>
             <div className="offerHead league">
               <div><span className={`ico ${sport?.icon ?? "soccer"} h13`} /></div>
               <div>
