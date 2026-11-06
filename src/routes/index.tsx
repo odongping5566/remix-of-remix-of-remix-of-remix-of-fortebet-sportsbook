@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type CSSProperties } from "react";
 import { queryOptions, useQuery } from "@tanstack/react-query";
 import { getHomeData, getLiveData, getEventDetail, type Match } from "@/lib/fortebet.functions";
 import capturedCSS from "../styles/site.css?raw";
@@ -845,7 +845,7 @@ function StatsModal({ id, live, onClose }: { id: string; live: boolean; onClose:
   }, [onClose]);
   const t = ev ? fmtTime(ev.startTs) : null;
   const main = ev?.markets[0];
-  const row: React.CSSProperties = { display: "flex", justifyContent: "space-between", padding: "8px 16px", borderBottom: "1px solid rgba(255,255,255,0.06)", fontSize: 13 };
+  const row: CSSProperties = { display: "flex", justifyContent: "space-between", padding: "8px 16px", borderBottom: "1px solid rgba(255,255,255,0.06)", fontSize: 13 };
   return (
     <div onClick={onClose} style={{ position: "fixed", inset: 0, zIndex: 1000, background: "rgba(0,0,0,0.65)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
       <div onClick={(e) => e.stopPropagation()} role="dialog" aria-label="Statistics center" style={{ width: "min(520px, 100%)", maxHeight: "90vh", overflow: "auto", background: "#2a2b31", color: "#e6e6e8", borderRadius: 4, boxShadow: "0 10px 40px rgba(0,0,0,0.6)" }}>
