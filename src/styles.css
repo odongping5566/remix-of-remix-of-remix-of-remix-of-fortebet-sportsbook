@@ -313,20 +313,28 @@
 .virtual-odd-display strong { color: var(--brand-500); }
 .virtual-wide { grid-column: 1 / -1; }
 .virtual-viewer { width: 100%; color: var(--virtual-text); }
-.virtual-viewer .virtual-view-tab { flex: 1; border: 0; border-radius: 4px 4px 0 0; background: var(--virtual-panel); color: var(--virtual-text); text-transform: uppercase; }
-.virtual-viewer .virtual-view-tab[aria-selected="true"] { background: var(--brand-500); }
+#app-content-main .virtual-viewer .virtual-view-tab { flex: 1; border: 0; border-radius: 4px 4px 0 0; background: var(--virtual-panel); color: var(--virtual-text); text-transform: uppercase; }
+#app-content-main .virtual-viewer .virtual-view-tab[aria-selected="true"] { background: var(--brand-500); }
 .virtual-view-frame { width: 100%; height: 242px; border: 0; display: block; }
-.virtual-viewer .virtual-expand { width: 100%; border: 0; border-radius: 0 0 4px 4px; background: var(--brand-500); color: var(--virtual-text); text-transform: uppercase; }
+#app-content-main .virtual-viewer .virtual-expand { width: 100%; border: 0; border-radius: 0 0 4px 4px; background: var(--brand-500); color: var(--virtual-text); text-transform: uppercase; }
 .virtual-expand svg, .virtual-expanded svg { fill: none; stroke: currentColor; }
 .virtual-results-live { background: var(--virtual-panel); color: var(--virtual-text); }
 .virtual-expanded { background: var(--virtual-field); color: var(--virtual-text); }
 @media (max-width: 800px) {
-  .virtual-soccer-main { grid-template-columns: minmax(0, 1fr); }
-  .virtual-soccer-main > :nth-child(1) { grid-column: 1; }
-  .virtual-soccer-main > :nth-child(2) { padding: 0 8px; }
-  .virtual-soccer-offer { grid-template-columns: minmax(0, 1fr); row-gap: 10px; }
-  .virtual-soccer-sidebar { width: auto; margin-top: 16px; }
-  .virtual-soccer-offer-header { flex-wrap: wrap; justify-content: center; gap: 12px; }
+  body:has(.virtual-viewer) #mainContainer { grid-template-columns: 8px minmax(0, 1fr) 8px; grid-template-rows: auto 50px 1fr auto; }
+  body:has(.virtual-viewer) #app-header .header { flex-wrap: wrap; height: auto; gap: 8px; padding: 10px 8px; }
+  body:has(.virtual-viewer) #app-header .header > div:first-of-type { display: none; }
+  body:has(.virtual-viewer) #app-header .header > div:last-of-type { margin-left: auto; }
+  body:has(.virtual-viewer) #app-header .buttons.hover { display: none; }
+  body:has(.virtual-viewer) #app-secheader { min-width: 0; overflow-x: auto; }
+  body:has(.virtual-viewer) .secHeader { min-width: 800px; }
+  body:has(.virtual-viewer) #app-footer { overflow: hidden; min-width: 0; }
+  #app-content-main .virtual-soccer-main { grid-template-columns: minmax(0, 1fr); }
+  #app-content-main .virtual-soccer-main > :nth-child(1) { grid-column: 1; }
+  #app-content-main .virtual-soccer-main > :nth-child(2) { padding: 0 8px; }
+  #app-content-main .virtual-soccer-offer { grid-template-columns: minmax(0, 1fr); row-gap: 10px; }
+  #app-content-main .virtual-soccer-sidebar { width: auto; margin-top: 16px; }
+  #app-content-main .virtual-soccer-offer-header { flex-wrap: wrap; justify-content: center; gap: 12px; }
   .virtual-soccer-offer-header > div:nth-of-type(2) { order: -1; width: 100%; justify-content: center; }
   .virtual-soccer-offer-header > div:nth-of-type(1), .virtual-soccer-offer-header > div:nth-of-type(3) { font-size: 12px; }
 }

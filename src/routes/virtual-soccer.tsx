@@ -36,7 +36,7 @@ function Index() {
   const viewerUrl = view === "stream" ? "https://zweb4ug.com/forteugvideo/index.php" : "https://zweb4ug.com/forteug/index.php";
   return (
     <>
-      <style>{capturedCSS.replaceAll("rgb(255, 100, 0)", "var(--brand-500)").replaceAll("#ff6400", "var(--brand-500)")}</style>
+      <style>{capturedCSS.replace(/:root\{--brand-500:[^}]+\}/g, "").replaceAll("rgb(255, 100, 0)", "var(--brand-500)").replaceAll("#ff6400", "var(--brand-500)")}</style>
       <div data-ce="app-root" {...({ "ng-version": "13.3.0" } as any)}>
         <div data-ce="app-svg-loader" {...({ "_nghost-bdf-c201": "" } as any)}>
           <svg xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" {...({ "_ngcontent-bdf-c201": "" } as any)}>
@@ -345,7 +345,7 @@ function Index() {
               <div className="header items-center [height:calc(54px_*_var(--factor))] [top:0px]" {...({ "_ngcontent-bdf-c202": "" } as any)}>
                 <h1 {...({ "_ngcontent-bdf-c202": "" } as any)}>Fortebet</h1>
                 <div {...({ "_ngcontent-bdf-c202": "" } as any)}>
-                  <div className="timer [font-weight:900] [margin-left:calc(44px_*_var(--factor))] [margin-right:calc(13px_*_var(--factor))] [top:calc(2px_*_var(--factor))]" {...({ "_ngcontent-bdf-c202": "" } as any)}><span className="ico clock h12" {...({ "_ngcontent-bdf-c202": "" } as any)} /> Nov 06 2026, 05:06:42 AM </div>
+                  <div className="timer [font-weight:900] [margin-left:calc(44px_*_var(--factor))] [margin-right:calc(13px_*_var(--factor))] [top:calc(2px_*_var(--factor))]" {...({ "_ngcontent-bdf-c202": "" } as any)}><span className="ico clock h12" {...({ "_ngcontent-bdf-c202": "" } as any)} /><HeaderClock /></div>
                   <div className="buttons hover [font-weight:900] [margin-left:calc(8px_*_var(--factor))]" {...({ "_ngcontent-bdf-c202": "" } as any)}>
                     <a href="/contact" {...({ "_ngcontent-bdf-c202": "" } as any)}>CONTACT US</a>
                   </div>
