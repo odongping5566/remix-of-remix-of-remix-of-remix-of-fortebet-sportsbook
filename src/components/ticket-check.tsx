@@ -46,6 +46,31 @@ function StatusDot({ status }: { status: string }) {
   );
 }
 
+/** Green coin with a "C": pick that was still running when the ticket was cashed out. */
+function CashoutCoin() {
+  return (
+    <svg width="19" height="19" viewBox="0 0 20 20" role="img" aria-label="Cashed out" style={{ display: "inline-block", flexShrink: 0 }}>
+      <circle cx="10" cy="10" r="9.5" fill={WIN_BG} />
+      <path d="M13.3 7.2a4.2 4.2 0 1 0 0 5.6" fill="none" stroke={DARK} strokeWidth="1.9" strokeLinecap="round" />
+      <path d="M10 3.6v12.8" stroke={DARK} strokeWidth="1.4" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+/** Result tick for a pick; cashed-out picks show a grey tick plus the cashout coin. */
+function PickMarks({ it }: { it: Pick<SheetItem, "status" | "cashedOut"> }) {
+  if (!it.cashedOut) return <StatusDot status={it.status} />;
+  return (
+    <span style={{ display: "inline-flex", gap: 4, alignItems: "center" }}>
+      <svg width="19" height="19" viewBox="0 0 20 20" role="img" aria-label="Not counted" style={{ display: "inline-block" }}>
+        <circle cx="10" cy="10" r="9.5" fill="#c9cacf" />
+        <path d="M5.6 10.4l3 3 5.8-6.2" fill="none" stroke={DARK} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+      <CashoutCoin />
+    </span>
+  );
+}
+
 /** Grey paper ticket with a torn stub on the left, as in the Fortebet ticket header. */
 function TicketGlyph({ label }: { label?: string | undefined }) {
   return (
@@ -77,11 +102,11 @@ const fmtItemTime = (ts: string, relative = false) => {
   return `${date} | ${d.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}`;
 };
 
-export type SheetItem = { key: string; time: string; match: string; market: string; outcome: string; odds: number; oldOdds?: number | undefined; result?: string | null; status: string; league?: string | undefined };
+export type SheetItem = { cashedOut?: boolean | undefined; key: string; time: string; match: string; market: string; outcome: string; odds: number; oldOdds?: number | undefined; result?: string | null; status: string; league?: string | undefined };
 export type SheetRow = { label: ReactNode; value: string; accent?: boolean };
 
 /** Shared ticket layout: header bar, picks on the left, status and totals on the right. */
-export function TicketSheet({ title, items, status, rows, number, shortNumber, note, relativeDays = false, actions, onClose }: {
+export function TicketSheet({ title, items, status, rows, number, shortNumber, note, relativeDays = false, leftPanel, actions, onClose }: {
   title: string;
   items: SheetItem[];
   status: string;
@@ -93,6 +118,8 @@ export function TicketSheet({ title, items, status, rows, number, shortNumber, n
   note?: ReactNode;
   /** Show "Today" / "Tomorrow" instead of the date (bet slip preview). */
   relativeDays?: boolean;
+  /** Replaces the pick list (e.g. the Fair Cashout calculation). */
+  leftPanel?: ReactNode;
   actions?: ReactNode;
   onClose: () => void;
 }) {
@@ -121,7 +148,7 @@ export function TicketSheet({ title, items, status, rows, number, shortNumber, n
                 <span style={{ position: "absolute", top: 2, left: byTime ? 14 : 2, width: 12, height: 12, borderRadius: 99, background: byTime ? G : "#c9cacf", transition: "left .15s" }} />
               </button>
             </div>
-            <div style={{ flex: 1, overflowY: "auto", padding: "0 14px" }}>
+            {leftPanel ?? <div style={{ flex: 1, overflowY: "auto", padding: "0 14px" }}>
               {list.map((it) => (
                 <div key={it.key} style={{ padding: "10px 0", borderBottom: `1px solid ${LINE}` }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 13 }}>
@@ -130,7 +157,7 @@ export function TicketSheet({ title, items, status, rows, number, shortNumber, n
                       <span className="ico soccer h12 opa06" style={{ display: "inline-block", flexShrink: 0 }} />
                       {it.league && <span style={{ fontSize: 12, color: "#b9bac0", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{it.league.replace(/\s*\/\s*/g, " - ")}</span>}
                     </span>
-                    <StatusDot status={it.status} />
+                    <PickMarks it={it} />
                   </div>
                   <div style={{ fontWeight: 700, textTransform: "uppercase", fontSize: 12, margin: "6px 0 5px" }}>{it.match}</div>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 12 }}>
@@ -142,7 +169,7 @@ export function TicketSheet({ title, items, status, rows, number, shortNumber, n
                   {it.result && <span style={{ display: "inline-block", marginTop: 6, background: "#d9d9dc", color: "#222", fontWeight: 700, fontSize: 11, padding: "1px 5px", borderRadius: 3 }}>{it.result}</span>}
                 </div>
               ))}
-            </div>
+            </div>}
           </div>
           <div style={{ display: "flex", flexDirection: "column", minHeight: 0, overflowY: "auto" }}>
             <div style={{ display: "flex", alignItems: "stretch", borderBottom: "2px solid #25272e", height: 50, flexShrink: 0 }}>
@@ -175,6 +202,54 @@ function ShareIcon() {
       <circle cx="14.5" cy="3.5" r="2.4" /><circle cx="3.5" cy="10" r="2.4" /><circle cx="14.5" cy="16.5" r="2.4" />
       <path d="M5.6 8.8l6.8-4M5.6 11.2l6.8 4" />
     </svg>
+  );
+}
+
+function TicketTag() {
+  return (
+    <svg width="22" height="14" viewBox="0 0 22 14" aria-hidden="true" style={{ marginRight: 20, flexShrink: 0 }}>
+      <path fill="#fff" d="M1.5 0H5v14H1.5A1.5 1.5 0 0 1 0 12.5V9a2 2 0 0 0 0-4V1.5A1.5 1.5 0 0 1 1.5 0zM6.5 0h14A1.5 1.5 0 0 1 22 1.5v11a1.5 1.5 0 0 1-1.5 1.5h-14z" />
+    </svg>
+  );
+}
+
+const ACC = "#22d47e";
+
+/** Left-side "Fair Cashout calculation": matches still running at cashout time and how the amount was reached. */
+function CashoutCalc({ ticket, fair, onClose }: { ticket: TicketDTO; fair: boolean; onClose: () => void }) {
+  const open = ticket.items.filter((i) => i.cashedOut);
+  const sep: CSSProperties = { borderBottom: `1px solid ${LINE}` };
+  const accRow: CSSProperties = { display: "flex", justifyContent: "space-between", color: ACC, fontWeight: 700, fontSize: 13, lineHeight: "23px" };
+  return (
+    <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column" }} aria-label="Fair cashout calculation">
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "0 14px", height: 50, background: PANEL, borderTop: "1px solid #25272e", borderBottom: "2px solid #25272e" }}>
+        <span style={{ fontSize: 17, letterSpacing: 0.2, color: "#d8d8da" }}>{fair ? "FAIR CASHOUT" : "CASHOUT"} CALCULATION</span>
+        <button onClick={onClose} aria-label="Close calculation" style={{ background: "transparent", border: 0, color: "#c9cacf", cursor: "pointer", padding: 4, display: "flex" }}>
+          <svg width="18" height="18" viewBox="0 0 18 18" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="M2 2l14 14M16 2L2 16" /></svg>
+        </button>
+      </div>
+      <div style={{ flex: 1, overflowY: "auto", padding: "0 14px" }}>
+        <div style={{ ...sep, color: ACC, fontWeight: 700, fontSize: 13, padding: "13px 0 12px" }}>UNFINISHED MATCHES AT CASHOUT TIME</div>
+        {open.length === 0 && <div style={{ ...sep, padding: "10px 0", fontSize: 12, color: "#b9bac0" }}>All matches had finished.</div>}
+        {open.map((i, k) => (
+          <div key={k} style={{ ...sep, padding: "12px 0 10px", fontSize: 13 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <b style={{ textTransform: "uppercase", fontSize: 12 }}>{i.match}</b>
+              <PickMarks it={i} />
+            </div>
+            <div style={{ display: "flex", justifyContent: "space-between", marginTop: 4 }}><span>{i.market} : <b>{i.outcome}</b></span><b>{i.odds.toFixed(2)}</b></div>
+            <div style={{ display: "flex", justifyContent: "space-between", marginTop: 4, color: "#a9aab0" }}><span>Odds in cashout time</span><span style={{ color: ACC }}>{(i.cashoutOdds ?? i.odds).toFixed(2)}</span></div>
+          </div>
+        ))}
+        <div style={{ ...sep, padding: "9px 0" }}>
+          <div style={accRow}><span>ORIGINAL POSSIBLE WIN</span><span>{fmtMoney(ticket.possible)} UGX</span></div>
+          <div style={accRow}><span>TOTAL ODDS IN CASHOUT TIME</span><span>{(ticket.cashout?.totalOdds ?? 1).toFixed(2)}</span></div>
+        </div>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 0", fontWeight: 700, fontSize: 13, color: ACC }}>
+          <CashoutBadge fair={fair} /><span>{fmtMoney(ticket.payout)} UGX</span>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -242,15 +317,13 @@ export function TicketDetailModal({ ticket, onClose }: { ticket: TicketDTO; onCl
       note={note}
       number={ticket.number}
       onClose={onClose}
-      items={ticket.items.map((i, k) => ({ key: String(k), time: i.time, match: i.match, market: i.market, outcome: i.outcome, odds: i.odds, result: i.result, status: i.status }))}
+      items={ticket.items.map((i, k) => ({ key: String(k), time: i.time, match: i.match, market: i.market, outcome: i.outcome, odds: i.odds, result: i.result, status: i.status, cashedOut: i.cashedOut }))}
+      leftPanel={co && explain ? <CashoutCalc ticket={ticket} fair={fair} onClose={() => setExplain(false)} /> : undefined}
       actions={<>
-        {co && <button style={{ ...sheetBtn, background: G, color: "#fff" }} onClick={() => setExplain((v) => !v)}><CalcIcon /> How we count it</button>}
-        {co && explain && (
-          <div style={{ background: LIST, borderRadius: 3, padding: "8px 12px", fontSize: 12, lineHeight: 1.5, color: "#d8d8da" }}>
-            This ticket was cashed out{fair ? " with Fair Cashout" : ""} for <b>{fmtMoney(ticket.payout)} UGX</b> instead of waiting for all {ticket.items.length} matches to finish.
-            {co.fee > 0 && <> A {Math.round(co.feeRate * 100)}% fee of <b>{fmtMoney(co.fee)} UGX</b> was applied.</>}
-            {ticket.vipPoints <= 0 && <> Cashed-out tickets do not earn VIP points.</>}
-          </div>
+        {co && (
+          <button style={{ ...sheetBtn, background: G, color: "#fff" }} onClick={() => setExplain((v) => !v)}>
+            {explain ? <><TicketTag /> Back to ticket detail</> : <><CalcIcon /> How we count it</>}
+          </button>
         )}
         <button style={sheetBtn} onClick={share}><ShareIcon /> {copied ? "Link copied" : "Share ticket"}</button>
       </>}
