@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { queryOptions, useQuery } from "@tanstack/react-query";
-import { useNavigate } from "@tanstack/react-router";
+import { useHydrated, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { CASINO_ASSETS, CASINO_IMG, getCasinoGames, getCasinoJackpots, getCasinoWinners, playCasinoGame, type CasinoGame } from "@/lib/fortebet.functions";
 import { availableKeys, CASINO_CATEGORIES, CASINO_PROVIDERS, DEFAULT_CASINO_FILTER, filterGames, isFiltered, jackpotCounter, jackpotStart, popularGames, type CasinoFilter } from "@/lib/casino";
@@ -150,7 +150,11 @@ function GameTile({ g, onPlay }: { g: CasinoGame; onPlay: (g: CasinoGame) => voi
 
 export function CasinoLobby() {
   const nav = useNavigate();
-  const { data, isLoading } = useQuery(casinoGamesQuery);
+  const q = useQuery(casinoGamesQuery);
+  // Server-loaded games are not handed to the browser, so wait for hydration to keep both renders identical.
+  const hydrated = useHydrated();
+  const data = hydrated ? q.data : undefined;
+  const isLoading = !hydrated || q.isLoading;
   const games = data?.games ?? [];
   const [f, setF] = useState<CasinoFilter>(DEFAULT_CASINO_FILTER);
   const popular = useMemo(() => popularGames(games), [games]);
