@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
+import { LogIn } from "lucide-react";
 import { BannerSlider, BetSlip, useSels, OfferCenter, HeaderClock, LiveOddsFeed } from "@/components/fortebet-live";
 import { openLogin, openRegister } from "@/lib/login-modal";
 import { Button } from "@/components/ui/button";
@@ -354,7 +355,7 @@ function Index() {
                     <Button variant="ghost" className="account-header-button" onClick={openRegister}>Register</Button>
                   </div>
                   <div className="buttons login" {...({ "_ngcontent-oky-c202": "" } as any)}>
-                    <Button variant="ghost" className="account-header-button" onClick={openLogin}><span className="ico login h15" {...({ "_ngcontent-oky-c202": "" } as any)} />Login</Button>
+                    <Button variant="ghost" className="account-header-button" onClick={openLogin}><LogIn aria-hidden="true" />Login</Button>
                   </div>
                 </div>
               </div>
