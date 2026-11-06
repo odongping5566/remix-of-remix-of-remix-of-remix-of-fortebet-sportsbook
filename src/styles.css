@@ -201,6 +201,9 @@
   --account-login-hover: oklch(0.79 0.1252 86.81);
   --account-overlay: oklch(0.08 0 0 / 75%);
   --account-shadow: 0 20px 70px oklch(0.08 0 0 / 45%);
+  --virtual-panel: oklch(0.43 0.025 275);
+  --virtual-field: oklch(0.36 0.015 275);
+  --virtual-text: oklch(0.96 0 0);
 }
 @theme inline {
   --color-account-surface: var(--account-surface);
@@ -300,4 +303,30 @@
   height: 16px;
   fill: none;
   stroke: currentColor;
+}
+
+.virtual-market-grid { display: grid; gap: 2px; padding: 0 5px; background: var(--virtual-panel); }
+.virtual-three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.virtual-two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.virtual-market-title { grid-column: 1 / -1; min-height: 30px; display: flex; align-items: center; justify-content: center; text-align: center; font-size: 11px; color: var(--virtual-text); }
+.virtual-odd-display { display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; gap: 4px; min-height: 30px; padding: 2px 8px; background: var(--virtual-field); color: var(--virtual-text); }
+.virtual-odd-display strong { color: var(--brand-500); }
+.virtual-wide { grid-column: 1 / -1; }
+.virtual-viewer { width: 100%; color: var(--virtual-text); }
+.virtual-viewer .virtual-view-tab { flex: 1; border: 0; border-radius: 4px 4px 0 0; background: var(--virtual-panel); color: var(--virtual-text); text-transform: uppercase; }
+.virtual-viewer .virtual-view-tab[aria-selected="true"] { background: var(--brand-500); }
+.virtual-view-frame { width: 100%; height: 242px; border: 0; display: block; }
+.virtual-viewer .virtual-expand { width: 100%; border: 0; border-radius: 0 0 4px 4px; background: var(--brand-500); color: var(--virtual-text); text-transform: uppercase; }
+.virtual-expand svg, .virtual-expanded svg { fill: none; stroke: currentColor; }
+.virtual-results-live { background: var(--virtual-panel); color: var(--virtual-text); }
+.virtual-expanded { background: var(--virtual-field); color: var(--virtual-text); }
+@media (max-width: 800px) {
+  .virtual-soccer-main { grid-template-columns: minmax(0, 1fr); }
+  .virtual-soccer-main > :nth-child(1) { grid-column: 1; }
+  .virtual-soccer-main > :nth-child(2) { padding: 0 8px; }
+  .virtual-soccer-offer { grid-template-columns: minmax(0, 1fr); row-gap: 10px; }
+  .virtual-soccer-sidebar { width: auto; margin-top: 16px; }
+  .virtual-soccer-offer-header { flex-wrap: wrap; justify-content: center; gap: 12px; }
+  .virtual-soccer-offer-header > div:nth-of-type(2) { order: -1; width: 100%; justify-content: center; }
+  .virtual-soccer-offer-header > div:nth-of-type(1), .virtual-soccer-offer-header > div:nth-of-type(3) { font-size: 12px; }
 }

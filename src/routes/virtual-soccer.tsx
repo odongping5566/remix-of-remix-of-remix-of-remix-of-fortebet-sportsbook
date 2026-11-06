@@ -36,7 +36,7 @@ function Index() {
   const viewerUrl = view === "stream" ? "https://zweb4ug.com/forteugvideo/index.php" : "https://zweb4ug.com/forteug/index.php";
   return (
     <>
-      <style>{capturedCSS}</style>
+      <style>{capturedCSS.replaceAll("rgb(255, 100, 0)", "var(--brand-500)").replaceAll("#ff6400", "var(--brand-500)")}</style>
       <div data-ce="app-root" {...({ "ng-version": "13.3.0" } as any)}>
         <div data-ce="app-svg-loader" {...({ "_nghost-bdf-c201": "" } as any)}>
           <svg xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" {...({ "_ngcontent-bdf-c201": "" } as any)}>
