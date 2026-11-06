@@ -1,13 +1,39 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
+import { LogIn, Maximize, X } from "lucide-react";
+import * as Dialog from "@radix-ui/react-dialog";
+import { Button } from "@/components/ui/button";
+import { openLogin, openRegister } from "@/lib/login-modal";
+import { HeaderClock } from "@/components/fortebet-live";
+import { getVirtualOffer } from "@/lib/virtual-soccer.functions";
+import { kickoffCountdown, virtualOddLabel, type VirtualMatch } from "@/lib/virtual-soccer";
 import capturedCSS from "../styles/pages/virtual-soccer.css?raw";
 
+const virtualQuery = queryOptions({ queryKey: ["virtual-soccer-offer"], queryFn: () => getVirtualOffer(), refetchInterval: 5000 });
+
 export const Route = createFileRoute("/virtual-soccer")({
-  head: () => ({ meta: [{ title: "Fortebet - Play for million now!" }] }),
+  head: () => ({ meta: [
+    { title: "Virtual Soccer - Live matches and results | Fortebet" },
+    { name: "description", content: "Watch Fortebet virtual soccer matches, upcoming fixtures and latest results." },
+    { property: "og:title", content: "Virtual Soccer | Fortebet" },
+    { property: "og:description", content: "Virtual soccer match viewing, upcoming fixtures and latest results." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary_large_image" },
+  ] }),
+  loader: ({ context }) => context.queryClient.ensureQueryData(virtualQuery),
   staticData: { importedDocument: { html: { "lang": "en" }, body: { "data-site-import-responsive-incomplete": "scroll" } } },
   component: Index,
 });
 
 function Index() {
+  const { data: offer } = useSuspenseQuery(virtualQuery);
+  const [now, setNow] = useState<number | null>(null);
+  const [view, setView] = useState<"stream" | "tracker">("stream");
+  const [expanded, setExpanded] = useState(false);
+  useEffect(() => { setNow(Date.now()); const timer = setInterval(() => setNow(Date.now()), 1000); return () => clearInterval(timer); }, []);
+  const countdown = kickoffCountdown(offer.matches[0]?.item_time, now ?? Date.parse(offer.at));
+  const viewerUrl = view === "stream" ? "https://zweb4ug.com/forteugvideo/index.php" : "https://zweb4ug.com/forteug/index.php";
   return (
     <>
       <style>{capturedCSS}</style>
@@ -332,10 +358,10 @@ function Index() {
                     <a {...({ "_ngcontent-bdf-c202": "", translate: "" } as any)}>HOW TO REGISTER</a>
                   </div>
                   <div className="buttons register [font-weight:900] [margin-left:calc(8px_*_var(--factor))]" {...({ "_ngcontent-bdf-c202": "" } as any)}>
-                    <a {...({ "_ngcontent-bdf-c202": "", translate: "" } as any)}>Register</a>
+                    <Button variant="ghost" className="account-header-button" onClick={openRegister}>Register</Button>
                   </div>
                   <div className="buttons login [font-weight:900] [margin-left:calc(8px_*_var(--factor))]" {...({ "_ngcontent-bdf-c202": "" } as any)}>
-                    <a {...({ "_ngcontent-bdf-c202": "" } as any)}><span className="ico login h15" {...({ "_ngcontent-bdf-c202": "" } as any)} />Login</a>
+                    <Button variant="ghost" className="account-header-button" onClick={openLogin}><LogIn aria-hidden="true" />Login</Button>
                   </div>
                 </div>
               </div>
@@ -344,10 +370,10 @@ function Index() {
               <div className="secHeader uppercase [font-weight:700] [height:100%] [transition:0.2s]" {...({ "_ngcontent-bdf-c206": "" } as any)}>
                 <ul {...({ "_ngcontent-bdf-c206": "" } as any)}>
                   <li {...({ "_ngcontent-bdf-c206": "" } as any)}>
-                    <a href="/prematch/landing" {...({ "_ngcontent-bdf-c206": "" } as any)}>Sportsbook</a>
+                    <a href="/" {...({ "_ngcontent-bdf-c206": "" } as any)}>Sportsbook</a>
                   </li>
                   <li {...({ "_ngcontent-bdf-c206": "" } as any)}>
-                    <a href="/live" {...({ "_ngcontent-bdf-c206": "", routerlinkactive: "active" } as any)}>Live</a>
+                    <a href="/live/preview" {...({ "_ngcontent-bdf-c206": "", routerlinkactive: "active" } as any)}>Live</a>
                   </li>
                   <li {...({ "_ngcontent-bdf-c206": "" } as any)}>
                     <a className="withIco active" href="#" {...({ "_ngcontent-bdf-c206": "", routerlinkactive: "active" } as any)}>
@@ -359,7 +385,7 @@ function Index() {
                             </svg>
                           </icon>
                         </div>
-                        <div> Spo-Ben <br /><span>03:17</span></div>
+                        <div> {offer.matches[0] ? `${offer.matches[0].home.replace("V-", "")}-${offer.matches[0].away.replace("V-", "")}` : "Virtual Soccer"} <br /><span>{countdown}</span></div>
                       </div>
                     </a>
                   </li>
@@ -387,7 +413,7 @@ function Index() {
                       <div className="virtual-soccer-offer-header items-center justify-between">
                         <div>
                           <span>Time to kickoff:</span>
-                          <span> 03:17</span>
+                          <span>{countdown}</span>
                         </div>
                         <div>
                           <img src="/site-assets/997a0eb72126c928-ccb59081866abf3f6caffaa6016fd1c3.png" width="24" height="31" />
@@ -403,622 +429,25 @@ function Index() {
                       </div>
                     </div>
                     <div>
-                      <div className="virtual-soccer-offer [column-gap:calc(5px_*_var(--factor))]">
-                        <div data-ce="app-virtual-soccer-match">
-                          <div className="virtual-soccer-match selected">
-                            <div className="virtual-soccer-match-header items-center">
-                              <div>192</div>
-                              <div>V-Sporting<small>vs</small>V-Benfica</div>
-                            </div>
-                            <div className="virtual-soccer-final-results [column-gap:calc(2px_*_var(--factor))] [row-gap:calc(2px_*_var(--factor))]">
-                              <div className="virtual-soccer-header items-center justify-center">FULL TIME RESULT</div>
-                              <div data-ce="app-virtual-soccer-named-odds" {...({ name: "1" } as any)}>
-                                <div className="virtual-soccer-odds items-center justify-between [height:100%] [transition:0.2s]">
-                                  <div>1</div>
-                                  <div>2.50</div>
-                                </div>
-                              </div>
-                              <div data-ce="app-virtual-soccer-named-odds" {...({ name: "X" } as any)}>
-                                <div className="virtual-soccer-odds items-center justify-between [height:100%] [transition:0.2s]">
-                                  <div>X</div>
-                                  <div>2.90</div>
-                                </div>
-                              </div>
-                              <div data-ce="app-virtual-soccer-named-odds" {...({ name: "2" } as any)}>
-                                <div className="virtual-soccer-odds items-center justify-between [height:100%] [transition:0.2s]">
-                                  <div>2</div>
-                                  <div>2.75</div>
-                                </div>
-                              </div>
-                              <div className="virtual-soccer-header items-center justify-center">1ST HALF RESULT</div>
-                              <div data-ce="app-virtual-soccer-named-odds" {...({ name: "1" } as any)}>
-                                <div className="virtual-soccer-odds items-center justify-between [height:100%] [transition:0.2s]">
-                                  <div>1</div>
-                                  <div>3.65</div>
-                                </div>
-                              </div>
-                              <div data-ce="app-virtual-soccer-named-odds" {...({ name: "X" } as any)}>
-                                <div className="virtual-soccer-odds items-center justify-between [height:100%] [transition:0.2s]">
-                                  <div>X</div>
-                                  <div>1.75</div>
-                                </div>
-                              </div>
-                              <div data-ce="app-virtual-soccer-named-odds" {...({ name: "2" } as any)}>
-                                <div className="virtual-soccer-odds items-center justify-between [height:100%] [transition:0.2s]">
-                                  <div>2</div>
-                                  <div>3.85</div>
-                                </div>
-                              </div>
-                            </div>
-                            <div className="virtual-soccer-total-goals [column-gap:calc(2px_*_var(--factor))] [row-gap:calc(2px_*_var(--factor))]">
-                              <div className="virtual-soccer-header items-center justify-center">TOTAL GOALS</div>
-                              <div data-ce="app-virtual-soccer-named-odds" {...({ name: "Under 1.5" } as any)}>
-                                <div className="virtual-soccer-odds items-center justify-between [height:100%] [transition:0.2s]">
-                                  <div>Under 1.5</div>
-                                  <div>3.35</div>
-                                </div>
-                              </div>
-                              <div data-ce="app-virtual-soccer-named-odds" {...({ name: "Over 1.5" } as any)}>
-                                <div className="virtual-soccer-odds items-center justify-between [height:100%] [transition:0.2s]">
-                                  <div>Over 1.5</div>
-                                  <div>1.30</div>
-                                </div>
-                              </div>
-                              <div data-ce="app-virtual-soccer-named-odds" {...({ name: "Under 2.5" } as any)}>
-                                <div className="virtual-soccer-odds items-center justify-between [height:100%] [transition:0.2s]">
-                                  <div>Under 2.5</div>
-                                  <div>1.75</div>
-                                </div>
-                              </div>
-                              <div data-ce="app-virtual-soccer-named-odds" {...({ name: "Over 2.5" } as any)}>
-                                <div className="virtual-soccer-odds items-center justify-between [height:100%] [transition:0.2s]">
-                                  <div>Over 2.5</div>
-                                  <div>2.00</div>
-                                </div>
-                              </div>
-                              <div data-ce="app-virtual-soccer-named-odds" {...({ name: "Under 3.5" } as any)}>
-                                <div className="virtual-soccer-odds items-center justify-between [height:100%] [transition:0.2s]">
-                                  <div>Under 3.5</div>
-                                  <div>1.20</div>
-                                </div>
-                              </div>
-                              <div data-ce="app-virtual-soccer-named-odds" {...({ name: "Over 3.5" } as any)}>
-                                <div className="virtual-soccer-odds items-center justify-between [height:100%] [transition:0.2s]">
-                                  <div>Over 3.5</div>
-                                  <div>3.85</div>
-                                </div>
-                              </div>
-                              <div data-ce="app-virtual-soccer-named-odds" {...({ name: "Under 4.5" } as any)}>
-                                <div className="virtual-soccer-odds items-center justify-between [height:100%] [transition:0.2s]">
-                                  <div>Under 4.5</div>
-                                  <div>1.05</div>
-                                </div>
-                              </div>
-                              <div data-ce="app-virtual-soccer-named-odds" {...({ name: "Over 4.5" } as any)}>
-                                <div className="virtual-soccer-odds items-center justify-between [height:100%] [transition:0.2s]">
-                                  <div>Over 4.5</div>
-                                  <div>7.20</div>
-                                </div>
-                              </div>
-                            </div>
-                            <div className="virtual-soccer-correct-score [column-gap:calc(2px_*_var(--factor))] [row-gap:calc(2px_*_var(--factor))]">
-                              <div className="virtual-soccer-header items-center justify-center">CORRECT SCORE</div>
-                              <div data-ce="app-virtual-soccer-named-odds" {...({ name: "1:0" } as any)}>
-                                <div className="virtual-soccer-odds items-center justify-between [height:100%] [transition:0.2s]">
-                                  <div>1:0</div>
-                                  <div>8.50</div>
-                                </div>
-                              </div>
-                              <div data-ce="app-virtual-soccer-named-odds" {...({ name: "0:0" } as any)}>
-                                <div className="virtual-soccer-odds items-center justify-between [height:100%] [transition:0.2s]">
-                                  <div>0:0</div>
-                                  <div>11.00</div>
-                                </div>
-                              </div>
-                              <div data-ce="app-virtual-soccer-named-odds" {...({ name: "0:1" } as any)}>
-                                <div className="virtual-soccer-odds items-center justify-between [height:100%] [transition:0.2s]">
-                                  <div>0:1</div>
-                                  <div>9.00</div>
-                                </div>
-                              </div>
-                              <div data-ce="app-virtual-soccer-named-odds" {...({ name: "2:0" } as any)}>
-                                <div className="virtual-soccer-odds items-center justify-between [height:100%] [transition:0.2s]">
-                                  <div>2:0</div>
-                                  <div>10.00</div>
-                                </div>
-                              </div>
-                              <div data-ce="app-virtual-soccer-named-odds" {...({ name: "1:1" } as any)}>
-                                <div className="virtual-soccer-odds items-center justify-between [height:100%] [transition:0.2s]">
-                                  <div>1:1</div>
-                                  <div>7.00</div>
-                                </div>
-                              </div>
-                              <div data-ce="app-virtual-soccer-named-odds" {...({ name: "0:2" } as any)}>
-                                <div className="virtual-soccer-odds items-center justify-between [height:100%] [transition:0.2s]">
-                                  <div>0:2</div>
-                                  <div>11.00</div>
-                                </div>
-                              </div>
-                              <div data-ce="app-virtual-soccer-named-odds" {...({ name: "2:1" } as any)}>
-                                <div className="virtual-soccer-odds items-center justify-between [height:100%] [transition:0.2s]">
-                                  <div>2:1</div>
-                                  <div>8.00</div>
-                                </div>
-                              </div>
-                              <div data-ce="app-virtual-soccer-named-odds" {...({ name: "2:2" } as any)}>
-                                <div className="virtual-soccer-odds items-center justify-between [height:100%] [transition:0.2s]">
-                                  <div>2:2</div>
-                                  <div>10.50</div>
-                                </div>
-                              </div>
-                              <div data-ce="app-virtual-soccer-named-odds" {...({ name: "1:2" } as any)}>
-                                <div className="virtual-soccer-odds items-center justify-between [height:100%] [transition:0.2s]">
-                                  <div>1:2</div>
-                                  <div>10.00</div>
-                                </div>
-                              </div>
-                              <div data-ce="app-virtual-soccer-named-odds3" style={{ gridColumn: "span 3" }} {...({ name: "Any other result" } as any)}>
-                                <div className="virtual-soccer-odds-3 items-center justify-between [height:100%] [transition:0.2s]">
-                                  <div>Any other result</div>
-                                  <div>4.35</div>
-                                </div>
-                              </div>
-                            </div>
-                            <div className="virtual-soccer-both-to-score [column-gap:calc(2px_*_var(--factor))] [row-gap:calc(2px_*_var(--factor))]">
-                              <div className="virtual-soccer-header items-center justify-center">BOTH TEAMS TO SCORE: FULL TIME </div>
-                              <div data-ce="app-virtual-soccer-named-odds" {...({ name: "Yes" } as any)}>
-                                <div className="virtual-soccer-odds items-center justify-between [height:100%] [transition:0.2s]">
-                                  <div>Yes</div>
-                                  <div>1.95</div>
-                                </div>
-                              </div>
-                              <div data-ce="app-virtual-soccer-named-odds" {...({ name: "No" } as any)}>
-                                <div className="virtual-soccer-odds items-center justify-between [height:100%] [transition:0.2s]">
-                                  <div>No</div>
-                                  <div>1.75</div>
-                                </div>
-                              </div>
-                              <div className="virtual-soccer-header items-center justify-center">BOTH TEAMS TO SCORE: 1ST HALF</div>
-                              <div data-ce="app-virtual-soccer-named-odds" {...({ name: "Yes" } as any)}>
-                                <div className="virtual-soccer-odds items-center justify-between [height:100%] [transition:0.2s]">
-                                  <div>Yes</div>
-                                  <div>4.90</div>
-                                </div>
-                              </div>
-                              <div data-ce="app-virtual-soccer-named-odds" {...({ name: "No" } as any)}>
-                                <div className="virtual-soccer-odds items-center justify-between [height:100%] [transition:0.2s]">
-                                  <div>No</div>
-                                  <div>1.15</div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        <div data-ce="app-virtual-soccer-match">
-                          <div className="virtual-soccer-match">
-                            <div className="virtual-soccer-match-header items-center">
-                              <div>193</div>
-                              <div>V-Newcastle<small>vs</small>V-Arsenal</div>
-                            </div>
-                            <div className="virtual-soccer-final-results [column-gap:calc(2px_*_var(--factor))] [row-gap:calc(2px_*_var(--factor))]">
-                              <div className="virtual-soccer-header items-center justify-center">FULL TIME RESULT</div>
-                              <div data-ce="app-virtual-soccer-named-odds" {...({ name: "1" } as any)}>
-                                <div className="virtual-soccer-odds items-center justify-between [height:100%] [transition:0.2s]">
-                                  <div>1</div>
-                                  <div>2.75</div>
-                                </div>
-                              </div>
-                              <div data-ce="app-virtual-soccer-named-odds" {...({ name: "X" } as any)}>
-                                <div className="virtual-soccer-odds items-center justify-between [height:100%] [transition:0.2s]">
-                                  <div>X</div>
-                                  <div>2.95</div>
-                                </div>
-                              </div>
-                              <div data-ce="app-virtual-soccer-named-odds" {...({ name: "2" } as any)}>
-                                <div className="virtual-soccer-odds items-center justify-between [height:100%] [transition:0.2s]">
-                                  <div>2</div>
-                                  <div>2.50</div>
-                                </div>
-                              </div>
-                              <div className="virtual-soccer-header items-center justify-center">1ST HALF RESULT</div>
-                              <div data-ce="app-virtual-soccer-named-odds" {...({ name: "1" } as any)}>
-                                <div className="virtual-soccer-odds items-center justify-between [height:100%] [transition:0.2s]">
-                                  <div>1</div>
-                                  <div>3.85</div>
-                                </div>
-                              </div>
-                              <div data-ce="app-virtual-soccer-named-odds" {...({ name: "X" } as any)}>
-                                <div className="virtual-soccer-odds items-center justify-between [height:100%] [transition:0.2s]">
-                                  <div>X</div>
-                                  <div>1.85</div>
-                                </div>
-                              </div>
-                              <div data-ce="app-virtual-soccer-named-odds" {...({ name: "2" } as any)}>
-                                <div className="virtual-soccer-odds items-center justify-between [height:100%] [transition:0.2s]">
-                                  <div>2</div>
-                                  <div>3.25</div>
-                                </div>
-                              </div>
-                            </div>
-                            <div className="virtual-soccer-total-goals [column-gap:calc(2px_*_var(--factor))] [row-gap:calc(2px_*_var(--factor))]">
-                              <div className="virtual-soccer-header items-center justify-center">TOTAL GOALS</div>
-                              <div data-ce="app-virtual-soccer-named-odds" {...({ name: "Under 1.5" } as any)}>
-                                <div className="virtual-soccer-odds items-center justify-between [height:100%] [transition:0.2s]">
-                                  <div>Under 1.5</div>
-                                  <div>3.45</div>
-                                </div>
-                              </div>
-                              <div data-ce="app-virtual-soccer-named-odds" {...({ name: "Over 1.5" } as any)}>
-                                <div className="virtual-soccer-odds items-center justify-between [height:100%] [transition:0.2s]">
-                                  <div>Over 1.5</div>
-                                  <div>1.25</div>
-                                </div>
-                              </div>
-                              <div data-ce="app-virtual-soccer-named-odds" {...({ name: "Under 2.5" } as any)}>
-                                <div className="virtual-soccer-odds items-center justify-between [height:100%] [transition:0.2s]">
-                                  <div>Under 2.5</div>
-                                  <div>1.80</div>
-                                </div>
-                              </div>
-                              <div data-ce="app-virtual-soccer-named-odds" {...({ name: "Over 2.5" } as any)}>
-                                <div className="virtual-soccer-odds items-center justify-between [height:100%] [transition:0.2s]">
-                                  <div>Over 2.5</div>
-                                  <div>1.90</div>
-                                </div>
-                              </div>
-                              <div data-ce="app-virtual-soccer-named-odds" {...({ name: "Under 3.5" } as any)}>
-                                <div className="virtual-soccer-odds items-center justify-between [height:100%] [transition:0.2s]">
-                                  <div>Under 3.5</div>
-                                  <div>1.25</div>
-                                </div>
-                              </div>
-                              <div data-ce="app-virtual-soccer-named-odds" {...({ name: "Over 3.5" } as any)}>
-                                <div className="virtual-soccer-odds items-center justify-between [height:100%] [transition:0.2s]">
-                                  <div>Over 3.5</div>
-                                  <div>3.75</div>
-                                </div>
-                              </div>
-                              <div data-ce="app-virtual-soccer-named-odds" {...({ name: "Under 4.5" } as any)}>
-                                <div className="virtual-soccer-odds items-center justify-between [height:100%] [transition:0.2s]">
-                                  <div>Under 4.5</div>
-                                  <div>1.05</div>
-                                </div>
-                              </div>
-                              <div data-ce="app-virtual-soccer-named-odds" {...({ name: "Over 4.5" } as any)}>
-                                <div className="virtual-soccer-odds items-center justify-between [height:100%] [transition:0.2s]">
-                                  <div>Over 4.5</div>
-                                  <div>7.00</div>
-                                </div>
-                              </div>
-                            </div>
-                            <div className="virtual-soccer-correct-score [column-gap:calc(2px_*_var(--factor))] [row-gap:calc(2px_*_var(--factor))]">
-                              <div className="virtual-soccer-header items-center justify-center">CORRECT SCORE</div>
-                              <div data-ce="app-virtual-soccer-named-odds" {...({ name: "1:0" } as any)}>
-                                <div className="virtual-soccer-odds items-center justify-between [height:100%] [transition:0.2s]">
-                                  <div>1:0</div>
-                                  <div>9.00</div>
-                                </div>
-                              </div>
-                              <div data-ce="app-virtual-soccer-named-odds" {...({ name: "0:0" } as any)}>
-                                <div className="virtual-soccer-odds items-center justify-between [height:100%] [transition:0.2s]">
-                                  <div>0:0</div>
-                                  <div>10.00</div>
-                                </div>
-                              </div>
-                              <div data-ce="app-virtual-soccer-named-odds" {...({ name: "0:1" } as any)}>
-                                <div className="virtual-soccer-odds items-center justify-between [height:100%] [transition:0.2s]">
-                                  <div>0:1</div>
-                                  <div>8.00</div>
-                                </div>
-                              </div>
-                              <div data-ce="app-virtual-soccer-named-odds" {...({ name: "2:0" } as any)}>
-                                <div className="virtual-soccer-odds items-center justify-between [height:100%] [transition:0.2s]">
-                                  <div>2:0</div>
-                                  <div>11.00</div>
-                                </div>
-                              </div>
-                              <div data-ce="app-virtual-soccer-named-odds" {...({ name: "1:1" } as any)}>
-                                <div className="virtual-soccer-odds items-center justify-between [height:100%] [transition:0.2s]">
-                                  <div>1:1</div>
-                                  <div>7.00</div>
-                                </div>
-                              </div>
-                              <div data-ce="app-virtual-soccer-named-odds" {...({ name: "0:2" } as any)}>
-                                <div className="virtual-soccer-odds items-center justify-between [height:100%] [transition:0.2s]">
-                                  <div>0:2</div>
-                                  <div>10.00</div>
-                                </div>
-                              </div>
-                              <div data-ce="app-virtual-soccer-named-odds" {...({ name: "2:1" } as any)}>
-                                <div className="virtual-soccer-odds items-center justify-between [height:100%] [transition:0.2s]">
-                                  <div>2:1</div>
-                                  <div>9.00</div>
-                                </div>
-                              </div>
-                              <div data-ce="app-virtual-soccer-named-odds" {...({ name: "2:2" } as any)}>
-                                <div className="virtual-soccer-odds items-center justify-between [height:100%] [transition:0.2s]">
-                                  <div>2:2</div>
-                                  <div>10.00</div>
-                                </div>
-                              </div>
-                              <div data-ce="app-virtual-soccer-named-odds" {...({ name: "1:2" } as any)}>
-                                <div className="virtual-soccer-odds items-center justify-between [height:100%] [transition:0.2s]">
-                                  <div>1:2</div>
-                                  <div>9.00</div>
-                                </div>
-                              </div>
-                              <div data-ce="app-virtual-soccer-named-odds3" style={{ gridColumn: "span 3" }} {...({ name: "Any other result" } as any)}>
-                                <div className="virtual-soccer-odds-3 items-center justify-between [height:100%] [transition:0.2s]">
-                                  <div>Any other result</div>
-                                  <div>4.10</div>
-                                </div>
-                              </div>
-                            </div>
-                            <div className="virtual-soccer-both-to-score [column-gap:calc(2px_*_var(--factor))] [row-gap:calc(2px_*_var(--factor))]">
-                              <div className="virtual-soccer-header items-center justify-center">BOTH TEAMS TO SCORE: FULL TIME </div>
-                              <div data-ce="app-virtual-soccer-named-odds" {...({ name: "Yes" } as any)}>
-                                <div className="virtual-soccer-odds items-center justify-between [height:100%] [transition:0.2s]">
-                                  <div>Yes</div>
-                                  <div>1.85</div>
-                                </div>
-                              </div>
-                              <div data-ce="app-virtual-soccer-named-odds" {...({ name: "No" } as any)}>
-                                <div className="virtual-soccer-odds items-center justify-between [height:100%] [transition:0.2s]">
-                                  <div>No</div>
-                                  <div>1.85</div>
-                                </div>
-                              </div>
-                              <div className="virtual-soccer-header items-center justify-center">BOTH TEAMS TO SCORE: 1ST HALF</div>
-                              <div data-ce="app-virtual-soccer-named-odds" {...({ name: "Yes" } as any)}>
-                                <div className="virtual-soccer-odds items-center justify-between [height:100%] [transition:0.2s]">
-                                  <div>Yes</div>
-                                  <div>4.95</div>
-                                </div>
-                              </div>
-                              <div data-ce="app-virtual-soccer-named-odds" {...({ name: "No" } as any)}>
-                                <div className="virtual-soccer-odds items-center justify-between [height:100%] [transition:0.2s]">
-                                  <div>No</div>
-                                  <div>1.15</div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        <div data-ce="app-virtual-soccer-match">
-                          <div className="virtual-soccer-match">
-                            <div className="virtual-soccer-match-header items-center">
-                              <div>194</div>
-                              <div>V-Napoli<small>vs</small>V-Juventus</div>
-                            </div>
-                            <div className="virtual-soccer-final-results [column-gap:calc(2px_*_var(--factor))] [row-gap:calc(2px_*_var(--factor))]">
-                              <div className="virtual-soccer-header items-center justify-center">FULL TIME RESULT</div>
-                              <div data-ce="app-virtual-soccer-named-odds" {...({ name: "1" } as any)}>
-                                <div className="virtual-soccer-odds items-center justify-between [height:100%] [transition:0.2s]">
-                                  <div>1</div>
-                                  <div>2.80</div>
-                                </div>
-                              </div>
-                              <div data-ce="app-virtual-soccer-named-odds" {...({ name: "X" } as any)}>
-                                <div className="virtual-soccer-odds items-center justify-between [height:100%] [transition:0.2s]">
-                                  <div>X</div>
-                                  <div>2.95</div>
-                                </div>
-                              </div>
-                              <div data-ce="app-virtual-soccer-named-odds" {...({ name: "2" } as any)}>
-                                <div className="virtual-soccer-odds items-center justify-between [height:100%] [transition:0.2s]">
-                                  <div>2</div>
-                                  <div>2.45</div>
-                                </div>
-                              </div>
-                              <div className="virtual-soccer-header items-center justify-center">1ST HALF RESULT</div>
-                              <div data-ce="app-virtual-soccer-named-odds" {...({ name: "1" } as any)}>
-                                <div className="virtual-soccer-odds items-center justify-between [height:100%] [transition:0.2s]">
-                                  <div>1</div>
-                                  <div>3.95</div>
-                                </div>
-                              </div>
-                              <div data-ce="app-virtual-soccer-named-odds" {...({ name: "X" } as any)}>
-                                <div className="virtual-soccer-odds items-center justify-between [height:100%] [transition:0.2s]">
-                                  <div>X</div>
-                                  <div>1.90</div>
-                                </div>
-                              </div>
-                              <div data-ce="app-virtual-soccer-named-odds" {...({ name: "2" } as any)}>
-                                <div className="virtual-soccer-odds items-center justify-between [height:100%] [transition:0.2s]">
-                                  <div>2</div>
-                                  <div>3.05</div>
-                                </div>
-                              </div>
-                            </div>
-                            <div className="virtual-soccer-total-goals [column-gap:calc(2px_*_var(--factor))] [row-gap:calc(2px_*_var(--factor))]">
-                              <div className="virtual-soccer-header items-center justify-center">TOTAL GOALS</div>
-                              <div data-ce="app-virtual-soccer-named-odds" {...({ name: "Under 1.5" } as any)}>
-                                <div className="virtual-soccer-odds items-center justify-between [height:100%] [transition:0.2s]">
-                                  <div>Under 1.5</div>
-                                  <div>3.55</div>
-                                </div>
-                              </div>
-                              <div data-ce="app-virtual-soccer-named-odds" {...({ name: "Over 1.5" } as any)}>
-                                <div className="virtual-soccer-odds items-center justify-between [height:100%] [transition:0.2s]">
-                                  <div>Over 1.5</div>
-                                  <div>1.25</div>
-                                </div>
-                              </div>
-                              <div data-ce="app-virtual-soccer-named-odds" {...({ name: "Under 2.5" } as any)}>
-                                <div className="virtual-soccer-odds items-center justify-between [height:100%] [transition:0.2s]">
-                                  <div>Under 2.5</div>
-                                  <div>1.80</div>
-                                </div>
-                              </div>
-                              <div data-ce="app-virtual-soccer-named-odds" {...({ name: "Over 2.5" } as any)}>
-                                <div className="virtual-soccer-odds items-center justify-between [height:100%] [transition:0.2s]">
-                                  <div>Over 2.5</div>
-                                  <div>1.90</div>
-                                </div>
-                              </div>
-                              <div data-ce="app-virtual-soccer-named-odds" {...({ name: "Under 3.5" } as any)}>
-                                <div className="virtual-soccer-odds items-center justify-between [height:100%] [transition:0.2s]">
-                                  <div>Under 3.5</div>
-                                  <div>1.25</div>
-                                </div>
-                              </div>
-                              <div data-ce="app-virtual-soccer-named-odds" {...({ name: "Over 3.5" } as any)}>
-                                <div className="virtual-soccer-odds items-center justify-between [height:100%] [transition:0.2s]">
-                                  <div>Over 3.5</div>
-                                  <div>3.75</div>
-                                </div>
-                              </div>
-                              <div data-ce="app-virtual-soccer-named-odds" {...({ name: "Under 4.5" } as any)}>
-                                <div className="virtual-soccer-odds items-center justify-between [height:100%] [transition:0.2s]">
-                                  <div>Under 4.5</div>
-                                  <div>1.10</div>
-                                </div>
-                              </div>
-                              <div data-ce="app-virtual-soccer-named-odds" {...({ name: "Over 4.5" } as any)}>
-                                <div className="virtual-soccer-odds items-center justify-between [height:100%] [transition:0.2s]">
-                                  <div>Over 4.5</div>
-                                  <div>6.90</div>
-                                </div>
-                              </div>
-                            </div>
-                            <div className="virtual-soccer-correct-score [column-gap:calc(2px_*_var(--factor))] [row-gap:calc(2px_*_var(--factor))]">
-                              <div className="virtual-soccer-header items-center justify-center">CORRECT SCORE</div>
-                              <div data-ce="app-virtual-soccer-named-odds" {...({ name: "1:0" } as any)}>
-                                <div className="virtual-soccer-odds items-center justify-between [height:100%] [transition:0.2s]">
-                                  <div>1:0</div>
-                                  <div>9.50</div>
-                                </div>
-                              </div>
-                              <div data-ce="app-virtual-soccer-named-odds" {...({ name: "0:0" } as any)}>
-                                <div className="virtual-soccer-odds items-center justify-between [height:100%] [transition:0.2s]">
-                                  <div>0:0</div>
-                                  <div>12.00</div>
-                                </div>
-                              </div>
-                              <div data-ce="app-virtual-soccer-named-odds" {...({ name: "0:1" } as any)}>
-                                <div className="virtual-soccer-odds items-center justify-between [height:100%] [transition:0.2s]">
-                                  <div>0:1</div>
-                                  <div>8.00</div>
-                                </div>
-                              </div>
-                              <div data-ce="app-virtual-soccer-named-odds" {...({ name: "2:0" } as any)}>
-                                <div className="virtual-soccer-odds items-center justify-between [height:100%] [transition:0.2s]">
-                                  <div>2:0</div>
-                                  <div>11.50</div>
-                                </div>
-                              </div>
-                              <div data-ce="app-virtual-soccer-named-odds" {...({ name: "1:1" } as any)}>
-                                <div className="virtual-soccer-odds items-center justify-between [height:100%] [transition:0.2s]">
-                                  <div>1:1</div>
-                                  <div>7.00</div>
-                                </div>
-                              </div>
-                              <div data-ce="app-virtual-soccer-named-odds" {...({ name: "0:2" } as any)}>
-                                <div className="virtual-soccer-odds items-center justify-between [height:100%] [transition:0.2s]">
-                                  <div>0:2</div>
-                                  <div>9.50</div>
-                                </div>
-                              </div>
-                              <div data-ce="app-virtual-soccer-named-odds" {...({ name: "2:1" } as any)}>
-                                <div className="virtual-soccer-odds items-center justify-between [height:100%] [transition:0.2s]">
-                                  <div>2:1</div>
-                                  <div>9.00</div>
-                                </div>
-                              </div>
-                              <div data-ce="app-virtual-soccer-named-odds" {...({ name: "2:2" } as any)}>
-                                <div className="virtual-soccer-odds items-center justify-between [height:100%] [transition:0.2s]">
-                                  <div>2:2</div>
-                                  <div>10.00</div>
-                                </div>
-                              </div>
-                              <div data-ce="app-virtual-soccer-named-odds" {...({ name: "1:2" } as any)}>
-                                <div className="virtual-soccer-odds items-center justify-between [height:100%] [transition:0.2s]">
-                                  <div>1:2</div>
-                                  <div>9.00</div>
-                                </div>
-                              </div>
-                              <div data-ce="app-virtual-soccer-named-odds3" style={{ gridColumn: "span 3" }} {...({ name: "Any other result" } as any)}>
-                                <div className="virtual-soccer-odds-3 items-center justify-between [height:100%] [transition:0.2s]">
-                                  <div>Any other result</div>
-                                  <div>4.10</div>
-                                </div>
-                              </div>
-                            </div>
-                            <div className="virtual-soccer-both-to-score [column-gap:calc(2px_*_var(--factor))] [row-gap:calc(2px_*_var(--factor))]">
-                              <div className="virtual-soccer-header items-center justify-center">BOTH TEAMS TO SCORE: FULL TIME </div>
-                              <div data-ce="app-virtual-soccer-named-odds" {...({ name: "Yes" } as any)}>
-                                <div className="virtual-soccer-odds items-center justify-between [height:100%] [transition:0.2s]">
-                                  <div>Yes</div>
-                                  <div>1.80</div>
-                                </div>
-                              </div>
-                              <div data-ce="app-virtual-soccer-named-odds" {...({ name: "No" } as any)}>
-                                <div className="virtual-soccer-odds items-center justify-between [height:100%] [transition:0.2s]">
-                                  <div>No</div>
-                                  <div>1.90</div>
-                                </div>
-                              </div>
-                              <div className="virtual-soccer-header items-center justify-center">BOTH TEAMS TO SCORE: 1ST HALF</div>
-                              <div data-ce="app-virtual-soccer-named-odds" {...({ name: "Yes" } as any)}>
-                                <div className="virtual-soccer-odds items-center justify-between [height:100%] [transition:0.2s]">
-                                  <div>Yes</div>
-                                  <div>5.00</div>
-                                </div>
-                              </div>
-                              <div data-ce="app-virtual-soccer-named-odds" {...({ name: "No" } as any)}>
-                                <div className="virtual-soccer-odds items-center justify-between [height:100%] [transition:0.2s]">
-                                  <div>No</div>
-                                  <div>1.15</div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
+                      {offer.error && <p role="alert">{offer.error}</p>}
+                      <div className="virtual-soccer-offer gap-[5px]">
+                        {offer.matches.map((match, i) => <VirtualMatchView key={match.item_id} match={match} first={i === 0} />)}
                       </div>
-                      <div className="virtual-soccer-offer-results [height:calc(43px_*_var(--factor))] [margin-top:calc(10px_*_var(--factor))]">
-                        <div>RESULTS</div>
-                        <div>
-                          <img src="/site-assets/08f06d6c0a6bafdc-c12bc7680f689c1a69642fb9dd7e1cce.png" width="27" height="27" />
-                          <div>LAST 3 RESULTS</div>
-                          <div />
-                          <div className="result [font-weight:700]">
-                            <span>190: </span>
-                            <span>V-Man.United <small>vs</small> V-Tottenham 1:2 (0:0)</span>
-                            <span>    |</span>
-                          </div>
-                          <div className="result [font-weight:700]">
-                            <span>189: </span>
-                            <span>V-Sporting <small>vs</small> V-Porto 0:3 (0:1)</span>
-                            <span>    |</span>
-                          </div>
-                          <div className="result [font-weight:700]">
-                            <span>188: </span>
-                            <span>V-Leverkusen <small>vs</small> V-Dortmund 0:3 (0:2)</span>
-                          </div>
-                          <div style={{ flexGrow: "1" }} />
-                        </div>
+                      <div className="virtual-results-live mt-2 flex flex-wrap items-center gap-3 p-3">
+                        <strong>LAST 3 RESULTS</strong>
+                        {offer.results.map(result => <span key={result.id}><strong>{result.daily_id}: </strong>{result.home} vs {result.away} <strong>{result.result_ft.home}:{result.result_ft.away}</strong> ({result.result_ht.home}:{result.result_ht.away})</span>)}
                       </div>
                     </div>
                     <div data-ce="app-virtual-soccer-sidebar">
                       <div className="virtual-soccer-sidebar">
                         <div data-ce="app-virtual-soccer-tracker">
-                          <div className="virtual-soccer-tracker">
-                            <div>
-                              <div className="selected [height:calc(35px_*_var(--factor))]"> STREAM </div>
-                              <div> TRACKER </div>
+                          <div className="virtual-viewer">
+                            <div role="tablist" aria-label="Virtual match viewer" className="flex">
+                              <Button variant="ghost" role="tab" aria-selected={view === "stream"} className="virtual-view-tab" onClick={() => setView("stream")}>Stream</Button>
+                              <Button variant="ghost" role="tab" aria-selected={view === "tracker"} className="virtual-view-tab" onClick={() => setView("tracker")}>Tracker</Button>
                             </div>
-                            <div>
-                              <input type="checkbox" id="virtualSoccerExpand" />
-                              <label htmlFor="virtualSoccerExpand">
-                                <icon {...({ href: "https://fortebet.ug/#icoExpand", classname: "current h23", "_nghost-bdf-c39": "" } as any)}>
-                                  <svg className="current h23 align-middle [transition:0.5s]" viewBox="0 0 100 100" {...({ "_ngcontent-bdf-c39": "" } as any)}>
-                                    <use xlinkHref="#icoExpand" {...({ "_ngcontent-bdf-c39": "" } as any)} />
-                                  </svg>
-                                </icon>
-                                <span>Expand stream</span>
-                              </label>
-                              <img style={{ width: "277px", maxWidth: "100%", height: "auto" }} alt="" src="/site-assets/42503a688adf70a8.png" data-site-import-static-fallback="video" />
-                            </div>
+                            <iframe key={viewerUrl} src={viewerUrl} title={view === "stream" ? "Virtual soccer stream" : "Virtual soccer tracker"} className="virtual-view-frame" allow="autoplay; fullscreen" allowFullScreen />
+                            <Button className="virtual-expand" onClick={() => setExpanded(true)}><Maximize />Expand {view}</Button>
                           </div>
                         </div>
                         <div data-ce="app-virtual-soccer-ticket">
@@ -1027,7 +456,7 @@ function Index() {
                               <div>BET SLIP - VIRTUAL SOCCER</div>
                               <div />
                             </div>
-                            <div className="virtual-ticket-content-empty text-center [font-weight:400] [margin-top:calc(10px_*_var(--factor))] [min-height:calc(10px_*_var(--factor))]"> Your Ticket is still empty </div>
+                            <div className="virtual-ticket-content-empty text-center [font-weight:400] [margin-top:calc(10px_*_var(--factor))] [min-height:calc(10px_*_var(--factor))]"> Real-money betting is unavailable here. </div>
                           </div>
                         </div>
                       </div>
@@ -1112,7 +541,39 @@ function Index() {
           </div>
         </div>
       </div>
+      <Dialog.Root open={expanded} onOpenChange={setExpanded}>
+        <Dialog.Portal><Dialog.Overlay className="fixed inset-0 z-[1000] bg-account-overlay" />
+          <Dialog.Content className="virtual-expanded fixed left-1/2 top-1/2 z-[1001] w-[calc(100%-24px)] max-w-[900px] -translate-x-1/2 -translate-y-1/2">
+            <div className="flex items-center justify-between bg-brand-600 p-2"><Dialog.Title>Virtual Soccer · {view}</Dialog.Title><Dialog.Close asChild><Button variant="ghost" size="icon" aria-label="Close virtual viewer"><X /></Button></Dialog.Close></div>
+            <Dialog.Description className="sr-only">Live virtual soccer match viewer</Dialog.Description>
+            <iframe src={expanded ? viewerUrl : undefined} title="Expanded virtual soccer viewer" className="h-[min(70dvh,640px)] w-full border-0" allow="autoplay; fullscreen" allowFullScreen />
+          </Dialog.Content>
+        </Dialog.Portal>
+      </Dialog.Root>
       <img style={{ position: "absolute", width: "1px", height: "1px", left: "0px", bottom: "0px", opacity: "0" }} src="/site-assets/b7c11b29322e4de2.gif" />
     </>
   );
+}
+
+
+function VirtualMatchView({ match, first }: { match: VirtualMatch; first: boolean }) {
+  const groups = [
+    { title: "FULL TIME RESULT", markets: ["1"], ids: [1, 2, 3], cols: 3 },
+    { title: "1ST HALF RESULT", markets: ["2"], ids: [6, 7, 8], cols: 3 },
+    { title: "TOTAL GOALS", markets: ["3", "4", "5", "6"], cols: 2 },
+    { title: "CORRECT SCORE", markets: ["7", "8", "9", "10"], ids: [19,22,26,20,23,27,21,24,25,28], cols: 3 },
+    { title: "BOTH TEAMS TO SCORE: FULL TIME", markets: ["11"], cols: 2 },
+    { title: "BOTH TEAMS TO SCORE: 1ST HALF", markets: ["12"], cols: 2 },
+  ];
+  return <div data-ce="app-virtual-soccer-match"><div className={`virtual-soccer-match ${first ? "selected" : ""}`}>
+    <div className="virtual-soccer-match-header items-center"><div>{match.item_daily_id}</div><div>{match.home}<small>vs</small>{match.away}</div></div>
+    {groups.map(group => {
+      const odds = group.markets.flatMap(id => Object.values(match.odds[id]?.odds ?? {}));
+      const sorted = group.ids ? group.ids.flatMap(id => odds.filter(odd => odd.id === id)) : odds;
+      return <div key={group.title} className={`virtual-market-grid ${group.cols === 3 ? "virtual-three" : "virtual-two"}`}>
+        <div className="virtual-market-title">{group.title}</div>
+        {sorted.map(odd => <div key={odd.id} className={`virtual-odd-display ${odd.id === 28 ? "virtual-wide" : ""}`}><span>{virtualOddLabel(odd)}</span><strong>{Number.isFinite(odd.odds_val) && odd.odds_val > 0 ? odd.odds_val.toFixed(2) : "—"}</strong></div>)}
+      </div>;
+    })}
+  </div></div>;
 }
