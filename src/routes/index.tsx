@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { BannerSlider, BetSlip, useSels, OfferCenter, HeaderClock, LiveOddsFeed } from "@/components/fortebet-live";
+import { TicketSearch } from "@/components/ticket-check";
 import { OfferSearch, DateFilter, OddsRange, TopBetsList, MySelection, SportsList } from "@/components/offer-sidebar";
 import { OfferFilterProvider } from "@/components/offer-context";
 import capturedCSS from "../styles/site.css?raw";
@@ -433,16 +434,7 @@ function Index() {
                     <ImportedNativeTag0 {...({ "_nghost-oky-c53": "" } as any)}>
                       <BetSlip slip={slip} />
                     </ImportedNativeTag0>
-                    <div data-ce="sbticket-search" {...({ "_nghost-oky-c54": "" } as any)}>
-                      <div className="ticketSearch" {...({ "_ngcontent-oky-c54": "" } as any)}>
-                        <h3 {...({ "_ngcontent-oky-c54": "" } as any)}>Ticket search</h3>
-                        <input className="w100p" type="text" placeholder="Insert ticket number ..." name="ticketSearch" pattern="^\d+$" inputMode="numeric" {...({ "_ngcontent-oky-c54": "", inputonlynumbers: "" } as any)} />
-                        <div className="buttons" {...({ "_ngcontent-oky-c54": "" } as any)}>
-                          <a {...({ "_ngcontent-oky-c54": "" } as any)}> Check ticket </a>
-                        </div>
-                      </div>
-                      <div className="overlayLoader items-center justify-center" {...({ "_ngcontent-oky-c54": "" } as any)} />
-                    </div>
+                    <TicketSearch />
                   </div>
                 </div>
                 </OfferFilterProvider>
