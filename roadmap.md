@@ -22,5 +22,6 @@
 - [x] Last winners strip from the real winners feed (click opens the game)
 - [x] Aviator opens through Fortebet's play-game (free mode)
 - [x] Login window (form checks only; sends nothing)
+- [ ] Match public floating login and registration windows; disconnected preview only
 - [ ] Real account sign-in / register / real-money play — not built: needs to run on Fortebet’s own site
 - [ ] Real bet placement / Save i-Ticket — blocked: needs an authorized Fortebet account connection
