@@ -352,7 +352,7 @@ function Index() {
                     <a {...({ "_ngcontent-oky-c202": "", translate: "" } as any)}>Register</a>
                   </div>
                   <div className="buttons login" {...({ "_ngcontent-oky-c202": "" } as any)}>
-                    <a {...({ "_ngcontent-oky-c202": "" } as any)}><span className="ico login h15" {...({ "_ngcontent-oky-c202": "" } as any)} />Login</a>
+                    <a role="button" onClick={openLogin} {...({ "_ngcontent-oky-c202": "" } as any)}><span className="ico login h15" {...({ "_ngcontent-oky-c202": "" } as any)} />Login</a>
                   </div>
                 </div>
               </div>
