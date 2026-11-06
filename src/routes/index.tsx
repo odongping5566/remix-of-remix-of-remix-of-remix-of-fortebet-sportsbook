@@ -1,6 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { TopBetsList, SportsList, BannerSlider, MatchesPanel, BetSlip, useSels } from "@/components/fortebet-live";
+import { BannerSlider, BetSlip, useSels, OfferCenter, HeaderClock, LiveOddsFeed } from "@/components/fortebet-live";
+import { OfferSearch, DateFilter, OddsRange, TopBetsList, MySelection, SportsList } from "@/components/offer-sidebar";
+import { OfferFilterProvider } from "@/components/offer-context";
 import capturedCSS from "../styles/site.css?raw";
 
 const ImportedNativeTag0 = "sbticket" as import("react").ElementType;
@@ -333,7 +335,7 @@ function Index() {
               <div className="header items-center" {...({ "_ngcontent-oky-c202": "" } as any)}>
                 <h1 {...({ "_ngcontent-oky-c202": "" } as any)}>Fortebet</h1>
                 <div {...({ "_ngcontent-oky-c202": "" } as any)}>
-                  <div className="timer" {...({ "_ngcontent-oky-c202": "" } as any)}><span className="ico clock h12" {...({ "_ngcontent-oky-c202": "" } as any)} /> Nov 05 2026, 07:16:46 AM </div>
+                  <div className="timer" {...({ "_ngcontent-oky-c202": "" } as any)}><span className="ico clock h12" {...({ "_ngcontent-oky-c202": "" } as any)} /><HeaderClock /></div>
                   <div className="buttons hover" {...({ "_ngcontent-oky-c202": "" } as any)}>
                     <a href="/contact" {...({ "_ngcontent-oky-c202": "" } as any)}>CONTACT US</a>
                   </div>
@@ -398,104 +400,16 @@ function Index() {
                 <div className="simSubGrid [column-gap:calc(10px_*_var(--factor))]">
                   <div className="staticModul" id="app-leftbar">
                     <div className="eventsFilter [gap:calc(8px_*_var(--factor))]">
-                      <div data-ce="offer-search" {...({ "_nghost-oky-c41": "" } as any)}>
-                        <div className="searchOffer" {...({ "_ngcontent-oky-c41": "" } as any)}>
-                          <input id="searchInputEl" name="searchOffer" type="text" placeholder="Looking for something?" autoComplete="off" {...({ "_ngcontent-oky-c41": "" } as any)} />
-                          <label htmlFor="searchInputEl" {...({ "_ngcontent-oky-c41": "" } as any)}>
-                            <icon {...({ "_ngcontent-oky-c41": "", href: "#icoGlass", classname: "current h20", "_nghost-oky-c39": "" } as any)}>
-                              <svg className="current h20 align-middle" viewBox="0 0 100 100" {...({ "_ngcontent-oky-c39": "" } as any)}>
-                                <use xlinkHref="#icoGlass" {...({ "_ngcontent-oky-c39": "" } as any)} />
-                              </svg>
-                            </icon>
-                          </label>
-                        </div>
-                      </div>
-                      <div data-ce="offer-date-filter" {...({ "_nghost-oky-c44": "" } as any)}>
-                        <div className="time [gap:calc(1px_*_var(--factor))]" {...({ "_ngcontent-oky-c44": "" } as any)}>
-                          <a {...({ "_ngcontent-oky-c44": "", "click-stop-propagation": "" } as any)}> Today </a>
-                          <a {...({ "_ngcontent-oky-c44": "", "click-stop-propagation": "" } as any)}> Tomorrow </a>
-                          <a className="active" {...({ "_ngcontent-oky-c44": "", "click-stop-propagation": "" } as any)}> All </a>
-                          <a {...({ "_ngcontent-oky-c44": "", "click-stop-propagation": "" } as any)}> 1 Hour </a>
-                          <a {...({ "_ngcontent-oky-c44": "", "click-stop-propagation": "" } as any)}> 3 Hours </a>
-                          <a id="filterCalIcon" {...({ "_ngcontent-oky-c44": "", "click-stop-propagation": "" } as any)}>
-                            <icon {...({ "_ngcontent-oky-c44": "", href: "#icoCalendar", classname: "current h16", "_nghost-oky-c39": "" } as any)}>
-                              <svg className="current h16 align-middle" viewBox="0 0 100 100" {...({ "_ngcontent-oky-c39": "" } as any)}>
-                                <use xlinkHref="#icoCalendar" {...({ "_ngcontent-oky-c39": "" } as any)} />
-                              </svg>
-                            </icon>
-                          </a>
-                        </div>
-                      </div>
-                      <div data-ce="offer-odds-range-filter" {...({ "_nghost-oky-c46": "" } as any)}>
-                        <div className="oddsRange" {...({ "_ngcontent-oky-c46": "" } as any)}>
-                          <div className="buttons [gap:calc(5px_*_var(--factor))] [transition:0.3s]" {...({ "_ngcontent-oky-c46": "" } as any)}>
-                            <a className="clearRange" id="oddsRangeReset" {...({ "_ngcontent-oky-c46": "" } as any)}>Reset range</a>
-                            <a className="collapseButton" {...({ "_ngcontent-oky-c46": "" } as any)}>
-                              <icon {...({ "_ngcontent-oky-c46": "", href: "#icoArrowSimple", "_nghost-oky-c39": "" } as any)}>
-                                <svg className="h16 t180 align-middle" viewBox="0 0 100 100" {...({ "_ngcontent-oky-c39": "" } as any)}>
-                                  <use xlinkHref="#icoArrowSimple" {...({ "_ngcontent-oky-c39": "" } as any)} />
-                                </svg>
-                              </icon>
-                            </a>
-                          </div>
-                          <h3 {...({ "_ngcontent-oky-c46": "" } as any)}>Odds range</h3>
-                          <div className="oddsRangeContent oddsRangeContent--collapsed" {...({ "_ngcontent-oky-c46": "" } as any)}>
-                            <div className="oddsSliderLine" {...({ "_ngcontent-oky-c46": "" } as any)}>
-                              <div {...({ "_ngcontent-oky-c46": "" } as any)}>
-                                <span id="oddsSliderLeft" {...({ "_ngcontent-oky-c46": "" } as any)} />
-                                <span id="oddsSliderRight" {...({ "_ngcontent-oky-c46": "" } as any)} />
-                              </div>
-                            </div>
-                            <div className="oddsRangeValues" {...({ "_ngcontent-oky-c46": "" } as any)}>
-                              <div {...({ "_ngcontent-oky-c46": "" } as any)}>
-                                <input type="text" id="oddsRangeMin" pattern="^\d+(\.{0,1}\d{0,2})$" inputMode="decimal" {...({ "_ngcontent-oky-c46": "", inputonlynumbers: "" } as any)} />
-                                <label htmlFor="oddsRangeMin" {...({ "_ngcontent-oky-c46": "" } as any)}>Min.</label>
-                              </div>
-                              <div {...({ "_ngcontent-oky-c46": "" } as any)}>
-                                <input type="text" id="oddsRangeMax" pattern="^\d+(\.{0,1}\d{0,2})$" inputMode="decimal" {...({ "_ngcontent-oky-c46": "", inputonlynumbers: "" } as any)} />
-                                <label htmlFor="oddsRangeMax" {...({ "_ngcontent-oky-c46": "" } as any)}>Max.</label>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
+                      <OfferSearch />
+                      <DateFilter />
+                      <OddsRange />
                     </div>
                     <div className="eventsMenu">
                       <div data-ce="offer-top-tournaments" {...({ "_nghost-oky-c38": "" } as any)}>
                         <h3 {...({ "_ngcontent-oky-c38": "" } as any)}>Top Bets</h3>
                         <TopBetsList />
                       </div>
-                      <div data-ce="offer-my-selection" {...({ "_nghost-oky-c48": "" } as any)}>
-                        <div className="mySelection" {...({ "_ngcontent-oky-c48": "" } as any)}>
-                          <strong {...({ "_ngcontent-oky-c48": "" } as any)}>My selection</strong>
-                          <div className="list" {...({ "_ngcontent-oky-c48": "" } as any)}>
-                            <div className="buttons disabled" {...({ "_ngcontent-oky-c48": "" } as any)}>
-                              <a {...({ "_ngcontent-oky-c48": "" } as any)}>
-                                <strong {...({ "_ngcontent-oky-c48": "" } as any)}><icon {...({ "_ngcontent-oky-c48": "", classname: "h12", href: "#icoFlag", "_nghost-oky-c39": "" } as any)}><svg className="h12 align-middle" viewBox="0 0 100 100" {...({ "_ngcontent-oky-c39": "" } as any)}><use xlinkHref="#icoFlag" {...({ "_ngcontent-oky-c39": "" } as any)} /></svg></icon> 0 </strong>
-                                <span {...({ "_ngcontent-oky-c48": "" } as any)}>My favorite<br {...({ "_ngcontent-oky-c48": "" } as any)} /> leagues</span>
-                              </a>
-                            </div>
-                            <div className="buttons disabled" {...({ "_ngcontent-oky-c48": "" } as any)}>
-                              <a {...({ "_ngcontent-oky-c48": "" } as any)}>
-                                <strong {...({ "_ngcontent-oky-c48": "" } as any)}><icon {...({ "_ngcontent-oky-c48": "", classname: "h12", href: "#icoStar", "_nghost-oky-c39": "" } as any)}><svg className="h12 align-middle" viewBox="0 0 100 100" {...({ "_ngcontent-oky-c39": "" } as any)}><use xlinkHref="#icoStar" {...({ "_ngcontent-oky-c39": "" } as any)} /></svg></icon> 0 </strong>
-                                <span {...({ "_ngcontent-oky-c48": "" } as any)}>My favorite<br {...({ "_ngcontent-oky-c48": "" } as any)} /> matches</span>
-                              </a>
-                            </div>
-                            <div className="buttons disabled" {...({ "_ngcontent-oky-c48": "" } as any)}>
-                              <a {...({ "_ngcontent-oky-c48": "" } as any)}>
-                                <strong {...({ "_ngcontent-oky-c48": "" } as any)}><icon {...({ "_ngcontent-oky-c48": "", classname: "h12", href: "#icoHeart", "_nghost-oky-c39": "" } as any)}><svg className="h12 align-middle" viewBox="0 0 100 100" {...({ "_ngcontent-oky-c39": "" } as any)}><use xlinkHref="#icoHeart" {...({ "_ngcontent-oky-c39": "" } as any)} /></svg></icon> 0 </strong>
-                                <span {...({ "_ngcontent-oky-c48": "" } as any)}>My favorite<br {...({ "_ngcontent-oky-c48": "" } as any)} /> teams</span>
-                              </a>
-                            </div>
-                            <div className="buttons" {...({ "_ngcontent-oky-c48": "" } as any)}>
-                              <a {...({ "_ngcontent-oky-c48": "" } as any)}>
-                                <strong {...({ "_ngcontent-oky-c48": "" } as any)}><span className="favSquare" {...({ "_ngcontent-oky-c48": "" } as any)} /> 0 </strong>
-                                <span {...({ "_ngcontent-oky-c48": "" } as any)}>My current<br {...({ "_ngcontent-oky-c48": "" } as any)} /> selection</span>
-                              </a>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
+                      <MySelection />
                       <div data-ce="offer-sct-select" {...({ "_nghost-oky-c49": "" } as any)}>
                         <SportsList />
                       </div>
@@ -511,13 +425,7 @@ function Index() {
                   </div>
                   <div className="staticModul" id="app-content">
                     <div data-ce="prematch-landing">
-                      <div data-ce="app-widget-slider">
-                        <BannerSlider />
-                      </div>
-                      <div data-ce="offer-highlighted-events" {...({ "_nghost-oky-c71": "" } as any)}>
-                        <MatchesPanel mode={mode} sels={sels} toggle={toggle} />
-                      </div>
-                      <div />
+                      <OfferCenter slip={slip} mode={mode} banner={<div data-ce="app-widget-slider"><BannerSlider /></div>} />
                     </div>
                   </div>
                   <div className="staticModul" id="app-rightbar">

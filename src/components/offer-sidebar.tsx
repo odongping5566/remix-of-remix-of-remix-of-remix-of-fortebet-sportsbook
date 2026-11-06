@@ -48,7 +48,7 @@ export function OfferSearch() {
         <label htmlFor="searchInputEl">
           {f.q ? (
             <a className="curPointer" aria-label="Clear search" onClick={() => { set({ q: "" }); setOpen(false); }} style={{ position: "absolute", right: 8, top: 4, color: "rgb(0,166,90)", fontSize: 18, fontWeight: 900 }}>✕</a>
-          ) : <icon href="#icoGlass" classname="current h20"><Icon href="#icoGlass" /></icon>}
+          ) : <icon {...({ href: "#icoGlass", classname: "current h20" } as any)}><Icon href="#icoGlass" /></icon>}
         </label>
         {open && q.length > 0 && (
           <div className="results" style={{ zIndex: 50, maxHeight: 420, overflowY: "auto" }}>
@@ -83,7 +83,7 @@ export function DateFilter() {
           <a key={d.key} className={`curPointer ${f.date === d.key ? "active" : ""}`} onClick={() => { set({ date: d.key, cal: "" }); setCal(false); }}> {d.label} </a>
         ))}
         <a id="filterCalIcon" className={`curPointer ${f.date === "CAL" ? "active" : ""}`} aria-label="Pick a day" onClick={() => setCal((x) => !x)}>
-          <icon href="#icoCalendar" classname="current h16"><Icon href="#icoCalendar" cls="current h16" /></icon>
+          <icon {...({ href: "#icoCalendar", classname: "current h16" } as any)}><Icon href="#icoCalendar" cls="current h16" /></icon>
         </a>
       </div>
       {cal && (
@@ -148,7 +148,7 @@ export function OddsRange() {
         <div className="buttons [gap:calc(5px_*_var(--factor))] [transition:0.3s]">
           <a className="clearRange" id="oddsRangeReset" onClick={() => set({ min: ODDS_MIN, max: ODDS_MAX })} style={leftSet || rightSet ? { opacity: 1, cursor: "pointer" } : undefined}>Reset range</a>
           <a className="collapseButton curPointer" aria-label="Show odds range" onClick={() => setOpen((x) => !x)}>
-            <icon href="#icoArrowSimple"><svg className={`h16 ${open ? "" : "t180"} align-middle`} viewBox="0 0 100 100"><use xlinkHref="#icoArrowSimple" /></svg></icon>
+            <icon {...({ href: "#icoArrowSimple" } as any)}><svg className={`h16 ${open ? "" : "t180"} align-middle`} viewBox="0 0 100 100"><use xlinkHref="#icoArrowSimple" /></svg></icon>
           </a>
         </div>
         <h3 className="curPointer" onClick={() => setOpen((x) => !x)}>Odds range</h3>
@@ -209,7 +209,7 @@ export function MySelection() {
   const box = (icon: string, n: number, label: ReactNode, onClick: () => void, extra?: ReactNode) => (
     <div className={`buttons ${n ? "" : "disabled"}`}>
       <a className={n ? "curPointer" : ""} onClick={() => n && onClick()}>
-        <strong>{extra ?? <icon classname="h12" href={icon}><Icon href={icon} cls="h12" /></icon>} {n} </strong>
+        <strong>{extra ?? <icon {...({ href: icon, classname: "h12" } as any)}><Icon href={icon} cls="h12" /></icon>} {n} </strong>
         <span>{label}</span>
       </a>
     </div>
