@@ -323,7 +323,7 @@ export function SportsView({ slip }: { slip: Slip }) {
         const cols = useQf ? qf!.cols : sport?.cols ?? ["1", "X", "2"];
         const favL = favs.leagues.includes(g.t.id);
         return (
-          <div key={g.t.id}>
+          <div key={g.t.id} style={{ display: "contents" }}>
             <div className="offerHead" style={{ background: "#cea642", color: "#20222c", marginTop: 8, textTransform: "uppercase" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                 <span className={`ico flag ${g.icon}`} /> {g.cat} - {g.t.name}
