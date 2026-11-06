@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SlotsRouteImport } from './routes/slots'
+import { Route as VirtualSoccerRouteImport } from './routes/virtual-soccer'
 import { Route as LivePreviewRouteImport } from './routes/live_.preview'
 import { Route as LiveEventIdRouteImport } from './routes/live_.event_.$id'
 import { Route as SlotsGameIdentRouteImport } from './routes/slots.game.$ident'
@@ -23,6 +24,11 @@ const IndexRoute = IndexRouteImport.update({
 const SlotsRoute = SlotsRouteImport.update({
   id: '/slots',
   path: '/slots',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VirtualSoccerRoute = VirtualSoccerRouteImport.update({
+  id: '/virtual-soccer',
+  path: '/virtual-soccer',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LivePreviewRoute = LivePreviewRouteImport.update({
@@ -44,6 +50,7 @@ const SlotsGameIdentRoute = SlotsGameIdentRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/slots': typeof SlotsRouteWithChildren
+  '/virtual-soccer': typeof VirtualSoccerRoute
   '/live/preview': typeof LivePreviewRoute
   '/live/event/$id': typeof LiveEventIdRoute
   '/slots/game/$ident': typeof SlotsGameIdentRoute
@@ -51,6 +58,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/slots': typeof SlotsRouteWithChildren
+  '/virtual-soccer': typeof VirtualSoccerRoute
   '/live/preview': typeof LivePreviewRoute
   '/live/event/$id': typeof LiveEventIdRoute
   '/slots/game/$ident': typeof SlotsGameIdentRoute
@@ -59,6 +67,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/slots': typeof SlotsRouteWithChildren
+  '/virtual-soccer': typeof VirtualSoccerRoute
   '/live_/preview': typeof LivePreviewRoute
   '/live_/event_/$id': typeof LiveEventIdRoute
   '/slots/game/$ident': typeof SlotsGameIdentRoute
@@ -66,14 +75,25 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/slots' | '/live/preview' | '/live/event/$id' | '/slots/game/$ident'
+    | '/'
+    | '/slots'
+    | '/virtual-soccer'
+    | '/live/preview'
+    | '/live/event/$id'
+    | '/slots/game/$ident'
   fileRoutesByTo: FileRoutesByTo
   to:
-    '/' | '/slots' | '/live/preview' | '/live/event/$id' | '/slots/game/$ident'
+    | '/'
+    | '/slots'
+    | '/virtual-soccer'
+    | '/live/preview'
+    | '/live/event/$id'
+    | '/slots/game/$ident'
   id:
     | '__root__'
     | '/'
     | '/slots'
+    | '/virtual-soccer'
     | '/live_/preview'
     | '/live_/event_/$id'
     | '/slots/game/$ident'
@@ -82,6 +102,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   SlotsRoute: typeof SlotsRouteWithChildren
+  VirtualSoccerRoute: typeof VirtualSoccerRoute
   LivePreviewRoute: typeof LivePreviewRoute
   LiveEventIdRoute: typeof LiveEventIdRoute
 }
@@ -100,6 +121,13 @@ declare module '@tanstack/react-router' {
       path: '/slots'
       fullPath: '/slots'
       preLoaderRoute: typeof SlotsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/virtual-soccer': {
+      id: '/virtual-soccer'
+      path: '/virtual-soccer'
+      fullPath: '/virtual-soccer'
+      preLoaderRoute: typeof VirtualSoccerRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/live_/preview': {
@@ -139,6 +167,7 @@ const SlotsRouteWithChildren = SlotsRoute._addFileChildren(SlotsRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   SlotsRoute: SlotsRouteWithChildren,
+  VirtualSoccerRoute: VirtualSoccerRoute,
   LivePreviewRoute: LivePreviewRoute,
   LiveEventIdRoute: LiveEventIdRoute,
 }
