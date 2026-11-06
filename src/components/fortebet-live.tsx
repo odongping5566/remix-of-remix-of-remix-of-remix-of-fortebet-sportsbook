@@ -196,7 +196,7 @@ export function BetSlip({ sels, remove, clear, title = "Sportsbook" }: { sels: S
     const map: Record<string, [string, string]> = { "1": ["Full Time Result", h], X: ["Full Time Result", "Draw"], "2": ["Full Time Result", a], "1X": ["Double Chance", `${h} or Draw`], X2: ["Double Chance", `Draw or ${a}`], "12": ["Double Chance", "No Draw"] };
     return map[s.pick] ?? ["", s.pick];
   };
-  const btn: CSSProperties = { background: "#e4e4e6", color: "#333", fontWeight: 700, fontSize: 12, padding: "6px 0", textAlign: "center", cursor: "pointer" };
+  const btn: CSSProperties = { background: "#e4e4e6", color: "#333", fontWeight: 700, fontSize: 11, padding: "4px 0", textAlign: "center", cursor: "pointer" };
   return (
     <div className="ticket">
       <div className="ticketHead"> Bet slip - {title} <div /></div>
@@ -207,7 +207,7 @@ export function BetSlip({ sels, remove, clear, title = "Sportsbook" }: { sels: S
       {sels.length === 0 ? (
         <div className="empty"> Your Ticket is still empty </div>
       ) : (
-        <div style={{ fontSize: 11, fontWeight: 700, lineHeight: 1.25 }}>
+        <div style={{ fontSize: 11, fontWeight: 700, lineHeight: 1.25, margin: 0, padding: 0, width: "100%" }}>
           <div style={{ background: G, color: "#fff" }}>
             {sels.map((s, i) => {
               const [mk, out] = describe(s);
@@ -224,18 +224,18 @@ export function BetSlip({ sels, remove, clear, title = "Sportsbook" }: { sels: S
               );
             })}
           </div>
-          <div style={{ background: "#3d3f49", color: "#fff", padding: "12px 14px", lineHeight: 1.6, fontSize: 12 }}>
+          <div style={{ background: "#3d3f49", color: "#fff", padding: "8px 10px", lineHeight: 1.5, fontSize: 12 }}>
             <div style={{ display: "flex", justifyContent: "space-between" }}><span>TOTAL ODDS</span><span>{total.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></div>
             <div style={{ display: "flex", justifyContent: "space-between" }}><span>STAKE</span><span>{stake.toLocaleString("en-US")} UGX</span></div>
             <div style={{ display: "flex", justifyContent: "space-between", color: "#22d47e" }}><span>POSSIBLE WIN</span><span>{(stake * total).toLocaleString("en-US", { maximumFractionDigits: 0 })} UGX</span></div>
             <div style={{ textAlign: "right", fontSize: 11 }}>+{sels.length} VIP PTS</div>
           </div>
-          <div style={{ background: "#fff", padding: "8px 12px", color: "#333" }}>
+          <div style={{ background: "#fff", padding: "6px 8px 8px", color: "#333" }}>
             <div style={{ textAlign: "center", marginBottom: 6 }}>STAKE</div>
             <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
-              <a className="curPointer" onClick={() => setStake((v) => Math.max(1000, v - 1000))} style={{ background: G, color: "#fff", width: 24, minWidth: 24, flexShrink: 0, height: 24, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 3 }}>-</a>
-              <input type="number" min={1000} value={stake} onChange={(e) => setStake(Math.max(0, Number(e.target.value)))} aria-label="Stake" style={{ flex: 1, minWidth: 0, width: "100%", border: 0, background: "#e9e9eb", color: "#333", padding: "4px 8px", textAlign: "right", fontSize: 15, borderRadius: 3 }} />
-              <a className="curPointer" onClick={() => setStake((v) => v + 1000)} style={{ background: G, color: "#fff", width: 24, minWidth: 24, flexShrink: 0, height: 24, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 3 }}>+</a>
+              <a className="curPointer" onClick={() => setStake((v) => Math.max(1000, v - 1000))} style={{ background: G, color: "#fff", width: 22, minWidth: 22, flexShrink: 0, height: 22, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 3 }}>-</a>
+              <input type="number" min={1000} value={stake} onChange={(e) => setStake(Math.max(0, Number(e.target.value)))} aria-label="Stake" style={{ flex: 1, minWidth: 0, width: "100%", border: 0, background: "#e9e9eb", color: "#333", padding: "4px 8px", textAlign: "right", fontSize: 13, borderRadius: 3 }} />
+              <a className="curPointer" onClick={() => setStake((v) => v + 1000)} style={{ background: G, color: "#fff", width: 22, minWidth: 22, flexShrink: 0, height: 22, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 3 }}>+</a>
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 3, marginTop: 6 }}>
               {[10000, 50000, 250000].map((v) => <div key={v} style={btn} onClick={() => setStake(v)}>{v.toLocaleString("en-US")}</div>)}
@@ -244,9 +244,9 @@ export function BetSlip({ sels, remove, clear, title = "Sportsbook" }: { sels: S
               <div style={{ ...btn, background: G, color: "#fff" }}>UGX</div><div style={btn}>VIP POINTS</div>
             </div>
             <div style={{ ...btn, background: "#3d3f49", color: "#fff", marginTop: 6 }}>TICKET PREVIEW</div>
-            <div style={{ ...btn, background: "#cea642", color: "#fff", fontSize: 15, padding: "9px 0", marginTop: 6, borderRadius: 3 }}>SAVE i-TICKET</div>
+            <div style={{ ...btn, background: "#cea642", color: "#fff", fontSize: 13, padding: "6px 0", marginTop: 5, borderRadius: 3 }}>SAVE i-TICKET</div>
             <div style={{ textAlign: "center", color: "#888", margin: "4px 0", fontSize: 11 }}>- OR -</div>
-            <div style={{ ...btn, background: "#d0d0d2", color: "#999", fontSize: 15, padding: "9px 0", borderRadius: 3, cursor: "not-allowed" }} title="Log in with Fortebet to place a bet">PLACE BET</div>
+            <div style={{ ...btn, background: "#d0d0d2", color: "#999", fontSize: 13, padding: "6px 0", borderRadius: 3, cursor: "not-allowed" }} title="Log in with Fortebet to place a bet">PLACE BET</div>
           </div>
         </div>
       )}
