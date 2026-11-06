@@ -207,33 +207,34 @@ export function BetSlip({ sels, remove, clear, title = "Sportsbook" }: { sels: S
       {sels.length === 0 ? (
         <div className="empty"> Your Ticket is still empty </div>
       ) : (
-        <div style={{ fontSize: 12, fontWeight: 700 }}>
+        <div style={{ fontSize: 11, fontWeight: 700, lineHeight: 1.25 }}>
           <div style={{ background: G, color: "#fff" }}>
             {sels.map((s, i) => {
               const [mk, out] = describe(s);
               return (
-                <div key={s.key} style={{ padding: "6px 8px", borderBottom: "1px solid rgba(255,255,255,0.35)" }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 13 }}>
+                <div key={s.key} style={{ padding: "5px 8px 6px", borderBottom: "1px solid rgba(255,255,255,0.3)" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 12, gap: 6 }}>
                     <span><span style={{ display: "inline-flex", width: 15, height: 15, borderRadius: 99, background: "#fff", color: G, fontSize: 10, alignItems: "center", justifyContent: "center", marginRight: 5 }}>{i + 1}</span>{s.match}</span>
-                    <a className="curPointer" onClick={() => remove(s.key)} aria-label="Remove" style={{ color: "#fff", fontSize: 15 }}>✕</a>
+                    <a className="curPointer" onClick={() => remove(s.key)} aria-label="Remove" style={{ color: "#fff", fontSize: 14, fontWeight: 900, flexShrink: 0 }}>✕</a>
                   </div>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr auto", gap: 6, marginTop: 4, alignItems: "center", color: "rgba(255,255,255,0.85)" }}>
-                    <span>{mk}</span><span style={{ textAlign: "right" }}>{out}</span><b style={{ color: "#fff", minWidth: 34, textAlign: "right" }}>{s.odds.toFixed(2)}</b>
+                  <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) minmax(0,0.8fr) 38px", gap: 6, marginTop: 3, alignItems: "center", color: "rgba(255,255,255,0.9)" }}>
+                    <span>{mk}</span><span style={{ textAlign: "center", wordBreak: "break-word" }}>{out}</span><b style={{ color: "#fff", textAlign: "right", fontSize: 12 }}>{s.odds.toFixed(2)}</b>
                   </div>
                 </div>
               );
             })}
           </div>
-          <div style={{ background: "#3d3f49", color: "#fff", padding: "10px 12px", lineHeight: 1.7 }}>
-            <div style={{ display: "flex", justifyContent: "space-between" }}><span>TOTAL ODDS</span><span>{total.toFixed(2)}</span></div>
+          <div style={{ background: "#3d3f49", color: "#fff", padding: "12px 14px", lineHeight: 1.6, fontSize: 12 }}>
+            <div style={{ display: "flex", justifyContent: "space-between" }}><span>TOTAL ODDS</span><span>{total.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></div>
             <div style={{ display: "flex", justifyContent: "space-between" }}><span>STAKE</span><span>{stake.toLocaleString("en-US")} UGX</span></div>
             <div style={{ display: "flex", justifyContent: "space-between", color: "#22d47e" }}><span>POSSIBLE WIN</span><span>{(stake * total).toLocaleString("en-US", { maximumFractionDigits: 0 })} UGX</span></div>
+            <div style={{ textAlign: "right", fontSize: 11 }}>+{sels.length} VIP PTS</div>
           </div>
           <div style={{ background: "#fff", padding: "8px 12px", color: "#333" }}>
             <div style={{ textAlign: "center", marginBottom: 6 }}>STAKE</div>
             <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
               <a className="curPointer" onClick={() => setStake((v) => Math.max(1000, v - 1000))} style={{ background: G, color: "#fff", width: 24, minWidth: 24, flexShrink: 0, height: 24, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 3 }}>-</a>
-              <input type="number" min={1000} value={stake} onChange={(e) => setStake(Math.max(0, Number(e.target.value)))} aria-label="Stake" style={{ flex: 1, minWidth: 0, width: "100%", border: "1px solid #ccc", padding: "4px 8px", textAlign: "right", fontSize: 15, borderRadius: 3 }} />
+              <input type="number" min={1000} value={stake} onChange={(e) => setStake(Math.max(0, Number(e.target.value)))} aria-label="Stake" style={{ flex: 1, minWidth: 0, width: "100%", border: 0, background: "#e9e9eb", color: "#333", padding: "4px 8px", textAlign: "right", fontSize: 15, borderRadius: 3 }} />
               <a className="curPointer" onClick={() => setStake((v) => v + 1000)} style={{ background: G, color: "#fff", width: 24, minWidth: 24, flexShrink: 0, height: 24, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 3 }}>+</a>
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 3, marginTop: 6 }}>
