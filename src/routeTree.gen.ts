@@ -10,12 +10,19 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SlotsRouteImport } from './routes/slots'
 import { Route as LivePreviewRouteImport } from './routes/live_.preview'
 import { Route as LiveEventIdRouteImport } from './routes/live_.event_.$id'
+import { Route as SlotsGameIdentRouteImport } from './routes/slots.game.$ident'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SlotsRoute = SlotsRouteImport.update({
+  id: '/slots',
+  path: '/slots',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LivePreviewRoute = LivePreviewRouteImport.update({
@@ -28,33 +35,53 @@ const LiveEventIdRoute = LiveEventIdRouteImport.update({
   path: '/live/event/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SlotsGameIdentRoute = SlotsGameIdentRouteImport.update({
+  id: '/game/$ident',
+  path: '/game/$ident',
+  getParentRoute: () => SlotsRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/slots': typeof SlotsRouteWithChildren
   '/live/preview': typeof LivePreviewRoute
   '/live/event/$id': typeof LiveEventIdRoute
+  '/slots/game/$ident': typeof SlotsGameIdentRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/slots': typeof SlotsRouteWithChildren
   '/live/preview': typeof LivePreviewRoute
   '/live/event/$id': typeof LiveEventIdRoute
+  '/slots/game/$ident': typeof SlotsGameIdentRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/slots': typeof SlotsRouteWithChildren
   '/live_/preview': typeof LivePreviewRoute
   '/live_/event_/$id': typeof LiveEventIdRoute
+  '/slots/game/$ident': typeof SlotsGameIdentRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/live/preview' | '/live/event/$id'
+  fullPaths:
+    '/' | '/slots' | '/live/preview' | '/live/event/$id' | '/slots/game/$ident'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/live/preview' | '/live/event/$id'
-  id: '__root__' | '/' | '/live_/preview' | '/live_/event_/$id'
+  to:
+    '/' | '/slots' | '/live/preview' | '/live/event/$id' | '/slots/game/$ident'
+  id:
+    | '__root__'
+    | '/'
+    | '/slots'
+    | '/live_/preview'
+    | '/live_/event_/$id'
+    | '/slots/game/$ident'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  SlotsRoute: typeof SlotsRouteWithChildren
   LivePreviewRoute: typeof LivePreviewRoute
   LiveEventIdRoute: typeof LiveEventIdRoute
 }
@@ -66,6 +93,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/slots': {
+      id: '/slots'
+      path: '/slots'
+      fullPath: '/slots'
+      preLoaderRoute: typeof SlotsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/live_/preview': {
@@ -82,11 +116,29 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LiveEventIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/slots/game/$ident': {
+      id: '/slots/game/$ident'
+      path: '/game/$ident'
+      fullPath: '/slots/game/$ident'
+      preLoaderRoute: typeof SlotsGameIdentRouteImport
+      parentRoute: typeof SlotsRoute
+    }
   }
 }
 
+interface SlotsRouteChildren {
+  SlotsGameIdentRoute: typeof SlotsGameIdentRoute
+}
+
+const SlotsRouteChildren: SlotsRouteChildren = {
+  SlotsGameIdentRoute: SlotsGameIdentRoute,
+}
+
+const SlotsRouteWithChildren = SlotsRoute._addFileChildren(SlotsRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  SlotsRoute: SlotsRouteWithChildren,
   LivePreviewRoute: LivePreviewRoute,
   LiveEventIdRoute: LiveEventIdRoute,
 }

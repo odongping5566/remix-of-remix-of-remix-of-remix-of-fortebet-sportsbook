@@ -14,4 +14,9 @@
 - [x] Tests for filter and ticket rules
 - [x] Ticket search: real Fortebet ticket check in a floating ticket window (share link ?ticket=)
 - [x] Ticket preview uses the same ticket window; grey padlock for suspended odds
+- [x] Odds shown as "-" display the grey padlock
+- [x] Menu links switch pages without a full reload
+- [x] All Games page with real Fortebet games, jackpots, providers/types/search
+- [x] Game window: play for fun (demo) via play-game
+- [ ] Play games for real money — blocked: needs players signed in with their own Fortebet account
 - [ ] Real bet placement / Save i-Ticket — blocked: needs an authorized Fortebet account connection
