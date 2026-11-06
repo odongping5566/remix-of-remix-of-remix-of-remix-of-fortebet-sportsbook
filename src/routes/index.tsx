@@ -1,4 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { queryOptions, useQuery } from "@tanstack/react-query";
+import { getHomeData, getLiveData, getEventDetail, type Match } from "@/lib/fortebet.functions";
 import capturedCSS from "../styles/site.css?raw";
 
 const ImportedNativeTag0 = "sbticket" as import("react").ElementType;
@@ -17,6 +20,10 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
+  const [mode, setMode] = useState<"home" | "live">("home");
+  const [sels, setSels] = useState<Sel[]>([]);
+  const toggle = (sel: Sel) =>
+    setSels((s) => (s.some((x) => x.key === sel.key) ? s.filter((x) => x.key !== sel.key) : [...s.filter((x) => x.eventId !== sel.eventId), sel]));
   return (
     <>
       <style>{capturedCSS}</style>
@@ -353,10 +360,10 @@ function Index() {
               <div className="secHeader uppercase [transition:0.2s]" {...({ "_ngcontent-oky-c206": "" } as any)}>
                 <ul {...({ "_ngcontent-oky-c206": "" } as any)}>
                   <li {...({ "_ngcontent-oky-c206": "" } as any)}>
-                    <a className="active" href="/prematch/landing" {...({ "_ngcontent-oky-c206": "" } as any)}>Sportsbook</a>
+                    <a className={mode === "home" ? "active" : ""} href="/prematch/landing" onClick={(e) => { e.preventDefault(); setMode("home"); }} {...({ "_ngcontent-oky-c206": "" } as any)}>Sportsbook</a>
                   </li>
                   <li {...({ "_ngcontent-oky-c206": "" } as any)}>
-                    <a href="/live" {...({ "_ngcontent-oky-c206": "", routerlinkactive: "active" } as any)}>Live</a>
+                    <a className={mode === "live" ? "active" : ""} href="/live" onClick={(e) => { e.preventDefault(); setMode("live"); }} {...({ "_ngcontent-oky-c206": "", routerlinkactive: "active" } as any)}>Live</a>
                   </li>
                   <li {...({ "_ngcontent-oky-c206": "" } as any)}>
                     <a className="withIco" href="/virtual-soccer" {...({ "_ngcontent-oky-c206": "", routerlinkactive: "active" } as any)}>
@@ -458,79 +465,7 @@ function Index() {
                     <div className="eventsMenu">
                       <div data-ce="offer-top-tournaments" {...({ "_nghost-oky-c38": "" } as any)}>
                         <h3 {...({ "_ngcontent-oky-c38": "" } as any)}>Top Bets</h3>
-                        <ul className="topbets" {...({ "_ngcontent-oky-c38": "" } as any)}>
-                          <li {...({ "_ngcontent-oky-c38": "" } as any)}>
-                            <a {...({ "_ngcontent-oky-c38": "" } as any)}> Elite European Leagues <span {...({ "_ngcontent-oky-c38": "" } as any)}>(5x)</span></a>
-                            <span className="toRight" {...({ "_ngcontent-oky-c38": "", "click-stop-propagation": "" } as any)}>
-                              <input className="white items-center justify-center" type="checkbox" id="topBetsChbx0" {...({ "_ngcontent-oky-c38": "" } as any)} />
-                              <label htmlFor="topBetsChbx0" {...({ "_ngcontent-oky-c38": "" } as any)} />
-                            </span>
-                          </li>
-                          <li {...({ "_ngcontent-oky-c38": "" } as any)}>
-                            <a {...({ "_ngcontent-oky-c38": "" } as any)}> European Cups <span {...({ "_ngcontent-oky-c38": "" } as any)}>(3x)</span></a>
-                            <span className="toRight" {...({ "_ngcontent-oky-c38": "", "click-stop-propagation": "" } as any)}>
-                              <input className="white items-center justify-center" type="checkbox" id="topBetsChbx1" {...({ "_ngcontent-oky-c38": "" } as any)} />
-                              <label htmlFor="topBetsChbx1" {...({ "_ngcontent-oky-c38": "" } as any)} />
-                            </span>
-                          </li>
-                          <li {...({ "_ngcontent-oky-c38": "" } as any)}>
-                            <a {...({ "_ngcontent-oky-c38": "" } as any)}> South America <span {...({ "_ngcontent-oky-c38": "" } as any)}>(8x)</span></a>
-                            <span className="toRight" {...({ "_ngcontent-oky-c38": "", "click-stop-propagation": "" } as any)}>
-                              <input className="white items-center justify-center" type="checkbox" id="topBetsChbx4" {...({ "_ngcontent-oky-c38": "" } as any)} />
-                              <label htmlFor="topBetsChbx4" {...({ "_ngcontent-oky-c38": "" } as any)} />
-                            </span>
-                          </li>
-                          <hr {...({ "_ngcontent-oky-c38": "" } as any)} />
-                          <li {...({ "_ngcontent-oky-c38": "" } as any)}>
-                            <a {...({ "_ngcontent-oky-c38": "" } as any)}> Europa League </a>
-                            <span className="toRight" {...({ "_ngcontent-oky-c38": "", "click-stop-propagation": "" } as any)}>
-                              <input className="items-center justify-center" type="checkbox" id="topBetsChbx2" {...({ "_ngcontent-oky-c38": "" } as any)} />
-                              <label htmlFor="topBetsChbx2" {...({ "_ngcontent-oky-c38": "" } as any)} />
-                            </span>
-                          </li>
-                          <li {...({ "_ngcontent-oky-c38": "" } as any)}>
-                            <a {...({ "_ngcontent-oky-c38": "" } as any)}> Conference League </a>
-                            <span className="toRight" {...({ "_ngcontent-oky-c38": "", "click-stop-propagation": "" } as any)}>
-                              <input className="items-center justify-center" type="checkbox" id="topBetsChbx3" {...({ "_ngcontent-oky-c38": "" } as any)} />
-                              <label htmlFor="topBetsChbx3" {...({ "_ngcontent-oky-c38": "" } as any)} />
-                            </span>
-                          </li>
-                          <li {...({ "_ngcontent-oky-c38": "" } as any)}>
-                            <a {...({ "_ngcontent-oky-c38": "" } as any)}> England Premier League </a>
-                            <span className="toRight" {...({ "_ngcontent-oky-c38": "", "click-stop-propagation": "" } as any)}>
-                              <input className="items-center justify-center" type="checkbox" id="topBetsChbx5" {...({ "_ngcontent-oky-c38": "" } as any)} />
-                              <label htmlFor="topBetsChbx5" {...({ "_ngcontent-oky-c38": "" } as any)} />
-                            </span>
-                          </li>
-                          <li {...({ "_ngcontent-oky-c38": "" } as any)}>
-                            <a {...({ "_ngcontent-oky-c38": "" } as any)}> France Ligue 1 </a>
-                            <span className="toRight" {...({ "_ngcontent-oky-c38": "", "click-stop-propagation": "" } as any)}>
-                              <input className="items-center justify-center" type="checkbox" id="topBetsChbx6" {...({ "_ngcontent-oky-c38": "" } as any)} />
-                              <label htmlFor="topBetsChbx6" {...({ "_ngcontent-oky-c38": "" } as any)} />
-                            </span>
-                          </li>
-                          <li {...({ "_ngcontent-oky-c38": "" } as any)}>
-                            <a {...({ "_ngcontent-oky-c38": "" } as any)}> Germany Bundesliga </a>
-                            <span className="toRight" {...({ "_ngcontent-oky-c38": "", "click-stop-propagation": "" } as any)}>
-                              <input className="items-center justify-center" type="checkbox" id="topBetsChbx7" {...({ "_ngcontent-oky-c38": "" } as any)} />
-                              <label htmlFor="topBetsChbx7" {...({ "_ngcontent-oky-c38": "" } as any)} />
-                            </span>
-                          </li>
-                          <li {...({ "_ngcontent-oky-c38": "" } as any)}>
-                            <a {...({ "_ngcontent-oky-c38": "" } as any)}> Italy Serie A </a>
-                            <span className="toRight" {...({ "_ngcontent-oky-c38": "", "click-stop-propagation": "" } as any)}>
-                              <input className="items-center justify-center" type="checkbox" id="topBetsChbx8" {...({ "_ngcontent-oky-c38": "" } as any)} />
-                              <label htmlFor="topBetsChbx8" {...({ "_ngcontent-oky-c38": "" } as any)} />
-                            </span>
-                          </li>
-                          <li {...({ "_ngcontent-oky-c38": "" } as any)}>
-                            <a {...({ "_ngcontent-oky-c38": "" } as any)}> Spain LaLiga </a>
-                            <span className="toRight" {...({ "_ngcontent-oky-c38": "", "click-stop-propagation": "" } as any)}>
-                              <input className="items-center justify-center" type="checkbox" id="topBetsChbx9" {...({ "_ngcontent-oky-c38": "" } as any)} />
-                              <label htmlFor="topBetsChbx9" {...({ "_ngcontent-oky-c38": "" } as any)} />
-                            </span>
-                          </li>
-                        </ul>
+                        <TopBetsList />
                       </div>
                       <div data-ce="offer-my-selection" {...({ "_nghost-oky-c48": "" } as any)}>
                         <div className="mySelection" {...({ "_ngcontent-oky-c48": "" } as any)}>
@@ -564,44 +499,7 @@ function Index() {
                         </div>
                       </div>
                       <div data-ce="offer-sct-select" {...({ "_nghost-oky-c49": "" } as any)}>
-                        <ul className="events [font-weight:700]" {...({ "_ngcontent-oky-c49": "" } as any)}>
-                          <li {...({ "_ngcontent-oky-c49": "" } as any)}>
-                            <a {...({ "_ngcontent-oky-c49": "" } as any)}><span className="h16 ico soccer wp21" {...({ "_ngcontent-oky-c49": "" } as any)} /> Soccer <small {...({ "_ngcontent-oky-c49": "" } as any)}>793</small></a>
-                          </li>
-                          <li {...({ "_ngcontent-oky-c49": "" } as any)}>
-                            <a {...({ "_ngcontent-oky-c49": "" } as any)}><span className="h16 ico tennis wp21" {...({ "_ngcontent-oky-c49": "" } as any)} /> Tennis <small {...({ "_ngcontent-oky-c49": "" } as any)}>46</small></a>
-                          </li>
-                          <li {...({ "_ngcontent-oky-c49": "" } as any)}>
-                            <a {...({ "_ngcontent-oky-c49": "" } as any)}><span className="basketball h16 ico wp21" {...({ "_ngcontent-oky-c49": "" } as any)} /> Basketball <small {...({ "_ngcontent-oky-c49": "" } as any)}>26</small></a>
-                          </li>
-                          <li {...({ "_ngcontent-oky-c49": "" } as any)}>
-                            <a {...({ "_ngcontent-oky-c49": "" } as any)}><span className="baseball h16 ico wp21" {...({ "_ngcontent-oky-c49": "" } as any)} /> Baseball <small {...({ "_ngcontent-oky-c49": "" } as any)}>1</small></a>
-                          </li>
-                          <li {...({ "_ngcontent-oky-c49": "" } as any)}>
-                            <a {...({ "_ngcontent-oky-c49": "" } as any)}><span className="h16 handball ico wp21" {...({ "_ngcontent-oky-c49": "" } as any)} /> Handball <small {...({ "_ngcontent-oky-c49": "" } as any)}>13</small></a>
-                          </li>
-                          <li {...({ "_ngcontent-oky-c49": "" } as any)}>
-                            <a {...({ "_ngcontent-oky-c49": "" } as any)}><span className="h16 ico volleyball wp21" {...({ "_ngcontent-oky-c49": "" } as any)} /> Volleyball <small {...({ "_ngcontent-oky-c49": "" } as any)}>5</small></a>
-                          </li>
-                          <li {...({ "_ngcontent-oky-c49": "" } as any)}>
-                            <a {...({ "_ngcontent-oky-c49": "" } as any)}><span className="h16 icehockey ico wp21" {...({ "_ngcontent-oky-c49": "" } as any)} /> Hockey <small {...({ "_ngcontent-oky-c49": "" } as any)}>85</small></a>
-                          </li>
-                          <li {...({ "_ngcontent-oky-c49": "" } as any)}>
-                            <a {...({ "_ngcontent-oky-c49": "" } as any)}><span className="h16 ico rugby wp21" {...({ "_ngcontent-oky-c49": "" } as any)} /> American Football <small {...({ "_ngcontent-oky-c49": "" } as any)}>17</small></a>
-                          </li>
-                          <li {...({ "_ngcontent-oky-c49": "" } as any)}>
-                            <a {...({ "_ngcontent-oky-c49": "" } as any)}><span className="darts h16 ico wp21" {...({ "_ngcontent-oky-c49": "" } as any)} /> Darts <small {...({ "_ngcontent-oky-c49": "" } as any)}>10</small></a>
-                          </li>
-                          <li {...({ "_ngcontent-oky-c49": "" } as any)}>
-                            <a {...({ "_ngcontent-oky-c49": "" } as any)}><span className="h16 ico snooker wp21" {...({ "_ngcontent-oky-c49": "" } as any)} /> Snooker <small {...({ "_ngcontent-oky-c49": "" } as any)}>1</small></a>
-                          </li>
-                          <li {...({ "_ngcontent-oky-c49": "" } as any)}>
-                            <a {...({ "_ngcontent-oky-c49": "" } as any)}><span className="h16 ico mma wp21" {...({ "_ngcontent-oky-c49": "" } as any)} /> MMA <small {...({ "_ngcontent-oky-c49": "" } as any)}>22</small></a>
-                          </li>
-                          <li {...({ "_ngcontent-oky-c49": "" } as any)}>
-                            <a {...({ "_ngcontent-oky-c49": "" } as any)}><span className="h16 ico rugby wp21" {...({ "_ngcontent-oky-c49": "" } as any)} /> Rugby <small {...({ "_ngcontent-oky-c49": "" } as any)}>6</small></a>
-                          </li>
-                        </ul>
+                        <SportsList />
                       </div>
                       <div data-ce="ng-containter">
                         <div className="curPointer">
@@ -616,369 +514,17 @@ function Index() {
                   <div className="staticModul" id="app-content">
                     <div data-ce="prematch-landing">
                       <div data-ce="app-widget-slider">
-                        <div className="slider">
-                          <div>
-                            <div style={{ backgroundImage: "url(\"/site-assets/05bbece20555e650.webp\")" }} />
-                          </div>
-                          <div className="sliderDots justify-center [bottom:calc(32px_*_var(--factor))] [gap:calc(10px_*_var(--factor))]">
-                            <div className="" />
-                            <div className="" />
-                            <div className="" />
-                            <div className="" />
-                            <div className="" />
-                            <div className="" />
-                            <div className="" />
-                            <div className="active" />
-                            <div />
-                          </div>
-                        </div>
+                        <BannerSlider />
                       </div>
                       <div data-ce="offer-highlighted-events" {...({ "_nghost-oky-c71": "" } as any)}>
-                        <div className="mainOffer" {...({ "_ngcontent-oky-c71": "" } as any)}>
-                          <div className="offerMenu baseLeft center" {...({ "_ngcontent-oky-c71": "" } as any)}>
-                            <div className="active" {...({ "_ngcontent-oky-c71": "" } as any)}>
-                              <a {...({ "_ngcontent-oky-c71": "" } as any)}>MOST POPULAR MATCHES</a>
-                            </div>
-                            <div {...({ "_ngcontent-oky-c71": "" } as any)}>
-                              <a {...({ "_ngcontent-oky-c71": "" } as any)}>SOCCER ODDS UNDER 1.30</a>
-                            </div>
-                            <div {...({ "_ngcontent-oky-c71": "" } as any)}>
-                              <a {...({ "_ngcontent-oky-c71": "" } as any)}>LOW SOCCER ODDS (1.31 - 1.50)</a>
-                            </div>
-                          </div>
-                          <div className="emptyLow" {...({ "_ngcontent-oky-c71": "" } as any)} />
-                          <div className="offerHead" {...({ "_ngcontent-oky-c71": "" } as any)}>
-                            <div {...({ "_ngcontent-oky-c71": "" } as any)} />
-                            <div {...({ "_ngcontent-oky-c71": "" } as any)}>1</div>
-                            <div {...({ "_ngcontent-oky-c71": "" } as any)}>X</div>
-                            <div {...({ "_ngcontent-oky-c71": "" } as any)}>2</div>
-                            <div {...({ "_ngcontent-oky-c71": "" } as any)}>1X</div>
-                            <div {...({ "_ngcontent-oky-c71": "" } as any)}>X2</div>
-                            <div {...({ "_ngcontent-oky-c71": "" } as any)}>12</div>
-                          </div>
-                          <div className="offerMatch" {...({ "_ngcontent-oky-c71": "" } as any)}>
-                            <div className="app-widget-event-set" {...({ "_ngcontent-oky-c71": "" } as any)}>
-                              <span className="matchName" {...({ "_ngcontent-oky-c71": "" } as any)}><span {...({ "_ngcontent-oky-c71": "" } as any)}> AC Milan </span> - <span {...({ "_ngcontent-oky-c71": "" } as any)}> Ferencvaros </span><span className="tooltip" {...({ "_ngcontent-oky-c71": "" } as any)}>International Clubs / Europa League</span></span>
-                              <div {...({ "_ngcontent-oky-c71": "" } as any)}>
-                                <span {...({ "_ngcontent-oky-c71": "", "click-stop-propagation": "" } as any)}>
-                                  <span className="ico star h13 opa06 deadSpace" {...({ "_ngcontent-oky-c71": "" } as any)} />
-                                  <span className="liveIco" {...({ "_ngcontent-oky-c71": "" } as any)}>Live</span>
-                                  <span className="ico chart h13 opa06 deadSpace" {...({ "_ngcontent-oky-c71": "" } as any)} />
-                                  <span className="ico hearth h13 opa06 deadSpace" {...({ "_ngcontent-oky-c71": "" } as any)} />
-                                </span>
-                              </div>
-                            </div>
-                            <div className="app-widget-time-set" {...({ "_ngcontent-oky-c71": "" } as any)}>
-                              <div {...({ "_ngcontent-oky-c71": "" } as any)}><span className="textOrange" {...({ "_ngcontent-oky-c71": "" } as any)}> Today </span> | 09:45 AM </div>
-                            </div>
-                            <div className="app-widget-market-set" {...({ "_ngcontent-oky-c71": "", "click-stop-propagation": "" } as any)}>
-                              <div className="odds" {...({ "_ngcontent-oky-c71": "" } as any)}>
-                                <div className="favorite" {...({ "_ngcontent-oky-c71": "" } as any)}> 1.39 </div>
-                              </div>
-                              <div className="odds" {...({ "_ngcontent-oky-c71": "" } as any)}>
-                                <div {...({ "_ngcontent-oky-c71": "" } as any)}> 5.20 </div>
-                              </div>
-                              <div className="odds" {...({ "_ngcontent-oky-c71": "" } as any)}>
-                                <div {...({ "_ngcontent-oky-c71": "" } as any)}> 7.70 </div>
-                              </div>
-                              <div className="odds" {...({ "_ngcontent-oky-c71": "" } as any)}>
-                                <div {...({ "_ngcontent-oky-c71": "" } as any)}> 1.10 </div>
-                              </div>
-                              <div className="odds" {...({ "_ngcontent-oky-c71": "" } as any)}>
-                                <div {...({ "_ngcontent-oky-c71": "" } as any)}> 3.10 </div>
-                              </div>
-                              <div className="odds" {...({ "_ngcontent-oky-c71": "" } as any)}>
-                                <div {...({ "_ngcontent-oky-c71": "" } as any)}> 1.18 </div>
-                              </div>
-                            </div>
-                            <div {...({ "_ngcontent-oky-c71": "" } as any)}>+45</div>
-                          </div>
-                          <div className="offerMatch" {...({ "_ngcontent-oky-c71": "" } as any)}>
-                            <div className="app-widget-event-set" {...({ "_ngcontent-oky-c71": "" } as any)}>
-                              <span className="matchName" {...({ "_ngcontent-oky-c71": "" } as any)}><span {...({ "_ngcontent-oky-c71": "" } as any)}> Benfica </span> - <span {...({ "_ngcontent-oky-c71": "" } as any)}> Lech Poznan </span><span className="tooltip" {...({ "_ngcontent-oky-c71": "" } as any)}>International Clubs / Europa League</span></span>
-                              <div {...({ "_ngcontent-oky-c71": "" } as any)}>
-                                <span {...({ "_ngcontent-oky-c71": "", "click-stop-propagation": "" } as any)}>
-                                  <span className="ico star h13 opa06 deadSpace" {...({ "_ngcontent-oky-c71": "" } as any)} />
-                                  <span className="liveIco" {...({ "_ngcontent-oky-c71": "" } as any)}>Live</span>
-                                  <span className="ico chart h13 opa06 deadSpace" {...({ "_ngcontent-oky-c71": "" } as any)} />
-                                  <span className="ico hearth h13 opa06 deadSpace" {...({ "_ngcontent-oky-c71": "" } as any)} />
-                                </span>
-                              </div>
-                            </div>
-                            <div className="app-widget-time-set" {...({ "_ngcontent-oky-c71": "" } as any)}>
-                              <div {...({ "_ngcontent-oky-c71": "" } as any)}><span className="textOrange" {...({ "_ngcontent-oky-c71": "" } as any)}> Today </span> | 12:00 PM </div>
-                            </div>
-                            <div className="app-widget-market-set" {...({ "_ngcontent-oky-c71": "", "click-stop-propagation": "" } as any)}>
-                              <div className="odds" {...({ "_ngcontent-oky-c71": "" } as any)}>
-                                <div className="favorite" {...({ "_ngcontent-oky-c71": "" } as any)}> 1.14 </div>
-                              </div>
-                              <div className="odds" {...({ "_ngcontent-oky-c71": "" } as any)}>
-                                <div {...({ "_ngcontent-oky-c71": "" } as any)}> 9.00 </div>
-                              </div>
-                              <div className="odds" {...({ "_ngcontent-oky-c71": "" } as any)}>
-                                <div {...({ "_ngcontent-oky-c71": "" } as any)}> 19.0 </div>
-                              </div>
-                              <div className="odds" {...({ "_ngcontent-oky-c71": "" } as any)}>
-                                <div {...({ "_ngcontent-oky-c71": "" } as any)}> 1.01 </div>
-                              </div>
-                              <div className="odds" {...({ "_ngcontent-oky-c71": "" } as any)}>
-                                <div {...({ "_ngcontent-oky-c71": "" } as any)}> 6.10 </div>
-                              </div>
-                              <div className="odds" {...({ "_ngcontent-oky-c71": "" } as any)}>
-                                <div {...({ "_ngcontent-oky-c71": "" } as any)}> 1.08 </div>
-                              </div>
-                            </div>
-                            <div {...({ "_ngcontent-oky-c71": "" } as any)}>+45</div>
-                          </div>
-                          <div className="offerMatch" {...({ "_ngcontent-oky-c71": "" } as any)}>
-                            <div className="app-widget-event-set" {...({ "_ngcontent-oky-c71": "" } as any)}>
-                              <span className="matchName" {...({ "_ngcontent-oky-c71": "" } as any)}><span {...({ "_ngcontent-oky-c71": "" } as any)}> Sparta Prague </span> - <span {...({ "_ngcontent-oky-c71": "" } as any)}> Bournemouth </span><span className="tooltip" {...({ "_ngcontent-oky-c71": "" } as any)}>International Clubs / Europa League</span></span>
-                              <div {...({ "_ngcontent-oky-c71": "" } as any)}>
-                                <span {...({ "_ngcontent-oky-c71": "", "click-stop-propagation": "" } as any)}>
-                                  <span className="ico star h13 opa06 deadSpace" {...({ "_ngcontent-oky-c71": "" } as any)} />
-                                  <span className="liveIco" {...({ "_ngcontent-oky-c71": "" } as any)}>Live</span>
-                                  <span className="ico chart h13 opa06 deadSpace" {...({ "_ngcontent-oky-c71": "" } as any)} />
-                                  <span className="ico hearth h13 opa06 deadSpace" {...({ "_ngcontent-oky-c71": "" } as any)} />
-                                </span>
-                              </div>
-                            </div>
-                            <div className="app-widget-time-set" {...({ "_ngcontent-oky-c71": "" } as any)}>
-                              <div {...({ "_ngcontent-oky-c71": "" } as any)}><span className="textOrange" {...({ "_ngcontent-oky-c71": "" } as any)}> Today </span> | 09:45 AM </div>
-                            </div>
-                            <div className="app-widget-market-set" {...({ "_ngcontent-oky-c71": "", "click-stop-propagation": "" } as any)}>
-                              <div className="odds" {...({ "_ngcontent-oky-c71": "" } as any)}>
-                                <div {...({ "_ngcontent-oky-c71": "" } as any)}> 7.50 </div>
-                              </div>
-                              <div className="odds" {...({ "_ngcontent-oky-c71": "" } as any)}>
-                                <div {...({ "_ngcontent-oky-c71": "" } as any)}> 4.80 </div>
-                              </div>
-                              <div className="odds" {...({ "_ngcontent-oky-c71": "" } as any)}>
-                                <div className="favorite" {...({ "_ngcontent-oky-c71": "" } as any)}> 1.43 </div>
-                              </div>
-                              <div className="odds" {...({ "_ngcontent-oky-c71": "" } as any)}>
-                                <div {...({ "_ngcontent-oky-c71": "" } as any)}> 2.93 </div>
-                              </div>
-                              <div className="odds" {...({ "_ngcontent-oky-c71": "" } as any)}>
-                                <div {...({ "_ngcontent-oky-c71": "" } as any)}> 1.10 </div>
-                              </div>
-                              <div className="odds" {...({ "_ngcontent-oky-c71": "" } as any)}>
-                                <div {...({ "_ngcontent-oky-c71": "" } as any)}> 1.20 </div>
-                              </div>
-                            </div>
-                            <div {...({ "_ngcontent-oky-c71": "" } as any)}>+45</div>
-                          </div>
-                          <div className="offerMatch" {...({ "_ngcontent-oky-c71": "" } as any)}>
-                            <div className="app-widget-event-set" {...({ "_ngcontent-oky-c71": "" } as any)}>
-                              <span className="matchName" {...({ "_ngcontent-oky-c71": "" } as any)}><span {...({ "_ngcontent-oky-c71": "" } as any)}> Valencia </span> - <span {...({ "_ngcontent-oky-c71": "" } as any)}> Real Madrid </span><span className="tooltip" {...({ "_ngcontent-oky-c71": "" } as any)}>Spain / LaLiga</span></span>
-                              <div {...({ "_ngcontent-oky-c71": "" } as any)}>
-                                <span {...({ "_ngcontent-oky-c71": "", "click-stop-propagation": "" } as any)}>
-                                  <span className="ico star h13 opa06 deadSpace" {...({ "_ngcontent-oky-c71": "" } as any)} />
-                                  <span className="liveIco" {...({ "_ngcontent-oky-c71": "" } as any)}>Live</span>
-                                  <span className="ico chart h13 opa06 deadSpace" {...({ "_ngcontent-oky-c71": "" } as any)} />
-                                  <span className="ico hearth h13 opa06 deadSpace" {...({ "_ngcontent-oky-c71": "" } as any)} />
-                                </span>
-                              </div>
-                            </div>
-                            <div className="app-widget-time-set" {...({ "_ngcontent-oky-c71": "" } as any)}>
-                              <div {...({ "_ngcontent-oky-c71": "" } as any)}><span {...({ "_ngcontent-oky-c71": "" } as any)}> Nov 7 </span> | 12:00 PM </div>
-                            </div>
-                            <div className="app-widget-market-set" {...({ "_ngcontent-oky-c71": "", "click-stop-propagation": "" } as any)}>
-                              <div className="odds" {...({ "_ngcontent-oky-c71": "" } as any)}>
-                                <div {...({ "_ngcontent-oky-c71": "" } as any)}> 9.00 </div>
-                              </div>
-                              <div className="odds" {...({ "_ngcontent-oky-c71": "" } as any)}>
-                                <div {...({ "_ngcontent-oky-c71": "" } as any)}> 6.70 </div>
-                              </div>
-                              <div className="odds" {...({ "_ngcontent-oky-c71": "" } as any)}>
-                                <div className="favorite" {...({ "_ngcontent-oky-c71": "" } as any)}> 1.29 </div>
-                              </div>
-                              <div className="odds" {...({ "_ngcontent-oky-c71": "" } as any)}>
-                                <div {...({ "_ngcontent-oky-c71": "" } as any)}> 3.85 </div>
-                              </div>
-                              <div className="odds" {...({ "_ngcontent-oky-c71": "" } as any)}>
-                                <div {...({ "_ngcontent-oky-c71": "" } as any)}> 1.08 </div>
-                              </div>
-                              <div className="odds" {...({ "_ngcontent-oky-c71": "" } as any)}>
-                                <div {...({ "_ngcontent-oky-c71": "" } as any)}> 1.13 </div>
-                              </div>
-                            </div>
-                            <div {...({ "_ngcontent-oky-c71": "" } as any)}>+75</div>
-                          </div>
-                          <div className="offerMatch" {...({ "_ngcontent-oky-c71": "" } as any)}>
-                            <div className="app-widget-event-set" {...({ "_ngcontent-oky-c71": "" } as any)}>
-                              <span className="matchName" {...({ "_ngcontent-oky-c71": "" } as any)}><span {...({ "_ngcontent-oky-c71": "" } as any)}> Arsenal </span> - <span {...({ "_ngcontent-oky-c71": "" } as any)}> Hull </span><span className="tooltip" {...({ "_ngcontent-oky-c71": "" } as any)}>England / Premier League</span></span>
-                              <div {...({ "_ngcontent-oky-c71": "" } as any)}>
-                                <span {...({ "_ngcontent-oky-c71": "", "click-stop-propagation": "" } as any)}>
-                                  <span className="ico star h13 opa06 deadSpace" {...({ "_ngcontent-oky-c71": "" } as any)} />
-                                  <span className="liveIco" {...({ "_ngcontent-oky-c71": "" } as any)}>Live</span>
-                                  <span className="ico chart h13 opa06 deadSpace" {...({ "_ngcontent-oky-c71": "" } as any)} />
-                                  <span className="ico hearth h13 opa06 deadSpace" {...({ "_ngcontent-oky-c71": "" } as any)} />
-                                </span>
-                              </div>
-                            </div>
-                            <div className="app-widget-time-set" {...({ "_ngcontent-oky-c71": "" } as any)}>
-                              <div {...({ "_ngcontent-oky-c71": "" } as any)}><span {...({ "_ngcontent-oky-c71": "" } as any)}> Nov 7 </span> | 07:00 AM </div>
-                            </div>
-                            <div className="app-widget-market-set" {...({ "_ngcontent-oky-c71": "", "click-stop-propagation": "" } as any)}>
-                              <div className="odds" {...({ "_ngcontent-oky-c71": "" } as any)}>
-                                <div className="favorite" {...({ "_ngcontent-oky-c71": "" } as any)}> 1.17 </div>
-                              </div>
-                              <div className="odds" {...({ "_ngcontent-oky-c71": "" } as any)}>
-                                <div {...({ "_ngcontent-oky-c71": "" } as any)}> 8.30 </div>
-                              </div>
-                              <div className="odds" {...({ "_ngcontent-oky-c71": "" } as any)}>
-                                <div {...({ "_ngcontent-oky-c71": "" } as any)}> 18.0 </div>
-                              </div>
-                              <div className="odds" {...({ "_ngcontent-oky-c71": "" } as any)}>
-                                <div {...({ "_ngcontent-oky-c71": "" } as any)}> 1.03 </div>
-                              </div>
-                              <div className="odds" {...({ "_ngcontent-oky-c71": "" } as any)}>
-                                <div {...({ "_ngcontent-oky-c71": "" } as any)}> 5.70 </div>
-                              </div>
-                              <div className="odds" {...({ "_ngcontent-oky-c71": "" } as any)}>
-                                <div {...({ "_ngcontent-oky-c71": "" } as any)}> 1.10 </div>
-                              </div>
-                            </div>
-                            <div {...({ "_ngcontent-oky-c71": "" } as any)}>+80</div>
-                          </div>
-                          <div className="offerMatch" {...({ "_ngcontent-oky-c71": "" } as any)}>
-                            <div className="app-widget-event-set" {...({ "_ngcontent-oky-c71": "" } as any)}>
-                              <span className="matchName" {...({ "_ngcontent-oky-c71": "" } as any)}><span {...({ "_ngcontent-oky-c71": "" } as any)}> Sunderland </span> - <span {...({ "_ngcontent-oky-c71": "" } as any)}> D. Zagreb </span><span className="tooltip" {...({ "_ngcontent-oky-c71": "" } as any)}>International Clubs / Europa League</span></span>
-                              <div {...({ "_ngcontent-oky-c71": "" } as any)}>
-                                <span {...({ "_ngcontent-oky-c71": "", "click-stop-propagation": "" } as any)}>
-                                  <span className="ico star h13 opa06 deadSpace" {...({ "_ngcontent-oky-c71": "" } as any)} />
-                                  <span className="liveIco" {...({ "_ngcontent-oky-c71": "" } as any)}>Live</span>
-                                  <span className="ico chart h13 opa06 deadSpace" {...({ "_ngcontent-oky-c71": "" } as any)} />
-                                  <span className="ico hearth h13 opa06 deadSpace" {...({ "_ngcontent-oky-c71": "" } as any)} />
-                                </span>
-                              </div>
-                            </div>
-                            <div className="app-widget-time-set" {...({ "_ngcontent-oky-c71": "" } as any)}>
-                              <div {...({ "_ngcontent-oky-c71": "" } as any)}><span className="textOrange" {...({ "_ngcontent-oky-c71": "" } as any)}> Today </span> | 12:00 PM </div>
-                            </div>
-                            <div className="app-widget-market-set" {...({ "_ngcontent-oky-c71": "", "click-stop-propagation": "" } as any)}>
-                              <div className="odds" {...({ "_ngcontent-oky-c71": "" } as any)}>
-                                <div className="favorite" {...({ "_ngcontent-oky-c71": "" } as any)}> 1.42 </div>
-                              </div>
-                              <div className="odds" {...({ "_ngcontent-oky-c71": "" } as any)}>
-                                <div {...({ "_ngcontent-oky-c71": "" } as any)}> 5.00 </div>
-                              </div>
-                              <div className="odds" {...({ "_ngcontent-oky-c71": "" } as any)}>
-                                <div {...({ "_ngcontent-oky-c71": "" } as any)}> 7.30 </div>
-                              </div>
-                              <div className="odds" {...({ "_ngcontent-oky-c71": "" } as any)}>
-                                <div {...({ "_ngcontent-oky-c71": "" } as any)}> 1.11 </div>
-                              </div>
-                              <div className="odds" {...({ "_ngcontent-oky-c71": "" } as any)}>
-                                <div {...({ "_ngcontent-oky-c71": "" } as any)}> 2.97 </div>
-                              </div>
-                              <div className="odds" {...({ "_ngcontent-oky-c71": "" } as any)}>
-                                <div {...({ "_ngcontent-oky-c71": "" } as any)}> 1.19 </div>
-                              </div>
-                            </div>
-                            <div {...({ "_ngcontent-oky-c71": "" } as any)}>+46</div>
-                          </div>
-                          <div className="offerMatch" {...({ "_ngcontent-oky-c71": "" } as any)}>
-                            <div className="app-widget-event-set" {...({ "_ngcontent-oky-c71": "" } as any)}>
-                              <span className="matchName" {...({ "_ngcontent-oky-c71": "" } as any)}><span {...({ "_ngcontent-oky-c71": "" } as any)}> Monaco </span> - <span {...({ "_ngcontent-oky-c71": "" } as any)}> Nordsjalland </span><span className="tooltip" {...({ "_ngcontent-oky-c71": "" } as any)}>International Clubs / Conference League</span></span>
-                              <div {...({ "_ngcontent-oky-c71": "" } as any)}>
-                                <span {...({ "_ngcontent-oky-c71": "", "click-stop-propagation": "" } as any)}>
-                                  <span className="ico star h13 opa06 deadSpace" {...({ "_ngcontent-oky-c71": "" } as any)} />
-                                  <span className="liveIco" {...({ "_ngcontent-oky-c71": "" } as any)}>Live</span>
-                                  <span className="ico chart h13 opa06 deadSpace" {...({ "_ngcontent-oky-c71": "" } as any)} />
-                                  <span className="ico hearth h13 opa06 deadSpace" {...({ "_ngcontent-oky-c71": "" } as any)} />
-                                </span>
-                              </div>
-                            </div>
-                            <div className="app-widget-time-set" {...({ "_ngcontent-oky-c71": "" } as any)}>
-                              <div {...({ "_ngcontent-oky-c71": "" } as any)}><span className="textOrange" {...({ "_ngcontent-oky-c71": "" } as any)}> Today </span> | 12:00 PM </div>
-                            </div>
-                            <div className="app-widget-market-set" {...({ "_ngcontent-oky-c71": "", "click-stop-propagation": "" } as any)}>
-                              <div className="odds" {...({ "_ngcontent-oky-c71": "" } as any)}>
-                                <div className="favorite" {...({ "_ngcontent-oky-c71": "" } as any)}> 1.48 </div>
-                              </div>
-                              <div className="odds" {...({ "_ngcontent-oky-c71": "" } as any)}>
-                                <div {...({ "_ngcontent-oky-c71": "" } as any)}> 5.00 </div>
-                              </div>
-                              <div className="odds" {...({ "_ngcontent-oky-c71": "" } as any)}>
-                                <div {...({ "_ngcontent-oky-c71": "" } as any)}> 6.00 </div>
-                              </div>
-                              <div className="odds" {...({ "_ngcontent-oky-c71": "" } as any)}>
-                                <div {...({ "_ngcontent-oky-c71": "" } as any)}> 1.14 </div>
-                              </div>
-                              <div className="odds" {...({ "_ngcontent-oky-c71": "" } as any)}>
-                                <div {...({ "_ngcontent-oky-c71": "" } as any)}> 2.73 </div>
-                              </div>
-                              <div className="odds" {...({ "_ngcontent-oky-c71": "" } as any)}>
-                                <div {...({ "_ngcontent-oky-c71": "" } as any)}> 1.19 </div>
-                              </div>
-                            </div>
-                            <div {...({ "_ngcontent-oky-c71": "" } as any)}>+34</div>
-                          </div>
-                          <div className="offerMatch" {...({ "_ngcontent-oky-c71": "" } as any)}>
-                            <div className="app-widget-event-set" {...({ "_ngcontent-oky-c71": "" } as any)}>
-                              <span className="matchName" {...({ "_ngcontent-oky-c71": "" } as any)}><span {...({ "_ngcontent-oky-c71": "" } as any)}> PSG </span> - <span {...({ "_ngcontent-oky-c71": "" } as any)}> Troyes </span><span className="tooltip" {...({ "_ngcontent-oky-c71": "" } as any)}>France / Ligue 1</span></span>
-                              <div {...({ "_ngcontent-oky-c71": "" } as any)}>
-                                <span {...({ "_ngcontent-oky-c71": "", "click-stop-propagation": "" } as any)}>
-                                  <span className="ico star h13 opa06 deadSpace" {...({ "_ngcontent-oky-c71": "" } as any)} />
-                                  <span className="liveIco" {...({ "_ngcontent-oky-c71": "" } as any)}>Live</span>
-                                  <span className="ico chart h13 opa06 deadSpace" {...({ "_ngcontent-oky-c71": "" } as any)} />
-                                  <span className="ico hearth h13 opa06 deadSpace" {...({ "_ngcontent-oky-c71": "" } as any)} />
-                                </span>
-                              </div>
-                            </div>
-                            <div className="app-widget-time-set" {...({ "_ngcontent-oky-c71": "" } as any)}>
-                              <div {...({ "_ngcontent-oky-c71": "" } as any)}><span {...({ "_ngcontent-oky-c71": "" } as any)}> Nov 7 </span> | 12:05 PM </div>
-                            </div>
-                            <div className="app-widget-market-set" {...({ "_ngcontent-oky-c71": "", "click-stop-propagation": "" } as any)}>
-                              <div className="odds" {...({ "_ngcontent-oky-c71": "" } as any)}>
-                                <div className="favorite" {...({ "_ngcontent-oky-c71": "" } as any)}> 1.12 </div>
-                              </div>
-                              <div className="odds" {...({ "_ngcontent-oky-c71": "" } as any)}>
-                                <div {...({ "_ngcontent-oky-c71": "" } as any)}> 12.0 </div>
-                              </div>
-                              <div className="odds" {...({ "_ngcontent-oky-c71": "" } as any)}>
-                                <div {...({ "_ngcontent-oky-c71": "" } as any)}> 18.0 </div>
-                              </div>
-                              <div className="odds" {...({ "_ngcontent-oky-c71": "" } as any)}>
-                                <div {...({ "_ngcontent-oky-c71": "" } as any)}> 1.02 </div>
-                              </div>
-                              <div className="odds" {...({ "_ngcontent-oky-c71": "" } as any)}>
-                                <div {...({ "_ngcontent-oky-c71": "" } as any)}> 7.20 </div>
-                              </div>
-                              <div className="odds" {...({ "_ngcontent-oky-c71": "" } as any)}>
-                                <div {...({ "_ngcontent-oky-c71": "" } as any)}> 1.05 </div>
-                              </div>
-                            </div>
-                            <div {...({ "_ngcontent-oky-c71": "" } as any)}>+74</div>
-                          </div>
-                          <div className="offerButtons" {...({ "_ngcontent-oky-c71": "" } as any)}>
-                            <div className="buttons empty" {...({ "_ngcontent-oky-c71": "" } as any)}>
-                              <a {...({ "_ngcontent-oky-c71": "" } as any)}>SHOW MORE</a>
-                            </div>
-                            <div className="buttons" {...({ "_ngcontent-oky-c71": "" } as any)}>
-                              <a {...({ "_ngcontent-oky-c71": "" } as any)}>HIGHLIGHTED ODDS ON THE TICKET</a>
-                            </div>
-                          </div>
-                        </div>
+                        <MatchesPanel mode={mode} sels={sels} toggle={toggle} />
                       </div>
                       <div />
                     </div>
                   </div>
                   <div className="staticModul" id="app-rightbar">
                     <ImportedNativeTag0 {...({ "_nghost-oky-c53": "" } as any)}>
-                      <div className="ticket" {...({ "_ngcontent-oky-c53": "" } as any)}>
-                        <div className="ticketHead" {...({ "_ngcontent-oky-c53": "" } as any)}> Bet slip - Sportsbook <div {...({ "_ngcontent-oky-c53": "" } as any)} /></div>
-                        <div className="betSlipMenu" {...({ "_ngcontent-oky-c53": "" } as any)}>
-                          <div {...({ "_ngcontent-oky-c53": "" } as any)}>
-                            <a className="active" {...({ "_ngcontent-oky-c53": "" } as any)}> 1 <span {...({ "_ngcontent-oky-c53": "" } as any)}>0</span></a>
-                            <a {...({ "_ngcontent-oky-c53": "" } as any)}> 2 <span {...({ "_ngcontent-oky-c53": "" } as any)}>0</span></a>
-                            <a {...({ "_ngcontent-oky-c53": "" } as any)}> 3 <span {...({ "_ngcontent-oky-c53": "" } as any)}>0</span></a>
-                            <a {...({ "_ngcontent-oky-c53": "" } as any)}> 4 <span {...({ "_ngcontent-oky-c53": "" } as any)}>0</span></a>
-                          </div>
-                        </div>
-                        <div className="empty" {...({ "_ngcontent-oky-c53": "" } as any)}> Your Ticket is still empty </div>
-                      </div>
+                      <BetSlip sels={sels} remove={(k) => setSels((s) => s.filter((x) => x.key !== k))} clear={() => setSels([])} />
                     </ImportedNativeTag0>
                     <div data-ce="sbticket-search" {...({ "_nghost-oky-c54": "" } as any)}>
                       <div className="ticketSearch" {...({ "_ngcontent-oky-c54": "" } as any)}>
@@ -1072,5 +618,216 @@ function Index() {
       </div>
       <img style={{ position: "absolute", width: "1px", height: "1px", left: "0px", bottom: "0px", opacity: "0" }} src="/site-assets/281b338a62ab96f5.gif" />
     </>
+  );
+}
+
+// ---------- Live data (Fortebet feeds) ----------
+type Sel = { key: string; eventId: string; match: string; pick: string; odds: number };
+const PICKS = ["1", "X", "2", "1X", "X2", "12"];
+const homeQuery = queryOptions({ queryKey: ["fb-home"], queryFn: () => getHomeData(), refetchInterval: 60_000 });
+const liveQuery = queryOptions({ queryKey: ["fb-live"], queryFn: () => getLiveData(), refetchInterval: 15_000 });
+
+function fmtTime(ts: string) {
+  const d = new Date(ts);
+  const now = new Date();
+  const tom = new Date(now.getTime() + 864e5);
+  const time = d.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
+  const day = d.toDateString() === now.toDateString() ? "Today" : d.toDateString() === tom.toDateString() ? "Tomorrow" : d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  return { day, time };
+}
+
+function useHome() {
+  return useQuery(homeQuery);
+}
+
+function TopBetsList() {
+  const { data } = useHome();
+  if (!data) return <ul className="topbets"><li><a> Loading…</a></li></ul>;
+  return (
+    <ul className="topbets">
+      {data.topTournaments.slice(0, 3).map((g: any, i: number) => (
+        <li key={g.name}>
+          <a> {g.name} <span>({g.count}x)</span></a>
+          <span className="toRight"><input className="white items-center justify-center" type="checkbox" id={`tb${i}`} /><label htmlFor={`tb${i}`} /></span>
+        </li>
+      ))}
+      <hr />
+      {data.popularTournaments.map((t: any, i: number) => (
+        <li key={t.id}>
+          <a> {t.name} </a>
+          <span className="toRight"><input className="items-center justify-center" type="checkbox" id={`pt${i}`} /><label htmlFor={`pt${i}`} /></span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function SportsList() {
+  const { data } = useHome();
+  return (
+    <ul className="events [font-weight:700]">
+      {(data?.sports ?? []).map((s: any) => (
+        <li key={s.id}><a><span className={`h16 ico ${s.icon} wp21`} /> {s.name} <small>{s.count}</small></a></li>
+      ))}
+    </ul>
+  );
+}
+
+function BannerSlider() {
+  const { data } = useHome();
+  const list = data?.banners ?? [];
+  const [i, setI] = useState(0);
+  useEffect(() => {
+    if (list.length < 2) return;
+    const t = setInterval(() => setI((x) => (x + 1) % list.length), 6000);
+    return () => clearInterval(t);
+  }, [list.length]);
+  const img = list[i % Math.max(list.length, 1)]?.image ?? "/site-assets/05bbece20555e650.webp";
+  return (
+    <div className="slider">
+      <div><div style={{ backgroundImage: `url("${img}")` }} /></div>
+      <div className="sliderDots justify-center [bottom:calc(32px_*_var(--factor))] [gap:calc(10px_*_var(--factor))]">
+        {list.map((b: any, k: number) => (
+          <div key={b.label + k} className={k === i ? "active" : ""} onClick={() => setI(k)} role="button" aria-label={`Banner ${k + 1}`} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function MatchRow({ m, sels, toggle, open }: { m: Match; sels: Sel[]; toggle: (s: Sel) => void; open: (id: string) => void }) {
+  const t = fmtTime(m.startTs);
+  const fav = Math.min(...[m.odds[0], m.odds[2]].filter((x): x is number => x != null));
+  return (
+    <div className="offerMatch">
+      <div className="app-widget-event-set curPointer" onClick={() => open(m.id)}>
+        <span className="matchName"><span> {m.home} </span> - <span> {m.away} </span><span className="tooltip">{m.league}</span></span>
+        <div><span><span className="ico star h13 opa06 deadSpace" /><span className="liveIco">Live</span><span className="ico chart h13 opa06 deadSpace" /><span className="ico hearth h13 opa06 deadSpace" /></span></div>
+      </div>
+      <div className="app-widget-time-set">
+        <div>{m.score ? <><span className="textOrange"> {m.score} </span> | {m.status ?? "LIVE"}</> : <><span className="textOrange"> {t.day} </span> | {t.time}</>}</div>
+      </div>
+      <div className="app-widget-market-set">
+        {m.odds.map((o, k) => {
+          const key = `${m.id}-${k}`;
+          const on = sels.some((s) => s.key === key);
+          return (
+            <div className="odds" key={k}>
+              <div
+                className={`${o === fav && k !== 1 ? "favorite" : ""} ${on ? "selected" : ""}`}
+                style={on ? { background: "rgb(0,166,90)", color: "#fff" } : undefined}
+                onClick={() => o && toggle({ key, eventId: m.id, match: `${m.home} - ${m.away}`, pick: PICKS[k], odds: o })}
+              >
+                {o ? ` ${o.toFixed(2)} ` : " - "}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      <div className="curPointer" onClick={() => open(m.id)}>+{m.extra}</div>
+    </div>
+  );
+}
+
+function EventDetail({ id, live, onClose, sels, toggle }: { id: string; live: boolean; onClose: () => void; sels: Sel[]; toggle: (s: Sel) => void }) {
+  const q = useQuery({ queryKey: ["fb-ev", id, live], queryFn: () => getEventDetail({ data: { id, live } }), refetchInterval: 20_000 });
+  const num = id.replace(/\D/g, "");
+  const ev = q.data;
+  return (
+    <div className="mainOffer">
+      <div className="offerMenu baseLeft center">
+        <div className="active"><a>{ev ? `${ev.home} - ${ev.away}` : "Loading…"}</a></div>
+        <div><a onClick={onClose} className="curPointer">← BACK</a></div>
+      </div>
+      <iframe
+        title="Match tracker"
+        src={`https://fortebet-ug.24liveresults.com/match-widget/${num}?displayMode=kiosk&utm_source=fortebet&utm_medium=web&utm_campaign=match_detail&language=en&lang=en`}
+        style={{ width: "100%", height: 420, border: 0, display: "block" }}
+      />
+      {q.isError && <div className="offerHead"><div>Odds for this match are not available right now.</div></div>}
+      {ev?.markets.map((mk, mi) => (
+        <div key={mi}>
+          <div className="offerHead"><div>{mk.name}</div></div>
+          <div className="offerMatch" style={{ flexWrap: "wrap" }}>
+            <div className="app-widget-market-set" style={{ flexWrap: "wrap", width: "100%" }}>
+              {mk.outcomes.map((o, oi) => {
+                const key = `${id}-m${mi}-${oi}`;
+                const on = sels.some((s) => s.key === key);
+                return (
+                  <div className="odds" key={oi} style={{ width: "auto", minWidth: 120 }}>
+                    <div
+                      style={on ? { background: "rgb(0,166,90)", color: "#fff" } : undefined}
+                      onClick={() => o.odds && toggle({ key, eventId: id, match: `${ev.home} - ${ev.away}`, pick: `${mk.name}: ${o.name}`, odds: o.odds })}
+                    >
+                      {o.name} <b>{o.odds ? o.odds.toFixed(2) : "-"}</b>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function MatchesPanel({ mode, sels, toggle }: { mode: "home" | "live"; sels: Sel[]; toggle: (s: Sel) => void }) {
+  const home = useQuery({ ...homeQuery, enabled: mode === "home" });
+  const live = useQuery({ ...liveQuery, enabled: mode === "live" });
+  const [tab, setTab] = useState(0);
+  const [limit, setLimit] = useState(8);
+  const [open, setOpen] = useState<string | null>(null);
+  useEffect(() => setOpen(null), [mode]);
+  if (open) return <EventDetail id={open} live={mode === "live"} onClose={() => setOpen(null)} sels={sels} toggle={toggle} />;
+  const tabs = mode === "live" ? ["LIVE MATCHES"] : ["MOST POPULAR MATCHES", "SOCCER ODDS UNDER 1.30", "LOW SOCCER ODDS (1.31 - 1.50)"];
+  const q = mode === "live" ? live : home;
+  const list: Match[] = mode === "live" ? live.data?.matches ?? [] : home.data ? [home.data.popular, home.data.under130, home.data.low][tab] : [];
+  return (
+    <div className="mainOffer">
+      <div className="offerMenu baseLeft center">
+        {tabs.map((t, k) => (
+          <div key={t} className={k === tab || mode === "live" ? "active" : ""}><a className="curPointer" onClick={() => { setTab(k); setLimit(8); }}>{t}</a></div>
+        ))}
+      </div>
+      <div className="emptyLow" />
+      <div className="offerHead"><div />{PICKS.map((p) => <div key={p}>{p}</div>)}</div>
+      {q.isLoading && <div className="offerHead"><div>Loading matches…</div></div>}
+      {q.isError && <div className="offerHead"><div>Could not load matches. Retrying…</div></div>}
+      {!q.isLoading && list.length === 0 && !q.isError && <div className="offerHead"><div>No matches right now.</div></div>}
+      {list.slice(0, limit).map((m) => <MatchRow key={m.id} m={m} sels={sels} toggle={toggle} open={setOpen} />)}
+      <div className="offerButtons">
+        {limit < list.length && <div className="buttons empty"><a className="curPointer" onClick={() => setLimit((l) => l + 10)}>SHOW MORE</a></div>}
+      </div>
+    </div>
+  );
+}
+
+function BetSlip({ sels, remove, clear }: { sels: Sel[]; remove: (k: string) => void; clear: () => void }) {
+  const [stake, setStake] = useState(1000);
+  const total = sels.reduce((a, s) => a * s.odds, 1);
+  return (
+    <div className="ticket">
+      <div className="ticketHead"> Bet slip - Sportsbook <div /></div>
+      <div className="betSlipMenu"><div><a className="active"> 1 <span>{sels.length}</span></a><a> 2 <span>0</span></a><a> 3 <span>0</span></a><a> 4 <span>0</span></a></div></div>
+      {sels.length === 0 ? (
+        <div className="empty"> Your Ticket is still empty </div>
+      ) : (
+        <div style={{ padding: 10, color: "#333", fontSize: 13 }}>
+          {sels.map((s) => (
+            <div key={s.key} style={{ display: "flex", justifyContent: "space-between", gap: 8, padding: "6px 0", borderBottom: "1px solid #ddd" }}>
+              <div><b>{s.match}</b><div>{s.pick}</div></div>
+              <div style={{ textAlign: "right" }}><b>{s.odds.toFixed(2)}</b><div><a className="curPointer" onClick={() => remove(s.key)} aria-label="Remove">✕</a></div></div>
+            </div>
+          ))}
+          <div style={{ display: "flex", justifyContent: "space-between", marginTop: 8 }}><span>Total odds</span><b>{total.toFixed(2)}</b></div>
+          <label style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 6 }}>Stake (UGX)
+            <input type="number" min={1000} value={stake} onChange={(e) => setStake(Number(e.target.value))} style={{ width: 110, border: "1px solid #ccc", padding: 4 }} />
+          </label>
+          <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6 }}><span>Possible win</span><b>{(stake * total).toLocaleString("en-US", { maximumFractionDigits: 0 })} UGX</b></div>
+          <div className="buttons" style={{ marginTop: 8 }}><a className="curPointer" onClick={clear}>Clear ticket</a></div>
+        </div>
+      )}
+    </div>
   );
 }
