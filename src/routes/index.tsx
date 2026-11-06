@@ -717,7 +717,7 @@ function MatchRow({ m, sels, toggle, open }: { m: Match; sels: Sel[]; toggle: (s
               <div
                 className={`${o === fav && k !== 1 ? "favorite" : ""} ${on ? "selected" : ""}`}
                 style={on ? { background: "rgb(0,166,90)", color: "#fff" } : undefined}
-                onClick={() => o && toggle({ key, eventId: m.id, match: `${m.home} - ${m.away}`, pick: PICKS[k], odds: o })}
+                onClick={() => o && toggle({ key, eventId: m.id, match: `${m.home} - ${m.away}`, pick: PICKS[k] ?? "", odds: o })}
               >
                 {o ? ` ${o.toFixed(2)} ` : " - "}
               </div>
@@ -783,7 +783,7 @@ function MatchesPanel({ mode, sels, toggle }: { mode: "home" | "live"; sels: Sel
   if (open) return <EventDetail id={open} live={mode === "live"} onClose={() => setOpen(null)} sels={sels} toggle={toggle} />;
   const tabs = mode === "live" ? ["LIVE MATCHES"] : ["MOST POPULAR MATCHES", "SOCCER ODDS UNDER 1.30", "LOW SOCCER ODDS (1.31 - 1.50)"];
   const q = mode === "live" ? live : home;
-  const list: Match[] = mode === "live" ? live.data?.matches ?? [] : home.data ? [home.data.popular, home.data.under130, home.data.low][tab] : [];
+  const list: Match[] = mode === "live" ? live.data?.matches ?? [] : home.data ? [home.data.popular, home.data.under130, home.data.low][tab] ?? [] : [];
   return (
     <div className="mainOffer">
       <div className="offerMenu baseLeft center">
