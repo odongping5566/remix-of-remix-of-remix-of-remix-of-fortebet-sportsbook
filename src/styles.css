@@ -190,3 +190,41 @@
   --color-font-main: #C9C9CB;
 }
 /* site-import tokens: end */
+
+:root {
+  --account-surface: oklch(0.285 0.018 278);
+  --account-field: oklch(0.235 0.012 278);
+  --account-line: oklch(0.47 0.009 278);
+  --account-ink: oklch(0.96 0 0);
+  --account-overlay: oklch(0.08 0 0 / 75%);
+  --account-shadow: 0 20px 70px oklch(0.08 0 0 / 45%);
+}
+@theme inline {
+  --color-account-surface: var(--account-surface);
+  --color-account-field: var(--account-field);
+  --color-account-line: var(--account-line);
+  --color-account-ink: var(--account-ink);
+  --color-account-overlay: var(--account-overlay);
+  --shadow-account: var(--account-shadow);
+}
+
+/* Imported element rules must not override the account dialog controls. */
+[role="dialog"][data-state] button {
+  border: 0;
+  box-shadow: none;
+  font-family: inherit;
+}
+[role="dialog"][data-state] button[data-slot],
+[role="dialog"][data-state] button[aria-label="Close account window"],
+[role="dialog"][data-state] button[aria-label="Show password"],
+[role="dialog"][data-state] button[aria-label="Hide password"] {
+  background: transparent;
+  color: var(--account-ink);
+}
+[role="dialog"][data-state] button svg {
+  display: block;
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+}
