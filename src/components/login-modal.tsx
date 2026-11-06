@@ -6,8 +6,8 @@ import { closeLogin, openLogin, openRegister, openForgot, useLoginOpen, validate
 import countries from "@/lib/registration-countries.json";
 
 const field = "box-border h-9 w-full min-w-0 rounded border border-account-line bg-account-field px-2 text-sm text-account-ink outline-none placeholder:text-site-import-muted-foreground focus:border-brand-500";
-const action = "h-9 w-full rounded bg-brand-500 text-account-ink font-bold hover:bg-brand-700";
-const subtle = "border border-account-line bg-account-surface text-account-ink hover:bg-account-field";
+const action = "account-action h-9 w-full rounded bg-brand-500 text-account-ink font-bold hover:bg-brand-700";
+const subtle = "account-secondary border border-account-line bg-account-surface text-account-ink hover:bg-account-field";
 
 /** Disconnected public-layout preview: no requests, sessions, or storage. */
 export function LoginModal() {
@@ -42,7 +42,7 @@ function AccountForm({ mode }: { mode: AccountWindow }) {
 
   return <Dialog.Portal>
     <Dialog.Overlay className="fixed inset-0 z-[1000] bg-account-overlay" />
-    <Dialog.Content className={`fixed left-1/2 top-1/2 z-[1001] max-h-[92dvh] w-[calc(100%-24px)] -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-md bg-account-surface text-account-ink shadow-account outline-none ${register ? "max-w-[1100px]" : "max-w-[340px]"}`}>
+    <Dialog.Content className={`account-dialog fixed left-1/2 top-1/2 z-[1001] max-h-[92dvh] w-[calc(100%-24px)] -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-md bg-account-surface text-account-ink shadow-account outline-none ${register ? "max-w-[1100px]" : "max-w-[340px]"}`}>
       <header className={`relative flex h-12 items-center gap-2 px-4 ${register ? "bg-account-field" : "bg-brand-600"}`}>
         {register && <UserRound size={18} />}
         <Dialog.Title className={`text-sm font-black uppercase ${register ? "" : "w-full text-center"}`}>{title}</Dialog.Title>
@@ -70,7 +70,7 @@ function AccountForm({ mode }: { mode: AccountWindow }) {
             <RegistrationField label="Promo" placeholder="Enter your PROMO code" />
             <label className="flex items-start gap-2 pl-0 text-xs leading-5 md:pl-[90px]"><input type="checkbox" required className="mt-1 accent-brand-500" /> <span>I have read and accepted the general Terms and Conditions and I confirm that I am older than 18 years</span></label>
             <div className="md:pl-[90px]"><Button type="submit" className={action}>Confirm registration</Button></div>
-            <div className="text-center text-xs">Already registered? <Button variant="link" type="button" onClick={openLogin} className="h-auto p-1 text-brand-500">Login</Button></div>
+            <div className="text-center text-xs">Already registered? <Button variant="link" type="button" onClick={openLogin} className="account-link h-auto p-1 text-brand-500">Login</Button></div>
           </div>
           <aside className="space-y-4 border-t border-account-line pt-4 text-xs leading-5 md:border-t-0 md:pt-0">
             {[["1. Name, Surname", "Your first name and your family name."],["2. Username", "Choose your username."],["3. Mobile number", "Only Ugandan phone numbers are accepted on the original registration form."],["4. E-mail", "E-mail is optional in the original registration form."],["5. Date of birth", "Day, month and year of your birthday."],["6. NIN Number or Passport / Refugee card", "The original form requests an identity number. Use sample details in this preview."],["7. Terms", "General Terms and Conditions and age confirmation."],["8. Finish registration", "This preview does not create an account."]].map(([heading,text])=><section key={heading}><h3 className="font-bold">{heading}</h3><p className="mt-1 text-site-import-muted-foreground">{text}</p></section>)}

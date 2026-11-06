@@ -336,10 +336,10 @@ export function LiveShell({ children, slip, active = "live", layout = "ticket" }
                     <a {...({ "_ngcontent-wbi-c202": "", translate: "" } as any)}>HOW TO REGISTER</a>
                   </div>
                   <div className="buttons register [font-weight:900]" {...({ "_ngcontent-wbi-c202": "" } as any)}>
-                    <Button variant="ghost" className="h-auto rounded-none p-0 font-black hover:bg-transparent" onClick={openRegister}>Register</Button>
+                    <Button variant="ghost" className="account-header-button" onClick={openRegister}>Register</Button>
                   </div>
                   <div className="buttons login [font-weight:900]" {...({ "_ngcontent-wbi-c202": "" } as any)}>
-                    <Button variant="ghost" className="h-auto rounded-none p-0 font-black hover:bg-transparent" onClick={openLogin}><span className="ico login h15" {...({ "_ngcontent-wbi-c202": "" } as any)} />Login</Button>
+                    <Button variant="ghost" className="account-header-button" onClick={openLogin}><span className="ico login h15" {...({ "_ngcontent-wbi-c202": "" } as any)} />Login</Button>
                   </div>
                 </div>
               </div>

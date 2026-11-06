@@ -208,20 +208,74 @@
   --shadow-account: var(--account-shadow);
 }
 
-/* Imported element rules must not override the account dialog controls. */
-[role="dialog"][data-state] button {
+/* Keep account controls independent of the imported site's element rules. */
+#app-header .buttons > .account-header-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  box-sizing: border-box;
+  height: calc(30px * var(--factor, 1));
+  padding: 0 calc(15px * var(--factor, 1));
   border: 0;
+  border-radius: calc(6px * var(--factor, 1));
+  font: inherit;
+  font-size: calc(12px * var(--factor, 1));
+  font-weight: 900;
+  text-transform: uppercase;
+  box-shadow: none;
+}
+#app-header .register > .account-header-button {
+  background: var(--account-ink);
+  color: var(--brand-600);
+}
+#app-header .login > .account-header-button {
+  background: var(--brand-500);
+  color: var(--account-ink);
+}
+#app-header .login > .account-header-button:hover {
+  background: var(--brand-700);
+}
+.account-dialog button {
+  box-sizing: border-box;
   box-shadow: none;
   font-family: inherit;
 }
-[role="dialog"][data-state] button[data-slot],
-[role="dialog"][data-state] button[aria-label="Close account window"],
-[role="dialog"][data-state] button[aria-label="Show password"],
-[role="dialog"][data-state] button[aria-label="Hide password"] {
+.account-dialog .account-action {
+  height: 36px;
+  border: 1px solid var(--brand-500);
+  background: var(--brand-500);
+  color: var(--account-ink);
+  border-radius: 4px;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+.account-dialog .account-action:hover {
+  background: var(--brand-700);
+  border-color: var(--brand-700);
+}
+.account-dialog .account-secondary {
+  border: 1px solid var(--account-line);
+  background: var(--account-surface);
+  color: var(--account-ink);
+  border-radius: 4px;
+}
+.account-dialog .account-secondary:hover {
+  background: var(--account-field);
+}
+.account-dialog button[aria-label="Close account window"],
+.account-dialog button[aria-label="Show password"],
+.account-dialog button[aria-label="Hide password"] {
+  border: 0;
   background: transparent;
   color: var(--account-ink);
 }
-[role="dialog"][data-state] button svg {
+.account-dialog .account-link {
+  border: 0;
+  background: transparent;
+  color: var(--brand-500);
+}
+.account-dialog button svg {
   display: block;
   width: 16px;
   height: 16px;
