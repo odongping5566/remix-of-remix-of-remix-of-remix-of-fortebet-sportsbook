@@ -1,14 +1,15 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { queryOptions, useQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { CASINO_ASSETS, CASINO_IMG, getCasinoGames, getCasinoJackpots, playCasinoGame, type CasinoGame } from "@/lib/fortebet.functions";
-import { availableKeys, CASINO_CATEGORIES, CASINO_PROVIDERS, DEFAULT_CASINO_FILTER, filterGames, isFiltered, popularGames, type CasinoFilter } from "@/lib/casino";
+import { CASINO_ASSETS, CASINO_IMG, getCasinoGames, getCasinoJackpots, getCasinoWinners, playCasinoGame, type CasinoGame } from "@/lib/fortebet.functions";
+import { availableKeys, CASINO_CATEGORIES, CASINO_PROVIDERS, DEFAULT_CASINO_FILTER, filterGames, isFiltered, jackpotCounter, jackpotStart, popularGames, type CasinoFilter } from "@/lib/casino";
 
 const G = "rgb(0,166,90)";
 
 export const casinoGamesQuery = queryOptions({ queryKey: ["fb-casino-games"], queryFn: () => getCasinoGames(), staleTime: 600_000 });
-const jackpotsQuery = queryOptions({ queryKey: ["fb-casino-jackpots"], queryFn: () => getCasinoJackpots(), refetchInterval: 30_000, staleTime: 20_000 });
+const jackpotsQuery = queryOptions({ queryKey: ["fb-casino-jackpots"], queryFn: () => getCasinoJackpots(), refetchInterval: 60_000, staleTime: 50_000 });
+const winnersQuery = queryOptions({ queryKey: ["fb-casino-winners"], queryFn: () => getCasinoWinners(), refetchInterval: 60_000, staleTime: 50_000 });
 
 const CSS = `
 .fbCasino{padding-bottom:calc(10px * var(--factor));}
@@ -39,6 +40,17 @@ const CSS = `
 .fbCasino .games>button>img{width:100%;display:block;aspect-ratio:400/239;object-fit:cover;transition:inherit;position:relative;z-index:1;margin:0;background:#16181f}
 .fbCasino .games>button:hover>h4,.fbCasino .games>button:focus-visible>h4{background:${G};color:#fff}
 .fbCasino .games>button:hover>img{transform:scale(1.05)}
+.fbCasino .lastWinners{display:flex;align-items:center;justify-content:space-evenly;gap:calc(10px * var(--factor));background:#2E3139;border-radius:calc(6px * var(--factor));margin:calc(10px * var(--factor)) 0;padding:calc(5px * var(--factor))}
+.fbCasino .lastWinners h3{font-size:calc(25px * var(--factor));color:#fff;font-weight:500;text-transform:uppercase;margin:0 calc(10px * var(--factor));white-space:nowrap}
+.fbCasino .lastWinners .data{display:flex;gap:calc(10px * var(--factor));overflow:hidden;min-width:0}
+.fbCasino .lastWinners .winner{display:flex;align-items:center;gap:calc(5px * var(--factor));padding:calc(5px * var(--factor)) calc(15px * var(--factor)) calc(5px * var(--factor)) calc(5px * var(--factor));border-radius:calc(6px * var(--factor));background:#171921;color:#fff;border:0;cursor:pointer;font-family:inherit;text-align:left;flex-shrink:0;transition:box-shadow .2s ease}
+.fbCasino .lastWinners .winner:hover{box-shadow:inset 0 0 0 1px ${G}}
+.fbCasino .lastWinners .winner:disabled{cursor:default;box-shadow:none}
+.fbCasino .lastWinners img{height:calc(60px * var(--factor));aspect-ratio:400/239;object-fit:cover;border-radius:calc(6px * var(--factor));margin-right:calc(5px * var(--factor))}
+.fbCasino .lastWinners .wd{display:flex;flex-direction:column;line-height:calc(18px * var(--factor));font-size:calc(12px * var(--factor));color:#c9cacf}
+.fbCasino .lastWinners h4{font-size:calc(13px * var(--factor));margin:0;color:#fff;max-width:calc(150px * var(--factor));overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fbCasino .lastWinners strong{color:${G};font-weight:800}
+@media (max-width:1100px){.fbCasino .lastWinners h3{display:none}}
 .fbCasino .empty{text-align:center;color:#a3a4a8;font-size:calc(18px * var(--factor));padding:calc(60px * var(--factor)) 0}
 @media (max-width:1100px){.fbCasino .games{grid-template-columns:repeat(4,minmax(0,1fr))}}
 @media (max-width:700px){.fbCasino .games{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.fbCasino .casinoFilter{flex-direction:column}.fbCasino .casinoSearch{width:100%}}
@@ -63,6 +75,25 @@ const CSS = `
 @keyframes fbspin{to{transform:rotate(360deg)}}
 `;
 
+/** One jackpot counter that climbs like Fortebet's: from 60 s of growth below the real value up to it, then on to each new value. */
+function JackpotCounter({ value, speed }: { value: number; speed: number }) {
+  const anim = useRef<{ from: number; to: number; at: number } | null>(null);
+  const [shown, setShown] = useState(() => jackpotStart(value, speed));
+  useEffect(() => {
+    const now = Date.now();
+    const cur = anim.current ? jackpotCounter(anim.current.from, anim.current.to, now - anim.current.at) : jackpotStart(value, speed);
+    anim.current = { from: Math.min(cur, value), to: value, at: now };
+  }, [value, speed]);
+  useEffect(() => {
+    const t = setInterval(() => {
+      const a = anim.current;
+      if (a) setShown(jackpotCounter(a.from, a.to, Date.now() - a.at));
+    }, 50);
+    return () => clearInterval(t);
+  }, []);
+  return <div className="counter">{Math.floor(shown).toLocaleString("en-US")}&nbsp;UGX</div>;
+}
+
 function Jackpots() {
   const { data } = useQuery(jackpotsQuery);
   const list = data?.jackpots ?? [];
@@ -73,9 +104,37 @@ function Jackpots() {
       {list.map((j) => (
         <div key={j.ident} className="jackpot" style={{ ["--jp" as string]: `url(${CASINO_ASSETS}${img[j.ident] ?? "jackpot-golden.png"})` }}>
           <h3>{j.ident} Jackpot</h3>
-          <div className="counter">{Math.floor(j.value).toLocaleString("en-US")}&nbsp;UGX</div>
+          <JackpotCounter value={j.value} speed={j.speed} />
         </div>
       ))}
+    </div>
+  );
+}
+
+/** "Last winners" strip from Fortebet's casino winners feed; a click opens the game that was won. */
+function Winners({ games, onPlay }: { games: CasinoGame[]; onPlay: (g: CasinoGame) => void }) {
+  const { data } = useQuery(winnersQuery);
+  const list = data?.winners ?? [];
+  if (!list.length) return null;
+  const byImage = new Map(games.map((g) => [g.image, g]));
+  return (
+    <div className="lastWinners" aria-label="Last winners">
+      <h3>Last winners</h3>
+      <div className="data">
+        {list.slice(0, 5).map((w, i) => {
+          const g = byImage.get(w.image);
+          return (
+            <button type="button" key={i} className="winner" disabled={!g} onClick={() => g && onPlay(g)} title={w.game}>
+              <img alt={w.game} src={CASINO_IMG + w.image} loading="lazy" />
+              <span className="wd">
+                <h4>{w.game}</h4>
+                <span>{w.nickname}</span>
+                <strong>{Math.floor(w.win).toLocaleString("en-US")}&nbsp;UGX</strong>
+              </span>
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 }
@@ -103,6 +162,7 @@ export function CasinoLobby() {
     <div className="fbCasino">
       <style>{CSS}</style>
       <Jackpots />
+      <Winners games={games} onPlay={play} />
       {!isFiltered(f) && popular.length > 0 && (
         <>
           <div className="casinoHeader">Most popular games</div>
