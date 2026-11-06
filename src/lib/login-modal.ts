@@ -1,7 +1,8 @@
 import { useSyncExternalStore } from "react";
 
 /** Tiny open/close store so any header button can open the single login window. */
-let open = false;
+export type AccountWindow = "login" | "register" | "forgot";
+let open: AccountWindow | null = null;
 const listeners = new Set<() => void>();
 
 function emit() {
@@ -9,12 +10,22 @@ function emit() {
 }
 
 export function openLogin() {
-  open = true;
+  open = "login";
+  emit();
+}
+
+export function openRegister() {
+  open = "register";
+  emit();
+}
+
+export function openForgot() {
+  open = "forgot";
   emit();
 }
 
 export function closeLogin() {
-  open = false;
+  open = null;
   emit();
 }
 
@@ -25,7 +36,7 @@ export function useLoginOpen() {
       return () => listeners.delete(cb);
     },
     () => open,
-    () => false,
+    () => null,
   );
 }
 

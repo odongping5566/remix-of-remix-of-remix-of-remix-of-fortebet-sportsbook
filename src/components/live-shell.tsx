@@ -1,7 +1,8 @@
 import type { ReactNode } from "react";
 import { HeaderClock, LiveOddsFeed } from "@/components/fortebet-live";
 import { TicketSearch } from "@/components/ticket-check";
-import { openLogin } from "@/lib/login-modal";
+import { openLogin, openRegister } from "@/lib/login-modal";
+import { Button } from "@/components/ui/button";
 import capturedCSS from "../styles/pages/live.preview.css?raw";
 
 const ImportedNativeTag0 = "innerscroll" as import("react").ElementType;
@@ -335,10 +336,10 @@ export function LiveShell({ children, slip, active = "live", layout = "ticket" }
                     <a {...({ "_ngcontent-wbi-c202": "", translate: "" } as any)}>HOW TO REGISTER</a>
                   </div>
                   <div className="buttons register [font-weight:900]" {...({ "_ngcontent-wbi-c202": "" } as any)}>
-                    <a {...({ "_ngcontent-wbi-c202": "", translate: "" } as any)}>Register</a>
+                    <Button variant="ghost" className="h-auto rounded-none p-0 font-black hover:bg-transparent" onClick={openRegister}>Register</Button>
                   </div>
                   <div className="buttons login [font-weight:900]" {...({ "_ngcontent-wbi-c202": "" } as any)}>
-                    <a role="button" onClick={openLogin} {...({ "_ngcontent-wbi-c202": "" } as any)}><span className="ico login h15" {...({ "_ngcontent-wbi-c202": "" } as any)} />Login</a>
+                    <Button variant="ghost" className="h-auto rounded-none p-0 font-black hover:bg-transparent" onClick={openLogin}><span className="ico login h15" {...({ "_ngcontent-wbi-c202": "" } as any)} />Login</Button>
                   </div>
                 </div>
               </div>
@@ -500,7 +501,7 @@ export function LiveShell({ children, slip, active = "live", layout = "ticket" }
                     <a href="/contact" {...({ "_ngcontent-wbi-c207": "" } as any)}>Contact us</a>
                     <a href="/doc/cooperation" {...({ "_ngcontent-wbi-c207": "" } as any)}>Cooperation</a>
                     <a href="/doc/retail_betting_rules" {...({ "_ngcontent-wbi-c207": "" } as any)}>Terms &amp; Conditions</a>
-                    <a {...({ "_ngcontent-wbi-c207": "" } as any)}>Register</a>
+                    <Button variant="ghost" className="h-auto justify-start p-0 hover:bg-transparent" onClick={openRegister}>Register</Button>
                     <a href="/doc/privacy_policy" {...({ "_ngcontent-wbi-c207": "" } as any)}>Privacy policy</a>
                     <a href="/doc/mobile-app" {...({ "_ngcontent-wbi-c207": "" } as any)}>Mobile app</a>
                   </div>

@@ -36,3 +36,4 @@ use the editor.
 - Ticket check and ticket preview share one ticket window (src/components/ticket-check.tsx); ticket lookups go through the checkTicket server function, so both views stay identical.
 - Same-site <a href> clicks are turned into router navigation by one listener in src/routes/__root.tsx, so the imported pages' plain links never reload the app.
 - Casino lobby and jackpot-counter rules live in src/lib/casino.ts (tested in src/test/casino-rules.test.ts); games launch through the playCasinoGame server function in fun mode, since real mode needs a signed-in Fortebet session.
+- Account windows share one root-mounted dialog and an open/mode store; their forms validate locally without network requests or durable storage, keeping the preview disconnected.

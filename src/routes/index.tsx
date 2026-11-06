@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { BannerSlider, BetSlip, useSels, OfferCenter, HeaderClock, LiveOddsFeed } from "@/components/fortebet-live";
-import { openLogin } from "@/lib/login-modal";
+import { openLogin, openRegister } from "@/lib/login-modal";
+import { Button } from "@/components/ui/button";
 import { TicketSearch } from "@/components/ticket-check";
 import { OfferSearch, DateFilter, OddsRange, TopBetsList, MySelection, SportsList } from "@/components/offer-sidebar";
 import { OfferFilterProvider } from "@/components/offer-context";
@@ -350,10 +351,10 @@ function Index() {
                     <a {...({ "_ngcontent-oky-c202": "", translate: "" } as any)}>HOW TO REGISTER</a>
                   </div>
                   <div className="buttons register" {...({ "_ngcontent-oky-c202": "" } as any)}>
-                    <a {...({ "_ngcontent-oky-c202": "", translate: "" } as any)}>Register</a>
+                    <Button variant="ghost" className="h-auto rounded-none p-0 font-black hover:bg-transparent" onClick={openRegister}>Register</Button>
                   </div>
                   <div className="buttons login" {...({ "_ngcontent-oky-c202": "" } as any)}>
-                    <a role="button" onClick={openLogin} {...({ "_ngcontent-oky-c202": "" } as any)}><span className="ico login h15" {...({ "_ngcontent-oky-c202": "" } as any)} />Login</a>
+                    <Button variant="ghost" className="h-auto rounded-none p-0 font-black hover:bg-transparent" onClick={openLogin}><span className="ico login h15" {...({ "_ngcontent-oky-c202": "" } as any)} />Login</Button>
                   </div>
                 </div>
               </div>
@@ -492,7 +493,7 @@ function Index() {
                     <a href="/contact" {...({ "_ngcontent-oky-c207": "" } as any)}>Contact us</a>
                     <a href="/doc/cooperation" {...({ "_ngcontent-oky-c207": "" } as any)}>Cooperation</a>
                     <a href="/doc/retail_betting_rules" {...({ "_ngcontent-oky-c207": "" } as any)}>Terms &amp; Conditions</a>
-                    <a {...({ "_ngcontent-oky-c207": "" } as any)}>Register</a>
+                    <Button variant="ghost" className="h-auto justify-start p-0 hover:bg-transparent" onClick={openRegister}>Register</Button>
                     <a href="/doc/privacy_policy" {...({ "_ngcontent-oky-c207": "" } as any)}>Privacy policy</a>
                     <a href="/doc/mobile-app" {...({ "_ngcontent-oky-c207": "" } as any)}>Mobile app</a>
                   </div>
