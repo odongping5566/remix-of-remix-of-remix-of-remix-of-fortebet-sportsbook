@@ -18,5 +18,8 @@
 - [x] Menu links switch pages without a full reload
 - [x] All Games page with real Fortebet games, jackpots, providers/types/search
 - [x] Game window: play for fun (demo) via play-game
-- [ ] Play games for real money — blocked: needs players signed in with their own Fortebet account
+- [x] Jackpot counters climb like Fortebet's (60 s growth from speed)
+- [x] Last winners strip from the real winners feed (click opens the game)
+- [x] Aviator opens through Fortebet's play-game (free mode)
+- [ ] Login / register / real-money play — not built: this copy of Fortebet would collect real Fortebet passwords; needs Fortebet's own approval or an official partner connection
 - [ ] Real bet placement / Save i-Ticket — blocked: needs an authorized Fortebet account connection
