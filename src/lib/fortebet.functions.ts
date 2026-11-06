@@ -27,8 +27,8 @@ export type Match = {
   startTs: string;
   extra: number;
   odds: (number | null)[]; // 1, X, 2, 1X, X2, 12
-  score?: string;
-  status?: string;
+  score?: string | undefined;
+  status?: string | undefined;
 };
 
 const MAIN_OUTCOMES = [1, 2, 3, 200002, 200004, 200003];
