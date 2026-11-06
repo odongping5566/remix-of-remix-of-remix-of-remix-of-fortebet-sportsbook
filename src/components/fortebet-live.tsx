@@ -323,11 +323,12 @@ export function SportsView({ slip }: { slip: Slip }) {
         const cols = useQf ? qf!.cols : sport?.cols ?? ["1", "X", "2"];
         const favL = favs.leagues.includes(g.t.id);
         return (
-          <div key={g.t.id} style={{ display: "contents" }}>
-            <div className="offerHead" style={{ background: "#cea642", color: "#20222c", marginTop: 8, textTransform: "uppercase" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+          <div key={g.t.id} data-ce="offer-tournament-detail">
+            <div className="offerHead league">
+              <div><span className={`ico ${sport?.icon ?? "soccer"} h13`} /></div>
+              <div>
                 <span className={`ico flag ${g.icon}`} /> {g.cat} - {g.t.name}
-                <a className="curPointer" role="button" aria-label="Favourite league" onClick={() => toggleFav("leagues", g.t.id)} style={{ marginLeft: 4 }}>{favL ? "★" : "☆"}</a>
+                <a className="curPointer" role="button" aria-label="Favourite league" title="Favourite league" onClick={() => toggleFav("leagues", g.t.id)} style={{ marginLeft: 8 }}>{favL ? "★" : "☆"}</a>
               </div>
               {headerCols(cols).map((p, i) => <div key={i}>{p}</div>)}
             </div>
