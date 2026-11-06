@@ -207,3 +207,24 @@
   --color-account-overlay: var(--account-overlay);
   --shadow-account: var(--account-shadow);
 }
+
+/* Imported element rules must not override the account dialog controls. */
+[role="dialog"][data-state] button {
+  border: 0;
+  box-shadow: none;
+  font-family: inherit;
+}
+[role="dialog"][data-state] button[data-slot],
+[role="dialog"][data-state] button[aria-label="Close account window"],
+[role="dialog"][data-state] button[aria-label="Show password"],
+[role="dialog"][data-state] button[aria-label="Hide password"] {
+  background: transparent;
+  color: var(--account-ink);
+}
+[role="dialog"][data-state] button svg {
+  display: block;
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+}
