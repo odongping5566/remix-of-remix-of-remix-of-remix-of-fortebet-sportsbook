@@ -36,3 +36,21 @@ describe("casino lobby rules", () => {
     expect(filterGames(games, { ...DEFAULT_CASINO_FILTER, q: "joker" }).map((x) => x.id)).toEqual([5]);
   });
 });
+
+import { jackpotCounter, jackpotStart } from "@/lib/casino";
+describe("jackpot counter", () => {
+  it("starts 60 seconds of growth below the real value", () => {
+    expect(jackpotStart(1_901_258, 41.6)).toBeCloseTo(1_898_762, 0);
+  });
+  it("never starts below zero", () => {
+    expect(jackpotStart(100, 50)).toBe(0);
+  });
+  it("is halfway after 30 seconds and reaches the real value after 60 seconds", () => {
+    expect(jackpotCounter(1000, 2000, 30_000)).toBe(1500);
+    expect(jackpotCounter(1000, 2000, 60_000)).toBe(2000);
+    expect(jackpotCounter(1000, 2000, 120_000)).toBe(2000);
+  });
+  it("drops straight to a lower value (jackpot was won)", () => {
+    expect(jackpotCounter(5000, 100, 1000)).toBe(100);
+  });
+});

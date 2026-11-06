@@ -61,3 +61,14 @@ export function availableKeys(games: CasinoGame[], f: CasinoFilter) {
   for (const c of CASINO_CATEGORIES) if (c.tag && filterGames(games, { ...f, category: c.key }).length) categories.add(c.key);
   return { providers, categories };
 }
+
+/** Fortebet's jackpot counter: it climbs from (value − 60 s × speed) up to value over 60 seconds. */
+export const JACKPOT_CYCLE_MS = 60_000;
+export function jackpotStart(value: number, speed: number) {
+  return Math.max(0, value - 60 * Math.max(0, speed));
+}
+/** Counter value `elapsed` ms after it started moving from `from` towards `to`. A lower new value jumps straight down. */
+export function jackpotCounter(from: number, to: number, elapsed: number) {
+  if (to <= from) return to;
+  return from + (to - from) * Math.min(1, Math.max(0, elapsed) / JACKPOT_CYCLE_MS);
+}
