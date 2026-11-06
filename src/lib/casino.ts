@@ -58,8 +58,3 @@ export function availableKeys(games: CasinoGame[], f: CasinoFilter) {
   for (const c of CASINO_CATEGORIES) if (c.tag && filterGames(games, { ...f, category: c.key }).length) categories.add(c.key);
   return { providers, categories };
 }
-
-/** Jackpot counter grows between refreshes at its reported speed (UGX per hour). */
-export function jackpotNow(value: number, speedPerHour: number, sinceMs: number) {
-  return Math.floor(value + (speedPerHour * Math.max(0, sinceMs)) / 3_600_000);
-}
