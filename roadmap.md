@@ -17,5 +17,5 @@
 - [ ] Odds shown as "-" display the grey padlock
 - [ ] Live/Home menu links switch pages without a full reload
 - [ ] Slots page (imported look) with real Fortebet casino games list
-- [ ] Launching a slot game (play-game)
+- [ ] Launching a slot game (play-game) — study the signed-in launch flow once (credentials not stored)
 - [ ] Real bet placement / Save i-Ticket — blocked: needs an authorized Fortebet account connection
