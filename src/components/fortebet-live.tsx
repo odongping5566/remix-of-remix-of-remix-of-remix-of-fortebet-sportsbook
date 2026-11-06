@@ -1,4 +1,4 @@
-import { useEffect, useState, type CSSProperties } from "react";
+import { Fragment, useEffect, useState, type CSSProperties } from "react";
 import { queryOptions, useQuery } from "@tanstack/react-query";
 import { getHomeData, getLiveData, getEventDetail, type Match } from "@/lib/fortebet.functions";
 
@@ -177,7 +177,7 @@ export function MatchesPanel({ mode, sels, toggle }: { mode: "home" | "live"; se
       {q.isLoading && <div className="offerHead"><div>Loading matches…</div></div>}
       {q.isError && <div className="offerHead"><div>Could not load matches. Retrying…</div></div>}
       {!q.isLoading && list.length === 0 && !q.isError && <div className="offerHead"><div>No matches right now.</div></div>}
-      {list.slice(0, limit).map((m) => <div key={m.id}><MatchRow m={m} sels={sels} toggle={toggle} open={(id) => setOpen((o) => (o === id ? null : id))} stats={setStatsId} />{open === m.id && <MarketsDropdown id={m.id} live={mode === "live"} sels={sels} toggle={toggle} />}</div>)}
+      {list.slice(0, limit).map((m) => <Fragment key={m.id}><MatchRow m={m} sels={sels} toggle={toggle} open={(id) => setOpen((o) => (o === id ? null : id))} stats={setStatsId} />{open === m.id && <MarketsDropdown id={m.id} live={mode === "live"} sels={sels} toggle={toggle} />}</Fragment>)}
       {statsId && <StatsModal id={statsId} live={mode === "live"} onClose={() => setStatsId(null)} />}
       <div className="offerButtons">
         {limit < list.length && <div className="buttons empty"><a className="curPointer" onClick={() => setLimit((l) => l + 10)}>SHOW MORE</a></div>}
@@ -333,7 +333,7 @@ export function MarketsDropdown({ id, live, sels, toggle }: { id: string; live: 
   const q = useQuery({ queryKey: ["fb-ev", id, live], queryFn: () => getEventDetail({ data: { id, live } }), refetchInterval: live ? 10_000 : 20_000 });
   const ev = q.data;
   const [closed, setClosed] = useState<number[]>([]);
-  const box: CSSProperties = { background: "#2e3139", color: "#e6e6e8", fontSize: 12, padding: "4px 6px 8px", marginBottom: 2 };
+  const box: CSSProperties = { gridColumn: "1 / -1", width: "100%", background: "#2e3139", color: "#e6e6e8", fontSize: 12, padding: "4px 6px 8px", marginBottom: 2 };
   if (q.isLoading) return <div style={box}>Loading odds…</div>;
   if (q.isError || !ev) return <div style={box}>Odds for this match are not available right now.</div>;
   return (
