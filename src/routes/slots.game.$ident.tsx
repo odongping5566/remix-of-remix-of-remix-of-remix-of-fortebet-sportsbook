@@ -5,7 +5,7 @@ import { GameModal, casinoGamesQuery } from "@/components/casino";
 type Search = { mode?: "fun" | "real" };
 
 export const Route = createFileRoute("/slots/game/$ident")({
-  validateSearch: (s: Record<string, unknown>): Search => (s.mode === "real" ? { mode: "real" } : {}),
+  validateSearch: (s: Record<string, unknown>): Search => (s["mode"] === "real" ? { mode: "real" } : {}),
   head: ({ params }) => ({ meta: [
     { title: `Play ${params.ident} - All Games | Fortebet` },
     { name: "description", content: "Play this Fortebet casino game for fun or for real." },
