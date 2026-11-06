@@ -5,11 +5,14 @@ import capturedCSS from "../styles/pages/live.preview.css?raw";
 
 const ImportedNativeTag0 = "innerscroll" as import("react").ElementType;
 
-export function LiveShell({ children, slip }: { children: ReactNode; slip: ReactNode }) {
+type NavKey = "sportsbook" | "live" | "slots";
+
+export function LiveShell({ children, slip, active = "live", layout = "ticket" }: { children: ReactNode; slip?: ReactNode; active?: NavKey; layout?: "ticket" | "full" }) {
+  const navCls = (k: NavKey) => (k === active ? "active" : "");
   return (
     <>
       <style>{capturedCSS}</style>
-      <LiveOddsFeed />
+      {layout === "ticket" && <LiveOddsFeed />}
       <div data-ce="app-root" {...({ "ng-version": "13.3.0" } as any)}>
         <div data-ce="app-svg-loader" {...({ "_nghost-wbi-c201": "" } as any)}>
           <svg xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" {...({ "_ngcontent-wbi-c201": "" } as any)}>
@@ -313,7 +316,7 @@ export function LiveShell({ children, slip }: { children: ReactNode; slip: React
           </svg>
         </div>
         <div data-ce="app-base-layout" {...({ "_nghost-wbi-c209": "" } as any)}>
-          <div className="col2Ticket [gap:calc(15px_*_var(--factor))_calc(10px_*_var(--factor))] [min-height:100%]" id="mainContainer" {...({ "_ngcontent-wbi-c209": "" } as any)}>
+          <div className={`${layout === "full" ? "col1" : "col2Ticket"} [gap:calc(15px_*_var(--factor))_calc(10px_*_var(--factor))] [min-height:100%]`} id="mainContainer" data-layout={layout} {...({ "_ngcontent-wbi-c209": "" } as any)}>
             <div data-ce="app-header" id="app-header" {...({ "_ngcontent-wbi-c209": "", "_nghost-wbi-c202": "" } as any)}>
               <div className="header [top:0px]" {...({ "_ngcontent-wbi-c202": "" } as any)}>
                 <h1 {...({ "_ngcontent-wbi-c202": "" } as any)}>Fortebet</h1>
@@ -343,10 +346,10 @@ export function LiveShell({ children, slip }: { children: ReactNode; slip: React
               <div className="secHeader uppercase [font-weight:700] [transition:0.2s]" {...({ "_ngcontent-wbi-c206": "" } as any)}>
                 <ul {...({ "_ngcontent-wbi-c206": "" } as any)}>
                   <li {...({ "_ngcontent-wbi-c206": "" } as any)}>
-                    <a href="/" {...({ "_ngcontent-wbi-c206": "" } as any)}>Sportsbook</a>
+                    <a className={navCls("sportsbook")} href="/" {...({ "_ngcontent-wbi-c206": "" } as any)}>Sportsbook</a>
                   </li>
                   <li {...({ "_ngcontent-wbi-c206": "" } as any)}>
-                    <a className="active" href="/live/preview" {...({ "_ngcontent-wbi-c206": "", routerlinkactive: "active" } as any)}>Live</a>
+                    <a className={navCls("live")} href="/live/preview" {...({ "_ngcontent-wbi-c206": "", routerlinkactive: "active" } as any)}>Live</a>
                   </li>
                   <li {...({ "_ngcontent-wbi-c206": "" } as any)}>
                     <a className="withIco" href="/virtual-soccer" {...({ "_ngcontent-wbi-c206": "", routerlinkactive: "active" } as any)}>
@@ -363,7 +366,7 @@ export function LiveShell({ children, slip }: { children: ReactNode; slip: React
                     </a>
                   </li>
                   <li {...({ "_ngcontent-wbi-c206": "" } as any)}>
-                    <a href="/slots" {...({ "_ngcontent-wbi-c206": "", routerlinkactive: "active" } as any)}>All Games</a>
+                    <a className={navCls("slots")} href="/slots" {...({ "_ngcontent-wbi-c206": "", routerlinkactive: "active" } as any)}>All Games</a>
                   </li>
                   <li {...({ "_ngcontent-wbi-c206": "" } as any)}>
                     <a className="withIco" href="/aviator" {...({ "_ngcontent-wbi-c206": "", routerlinkactive: "active" } as any)}><icon {...({ "_ngcontent-wbi-c206": "", href: "https://www.fortebet.ug/#icoSportAviator", classname: "h28 current", "_nghost-wbi-c39": "" } as any)}><svg className="current h28 align-middle" viewBox="0 0 100 100" {...({ "_ngcontent-wbi-c39": "" } as any)}><use xlinkHref="#icoSportAviator" {...({ "_ngcontent-wbi-c39": "" } as any)} /></svg></icon> Aviator </a>
@@ -378,6 +381,7 @@ export function LiveShell({ children, slip }: { children: ReactNode; slip: React
                 <div className="buttons" {...({ "_ngcontent-wbi-c206": "" } as any)} />
               </div>
             </div>
+            {layout === "ticket" && (
             <div className="live live--sticky [top:calc(104px_*_var(--factor))]" {...({ "_ngcontent-wbi-c209": "" } as any)}>
               <div className="live__head" {...({ "_ngcontent-wbi-c209": "" } as any)}>
                 <div className="[min-width:calc(39px_*_var(--factor))] [transition:width_0.2s_ease-in-out]" {...({ "_ngcontent-wbi-c209": "" } as any)}>
@@ -426,7 +430,13 @@ export function LiveShell({ children, slip }: { children: ReactNode; slip: React
               </div>
               <div className="match emptyLow [font-weight:700] [transition:background_0.2s]" {...({ "_ngcontent-wbi-c209": "" } as any)} />
             </div>
+            )}
             <div id="app-content-main" {...({ "_ngcontent-wbi-c209": "" } as any)}>
+              {layout === "full" ? (
+                <div className="simSubGrid [column-gap:calc(10px_*_var(--factor))]">
+                  <div id="app-content" style={{ gridColumn: "1 / -1" }}>{children}</div>
+                </div>
+              ) : (
               <div data-ce="live-index">
                 <div className="simSubGrid [column-gap:calc(10px_*_var(--factor))]">
                   <div className="staticModul [top:calc((54px_+_50px)_*_var(--factor))]" id="app-content">{children}</div>
@@ -436,6 +446,7 @@ export function LiveShell({ children, slip }: { children: ReactNode; slip: React
                   </div>
                 </div>
               </div>
+              )}
             </div>
             <div data-ce="app-footer" id="app-footer" {...({ "_ngcontent-wbi-c209": "", "_nghost-wbi-c207": "" } as any)}>
               <div className="footer" {...({ "_ngcontent-wbi-c207": "" } as any)}>
@@ -464,7 +475,7 @@ export function LiveShell({ children, slip }: { children: ReactNode; slip: React
                   </div>
                   <div {...({ "_ngcontent-wbi-c207": "" } as any)}>
                     <h4 {...({ "_ngcontent-wbi-c207": "" } as any)}>LIVE betting</h4>
-                    <a href="#" {...({ "_ngcontent-wbi-c207": "" } as any)}>In play</a>
+                    <a href="/live/preview" {...({ "_ngcontent-wbi-c207": "" } as any)}>In play</a>
                     <a href="/live/calendar" {...({ "_ngcontent-wbi-c207": "" } as any)}>Schedule</a>
                   </div>
                   <div {...({ "_ngcontent-wbi-c207": "" } as any)}>
