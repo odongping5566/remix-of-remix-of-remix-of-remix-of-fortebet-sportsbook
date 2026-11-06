@@ -6,6 +6,7 @@ import { applyFilters, favOdds } from "@/lib/offer-filters";
 import { possibleWin, stakeError, totalOdds, vipPoints, TICKET_RULES } from "@/lib/ticket";
 import { useSels, type Sel, type Slip } from "@/lib/tickets-store";
 import { useOfferFilters } from "@/components/offer-context";
+import { LockIcon, TicketSheet, sheetBtn } from "@/components/ticket-check";
 
 export { useSels };
 export type { Sel, Slip };
@@ -93,19 +94,19 @@ export function OddBtn({ cell, at, mk, sels, toggle, info, variant = "grid", lab
   const usable = !!cell && !locked && !!v;
   const click = () => usable && toggle({ key: String(cell!.id), oddsId: cell!.id, odds: v!, at: Date.now(), ...info });
   const arrow = dir ? <span style={{ color: on ? "#fff" : dir === "up" ? UP : DOWN, fontSize: "0.75em", marginLeft: 2 }}>{dir === "up" ? "▲" : "▼"}</span> : null;
-  const text = !cell ? " - " : locked ? "🔒" : v ? v.toFixed(2) : " - ";
+  const text = !cell ? " - " : locked ? <LockIcon size={12} /> : v ? v.toFixed(2) : " - ";
   const flash: CSSProperties | undefined = dir && !on ? { boxShadow: `inset 0 0 0 1px ${dir === "up" ? UP : DOWN}` } : undefined;
   if (variant === "chip") {
     return (
       <div className="curPointer" onClick={click}
-        style={{ display: "flex", justifyContent: "space-between", gap: 8, padding: "6px 10px", background: on ? G : "#2a2c33", color: on ? "#fff" : "#e6e6e8", fontWeight: 700, textTransform: "uppercase", opacity: locked ? 0.5 : 1, cursor: usable ? "pointer" : "not-allowed", ...flash }}>
+        style={{ display: "flex", justifyContent: "space-between", gap: 8, padding: "6px 10px", background: on ? G : locked ? "#25262c" : "#2a2c33", color: on ? "#fff" : locked ? "#8b8d96" : "#e6e6e8", fontWeight: 700, textTransform: "uppercase", cursor: usable ? "pointer" : "not-allowed", ...flash }}>
         <span>{label}</span><b style={{ color: on ? "#fff" : UP, whiteSpace: "nowrap" }}>{text}{arrow}</b>
       </div>
     );
   }
   return (
     <div className={`curPointer ${favorite && !on ? "favorite" : ""} ${on ? "selected" : ""}`}
-      style={{ ...(on ? { background: G, color: "#fff" } : {}), ...flash, ...(locked ? { opacity: 0.5, cursor: "not-allowed" } : {}) }}
+      style={{ ...(on ? { background: G, color: "#fff" } : {}), ...flash, ...(locked ? { background: "#25262c", cursor: "not-allowed", display: "flex", alignItems: "center", justifyContent: "center" } : {}) }}
       onClick={click}>
       {cell ? <> {text}{arrow} </> : " - "}
     </div>
@@ -540,7 +541,7 @@ export function BetSlip({ slip, title = "Sportsbook" }: { slip: Slip; title?: st
                   <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) minmax(0,0.8fr) 52px", gap: 6, marginTop: 3, alignItems: "center", color: "rgba(255,255,255,0.9)" }}>
                     <span>{mk}</span><span style={{ textAlign: "center", wordBreak: "break-word" }}>{out}</span>
                     <b style={{ color: "#fff", textAlign: "right", fontSize: 12 }}>
-                      {locked ? "🔒" : <>{ch && <s style={{ opacity: 0.6, fontSize: 10, marginRight: 3 }}>{s.odds.toFixed(2)}</s>}{cur.toFixed(2)}{ch && <span style={{ color: up ? "#c8ffe0" : "#ffd0d0", fontSize: 9 }}>{up ? "▲" : "▼"}</span>}</>}
+                      {locked ? <span style={{ display: "inline-flex", background: "#25262c", borderRadius: 3, padding: "2px 6px" }}><LockIcon size={12} /></span> : <>{ch && <s style={{ opacity: 0.6, fontSize: 10, marginRight: 3 }}>{s.odds.toFixed(2)}</s>}{cur.toFixed(2)}{ch && <span style={{ color: up ? "#c8ffe0" : "#ffd0d0", fontSize: 9 }}>{up ? "▲" : "▼"}</span>}</>}
                     </b>
                   </div>
                 </div>
@@ -591,25 +592,32 @@ export function BetSlip({ slip, title = "Sportsbook" }: { slip: Slip; title?: st
           </div>
         </div>
       )}
-      {preview && (
-        <div onClick={() => setPreview(false)} style={{ position: "fixed", inset: 0, zIndex: 1000, background: "rgba(0,0,0,0.65)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
-          <div onClick={(e) => e.stopPropagation()} role="dialog" aria-label="Ticket preview" style={{ width: "min(420px,100%)", maxHeight: "90vh", overflow: "auto", background: "#fff", color: "#222", borderRadius: 4, padding: 16, fontSize: 12 }}>
-            <div style={{ display: "flex", justifyContent: "space-between", fontWeight: 900, fontSize: 14, marginBottom: 8 }}><span>TICKET PREVIEW · {title.toUpperCase()} {active + 1}</span><a className="curPointer" onClick={() => setPreview(false)}>✕</a></div>
-            {items.map(({ s, cur, locked }, i) => (
-              <div key={s.key} style={{ borderBottom: "1px dashed #ccc", padding: "6px 0" }}>
-                <div style={{ fontWeight: 700 }}>{i + 1}. {s.match}</div>
-                <div style={{ display: "flex", justifyContent: "space-between" }}><span>{fmtTime(s.start).day} {fmtTime(s.start).time} · {s.market}: {s.outcome}</span><b>{locked ? "Suspended" : cur.toFixed(2)}</b></div>
-              </div>
-            ))}
-            <div style={{ marginTop: 8, lineHeight: 1.7 }}>
-              <div style={{ display: "flex", justifyContent: "space-between" }}><span>Total odds</span><b>{fmt(total, 2)}</b></div>
-              <div style={{ display: "flex", justifyContent: "space-between" }}><span>Stake</span><b>{fmt(stake)} UGX</b></div>
-              <div style={{ display: "flex", justifyContent: "space-between" }}><span>Possible win</span><b>{fmt(win)} UGX</b></div>
-              <div style={{ display: "flex", justifyContent: "space-between" }}><span>VIP points</span><b>{fmt(vip)}</b></div>
-            </div>
-          </div>
-        </div>
-      )}
+      {preview && (() => {
+        const lives = sels.filter((s) => s.live).length;
+        const mode = lives === 0 ? "PREMATCH" : lives === sels.length ? "LIVE" : "PREMATCH + LIVE";
+        const kind = sels.length > 1 ? "COMBO" : "SINGLE";
+        const now = new Date();
+        const stamp = `${now.toLocaleDateString("en-US", { month: "short", day: "2-digit" })} ${now.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", second: "2-digit" })}`;
+        return (
+          <TicketSheet
+            title={`TICKET PREVIEW | ${mode} | ${kind} ${sels.length} event${sels.length === 1 ? "" : "s"} | ${stamp}`}
+            status="NOT PLACED"
+            onClose={() => setPreview(false)}
+            items={items.map(({ s, cur, locked, changed: ch }) => ({ key: s.key, time: s.start, match: s.match, market: s.market, outcome: s.outcome, odds: cur, oldOdds: ch ? s.odds : undefined, status: locked ? "LOCKED" : "OPEN" }))}
+            rows={[
+              { label: "TOTAL ODDS", value: fmt(total, 2) },
+              { label: "STAKE", value: `${fmt(stake)} UGX` },
+              { label: "POSSIBLE WIN", value: `${fmt(win)} UGX`, accent: true },
+              { label: "VIP POINTS", value: `+${fmt(vip)}` },
+            ]}
+            actions={<>
+              {err && <div style={{ color: "#ffb4b4", fontSize: 12 }}>{err}</div>}
+              {lockedCount > 0 && <div style={{ color: "#c9cacf", fontSize: 12, display: "flex", gap: 6, alignItems: "center" }}><LockIcon size={12} /> {lockedCount} pick{lockedCount > 1 ? "s are" : " is"} suspended</div>}
+              <button style={sheetBtn} onClick={() => setPreview(false)}>Back to bet slip</button>
+            </>}
+          />
+        );
+      })()}
     </div>
   );
 }

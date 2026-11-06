@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { HeaderClock, LiveOddsFeed } from "@/components/fortebet-live";
+import { TicketSearch } from "@/components/ticket-check";
 import capturedCSS from "../styles/pages/live.preview.css?raw";
 
 const ImportedNativeTag0 = "innerscroll" as import("react").ElementType;
@@ -431,16 +432,7 @@ export function LiveShell({ children, slip }: { children: ReactNode; slip: React
                   <div className="staticModul [top:calc((54px_+_50px)_*_var(--factor))]" id="app-content">{children}</div>
                   <div className="staticModul [top:calc((54px_+_50px)_*_var(--factor))]" id="app-rightbar">
                     {slip}
-                    <div data-ce="sbticket-search" {...({ "_nghost-wbi-c54": "" } as any)}>
-                      <div className="ticketSearch" {...({ "_ngcontent-wbi-c54": "" } as any)}>
-                        <h3 {...({ "_ngcontent-wbi-c54": "" } as any)}>Ticket search</h3>
-                        <input className="w100p" type="text" placeholder="Insert ticket number ..." name="ticketSearch" pattern="^\d+$" inputMode="numeric" {...({ "_ngcontent-wbi-c54": "", inputonlynumbers: "" } as any)} />
-                        <div className="buttons uppercase [font-weight:700]" {...({ "_ngcontent-wbi-c54": "" } as any)}>
-                          <a {...({ "_ngcontent-wbi-c54": "" } as any)}> Check ticket </a>
-                        </div>
-                      </div>
-                      <div className="overlayLoader" {...({ "_ngcontent-wbi-c54": "" } as any)} />
-                    </div>
+                    <TicketSearch />
                   </div>
                 </div>
               </div>
