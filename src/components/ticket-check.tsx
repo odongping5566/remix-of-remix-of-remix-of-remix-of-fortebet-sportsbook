@@ -153,9 +153,10 @@ export function TicketSheet({ title, items, status, rows, number, shortNumber, n
               <div style={{ minWidth: 80, display: "flex", alignItems: "center", justifyContent: "center", background: statusBg, color: "#333", fontSize: 20, fontWeight: 400, letterSpacing: 0.3, padding: "0 8px", whiteSpace: "nowrap" }}>{status}</div>
             </div>
             <div style={{ padding: "9px 13px 10px", background: LIST, borderBottom: "2px solid #25272e", lineHeight: "21px", fontSize: 13, fontWeight: 700, color: "#e3e3e5" }}>
-              {rows.map((r) => (
-                <div key={r.label} style={{ display: "flex", justifyContent: "space-between", color: r.accent ? "#22d47e" : undefined }}><span>{r.label}</span><span>{r.value}</span></div>
+              {rows.map((r, k) => (
+                <div key={k} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", color: r.accent ? "#22d47e" : undefined }}><span style={{ display: "flex" }}>{r.label}</span><span>{r.value}</span></div>
               ))}
+              {note && <div style={{ textAlign: "right", fontSize: 12, fontWeight: 400, lineHeight: "19px", marginTop: 3, color: "#d8d8da" }}>{note}</div>}
             </div>
             {actions && <div style={{ padding: "10px 13px", borderBottom: "2px solid #25272e", display: "grid", gap: 8 }}>{actions}</div>}
             {number && <div style={{ margin: "14px 13px", background: "#eaeaea", color: "#444", textAlign: "center", fontSize: 14, lineHeight: "24px", padding: "0 6px", letterSpacing: 0.1 }}>Ticket No. {number}</div>}
@@ -177,6 +178,25 @@ function ShareIcon() {
   );
 }
 
+function CalcIcon() {
+  return (
+    <svg width="16" height="20" viewBox="0 0 16 20" fill="none" stroke="#fff" strokeWidth="1.5" aria-hidden="true" style={{ marginRight: 24, flexShrink: 0 }}>
+      <rect x="1" y="1" width="14" height="18" rx="1.5" /><rect x="3.5" y="3.5" width="9" height="3.5" />
+      {[0, 1, 2].flatMap((r) => [0, 1, 2].map((c) => <rect key={`${r}${c}`} x={3.3 + c * 3.4} y={9.3 + r * 3.2} width="1.6" height="1.4" fill="#fff" stroke="none" />))}
+    </svg>
+  );
+}
+
+/** "FAIR | CASHOUT" label, white then green, as on Fortebet. */
+function CashoutBadge({ fair }: { fair: boolean }) {
+  return (
+    <span style={{ display: "inline-flex", fontSize: 12, fontWeight: 900, lineHeight: "20px", borderRadius: 2, overflow: "hidden" }}>
+      {fair && <span style={{ background: "#fff", color: "#222", padding: "0 5px" }}>FAIR</span>}
+      <span style={{ background: G, color: "#fff", padding: "0 6px" }}>CASHOUT</span>
+    </span>
+  );
+}
+
 const MODE_LABEL: Record<TicketDTO["mode"], string> = { PREMATCH: "PREMATCH", LIVE: "LIVE", MIXED: "PREMATCH + LIVE", VIRTUAL: "VIRTUAL SOCCER" };
 
 export function TicketDetailModal({ ticket, onClose }: { ticket: TicketDTO; onClose: () => void }) {
@@ -192,23 +212,48 @@ export function TicketDetailModal({ ticket, onClose }: { ticket: TicketDTO; onCl
       /* user cancelled */
     }
   };
-  const type = ticket.type === "COMBI" ? "COMBO" : ticket.type;
+  const [explain, setExplain] = useState(false);
+  const type = ticket.type.replace(/^(LIVE|PREMATCH|MIXED)_/, "").replace(/^COMBI$/, "COMBO");
+  const co = ticket.cashout;
+  const fair = co?.type === "FCO";
   const rows: SheetRow[] = [
     { label: "TOTAL ODDS", value: fmtMoney(ticket.totalOdds, 2) },
     { label: "STAKE", value: `${fmtMoney(ticket.stake)} UGX` },
-    { label: ticket.status === "WIN" ? "REAL WIN" : "POSSIBLE WIN", value: `${fmtMoney(ticket.status === "WIN" ? ticket.payout : ticket.possible)} UGX`, accent: true },
   ];
-  if (ticket.taxRate > 0) rows.push({ label: `WIN TAX ${Math.round(ticket.taxRate * 100)}%`, value: `${fmtMoney(ticket.tax)} UGX` });
-  rows.push({ label: "TOTAL PAYOUT", value: `${fmtMoney(ticket.payout)} UGX` });
+  let note: ReactNode = null;
+  if (co) {
+    rows.push({ label: "ORIGINAL POSSIBLE WIN", value: `${fmtMoney(ticket.possible)} UGX` });
+    rows.push({ label: <CashoutBadge fair={fair} />, value: `${fmtMoney(ticket.payout)} UGX *`, accent: true });
+    note = <>
+      {co.fee > 0 && <div>* FEE of {fmtMoney(co.fee)} UGX applied</div>}
+      {ticket.vipPoints <= 0 && <div>NO VIP PTS credited</div>}
+    </>;
+  } else {
+    rows.push({ label: ticket.status === "WIN" ? "REAL WIN" : "POSSIBLE WIN", value: `${fmtMoney(ticket.status === "WIN" ? ticket.payout : ticket.possible)} UGX`, accent: true });
+    if (ticket.taxRate > 0) rows.push({ label: `WIN TAX ${Math.round(ticket.taxRate * 100)}%`, value: `${fmtMoney(ticket.tax)} UGX` });
+    rows.push({ label: "TOTAL PAYOUT", value: `${fmtMoney(ticket.payout)} UGX` });
+  }
   return (
     <TicketSheet
       title={`${MODE_LABEL[ticket.mode]} | ${type} ${ticket.items.length} event${ticket.items.length === 1 ? "" : "s"} | ${fmtStamp(ticket.placedAt)}`}
-      status={ticket.status}
+      status={co ? (fair ? "FAIR CASHOUT" : "CASHOUT") : ticket.status}
+      shortNumber={ticket.shortNumber || undefined}
       rows={rows}
+      note={note}
       number={ticket.number}
       onClose={onClose}
       items={ticket.items.map((i, k) => ({ key: String(k), time: i.time, match: i.match, market: i.market, outcome: i.outcome, odds: i.odds, result: i.result, status: i.status }))}
-      actions={<button style={sheetBtn} onClick={share}><ShareIcon /> {copied ? "Link copied" : "Share ticket"}</button>}
+      actions={<>
+        {co && <button style={{ ...sheetBtn, background: G, color: "#fff" }} onClick={() => setExplain((v) => !v)}><CalcIcon /> How we count it</button>}
+        {co && explain && (
+          <div style={{ background: LIST, borderRadius: 3, padding: "8px 12px", fontSize: 12, lineHeight: 1.5, color: "#d8d8da" }}>
+            This ticket was cashed out{fair ? " with Fair Cashout" : ""} for <b>{fmtMoney(ticket.payout)} UGX</b> instead of waiting for all {ticket.items.length} matches to finish.
+            {co.fee > 0 && <> A {Math.round(co.feeRate * 100)}% fee of <b>{fmtMoney(co.fee)} UGX</b> was applied.</>}
+            {ticket.vipPoints <= 0 && <> Cashed-out tickets do not earn VIP points.</>}
+          </div>
+        )}
+        <button style={sheetBtn} onClick={share}><ShareIcon /> {copied ? "Link copied" : "Share ticket"}</button>
+      </>}
     />
   );
 }
