@@ -386,3 +386,99 @@ export const checkTicket = createServerFn({ method: "POST" })
       return { ok: false, error: "UNAVAILABLE" };
     }
   });
+
+// ---------- Casino (All Games) ----------
+export const CASINO_IMG = "https://fortebet.ug/static/temp/cms/_games_content/small/";
+export const CASINO_ASSETS = "https://fortebet.ug/assets/img/casino/";
+
+export type CasinoGame = {
+  id: number;
+  provider: string;
+  name: string;
+  ident: string;
+  image: string;
+  tags: string[];
+  playReal: boolean;
+  playFun: boolean;
+  sortOrder: number;
+  popular: number | null;
+  portrait: boolean;
+};
+export type CasinoJackpot = { ident: string; value: number; speed: number; provider: string };
+
+async function postJson(path: string, body: unknown, ttl = 0): Promise<Raw> {
+  const key = "POST " + path + JSON.stringify(body);
+  if (ttl) {
+    const hit = cache.get(key);
+    if (hit && Date.now() - hit.at < ttl) return hit.data;
+  }
+  const res = await fetch(BASE + path, {
+    method: "POST",
+    headers: { "User-Agent": "Mozilla/5.0", Accept: "application/json", "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  const data: Raw = await res.json().catch(() => null);
+  if (!data) throw new Error(`Fortebet casino feed failed (${res.status})`);
+  if (ttl && data.status === "OK") cache.set(key, { at: Date.now(), data });
+  return data;
+}
+
+export const getCasinoGames = createServerFn({ method: "GET" }).handler(async (): Promise<{ games: CasinoGame[] }> => {
+  try {
+    const j = await postJson("/casino/games", {}, 600_000);
+    const games: CasinoGame[] = (j?.data ?? []).map((g: Raw) => {
+      const tags: string[] = (g.settings?.tags ?? []).map((t: unknown) => String(t));
+      return {
+        id: Number(g.id),
+        provider: String(g.provider ?? ""),
+        name: String(g.name ?? g.ident ?? ""),
+        ident: String(g.identUrl ?? g.ident ?? ""),
+        image: String(g.image ?? ""),
+        tags,
+        playReal: !!g.playReal,
+        playFun: !!g.playFun,
+        sortOrder: g.sortOrder == null ? 999 : Number(g.sortOrder),
+        popular: g.settings?.web_preferred != null ? Number(g.settings.web_preferred) : null,
+        portrait: tags.includes("view.portrait"),
+      };
+    });
+    return { games };
+  } catch (e) {
+    console.error("casino games failed", e);
+    return { games: [] };
+  }
+});
+
+export const getCasinoJackpots = createServerFn({ method: "GET" }).handler(async (): Promise<{ at: number; jackpots: CasinoJackpot[] }> => {
+  try {
+    const j = await postJson("/casino/jackpots", {}, 30_000);
+    return {
+      at: Date.now(),
+      jackpots: (j?.data ?? []).map((x: Raw) => ({ ident: String(x.ident), value: Number(x.value) || 0, speed: Number(x.speed) || 0, provider: String(x.provider ?? "") })),
+    };
+  } catch (e) {
+    console.error("casino jackpots failed", e);
+    return { at: Date.now(), jackpots: [] };
+  }
+});
+
+/** Starts a game exactly like Fortebet's "play-game" call. Without a signed-in Fortebet session only fun (demo) mode is allowed. */
+export const playCasinoGame = createServerFn({ method: "POST" })
+  .inputValidator((d: { gameId: number; mode: "fun" | "real"; backUrl: string }) => {
+    const gameId = Number(d?.gameId);
+    if (!Number.isInteger(gameId) || gameId <= 0) throw new Error("Invalid game");
+    const mode = d?.mode === "real" ? "real" : "fun";
+    const backUrl = typeof d?.backUrl === "string" && /^https?:\/\//.test(d.backUrl) ? d.backUrl.slice(0, 300) : "https://fortebet.ug/slots";
+    return { gameId, mode, backUrl } as const;
+  })
+  .handler(async ({ data }): Promise<{ ok: true; url: string } | { ok: false; error: "LOGIN_REQUIRED" | "UNAVAILABLE" }> => {
+    try {
+      const j = await postJson("/casino/play-game", { gameId: data.gameId, mode: data.mode, lang: "en", lurl: data.backUrl, kioskName: null });
+      if (j?.status === "OK" && j.data?.url) return { ok: true, url: String(j.data.url) };
+      if (j?.code === "ERR_CLIENT_NOT_LOGGED") return { ok: false, error: "LOGIN_REQUIRED" };
+      return { ok: false, error: "UNAVAILABLE" };
+    } catch (e) {
+      console.error("play game failed", e);
+      return { ok: false, error: "UNAVAILABLE" };
+    }
+  });
