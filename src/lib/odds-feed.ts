@@ -152,7 +152,7 @@ function open() {
     if (msg.startsWith("40/liveodds")) {
       retry = 0;
       connected = true;
-      sock.send('42/liveodds,["join","OFFER"]');
+      sock.send('42/liveodds,["join",{"room":"OFFER"}]');
       emit();
       return;
     }
