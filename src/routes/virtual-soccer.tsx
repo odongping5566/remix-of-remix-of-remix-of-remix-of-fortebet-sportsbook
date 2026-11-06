@@ -2,12 +2,11 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { LogIn, Maximize, X } from "lucide-react";
-import * as Dialog from "@radix-ui/react-dialog";
 import { Button } from "@/components/ui/button";
 import { openLogin, openRegister } from "@/lib/login-modal";
 import { HeaderClock } from "@/components/fortebet-live";
 import { getVirtualOffer } from "@/lib/virtual-soccer.functions";
-import { kickoffCountdown, virtualOddLabel, type VirtualMatch } from "@/lib/virtual-soccer";
+import { kickoffCountdown, virtualOddLabel, virtualClock, toggleVirtualPick, type VirtualMatch, type VirtualOdd, type VirtualPick } from "@/lib/virtual-soccer";
 import capturedCSS from "../styles/pages/virtual-soccer.css?raw";
 
 const virtualQuery = queryOptions({ queryKey: ["virtual-soccer-offer"], queryFn: () => getVirtualOffer(), refetchInterval: 5000 });
@@ -31,9 +30,22 @@ function Index() {
   const [now, setNow] = useState<number | null>(null);
   const [view, setView] = useState<"stream" | "tracker">("stream");
   const [expanded, setExpanded] = useState(false);
+  const [picks, setPicks] = useState<VirtualPick[]>([]);
+  const [stake, setStake] = useState("2000");
+  useEffect(() => {
+    if (!expanded) return;
+    const close = (event: KeyboardEvent) => { if (event.key === "Escape") setExpanded(false); };
+    document.addEventListener("keydown", close);
+    return () => document.removeEventListener("keydown", close);
+  }, [expanded]);
   useEffect(() => { setNow(Date.now()); const timer = setInterval(() => setNow(Date.now()), 1000); return () => clearInterval(timer); }, []);
   const countdown = kickoffCountdown(offer.matches[0]?.item_time, now ?? Date.parse(offer.at));
   const viewerUrl = view === "stream" ? "https://zweb4ug.com/forteugvideo/index.php" : "https://zweb4ug.com/forteug/index.php";
+  const total = picks.reduce((value, pick) => value * pick.odd.odds_val, 1);
+  function selectOdd(match: VirtualMatch, odd: VirtualOdd, market: string) {
+    if (Date.parse(match.item_time) <= (now ?? Date.parse(offer.at)) || !Number.isFinite(odd.odds_val) || odd.odds_val <= 0) return;
+    setPicks(current => toggleVirtualPick(current, { matchId: match.item_id, dailyId: match.item_daily_id, home: match.home, away: match.away, start: match.item_time, market, odd }));
+  }
   return (
     <>
       <style>{capturedCSS.replace(/:root\s*\{\s*--brand-500:[^}]+\}/g, "").replace(/rgb\(255,\s*100,\s*0\)|#ff6400|#FF6400/g, "var(--brand-500)")}</style>
@@ -431,7 +443,7 @@ function Index() {
                     <div>
                       {offer.error && <p role="alert">{offer.error}</p>}
                       <div className="virtual-soccer-offer gap-[5px]">
-                        {offer.matches.map((match, i) => <VirtualMatchView key={match.item_id} match={match} first={i === 0} />)}
+                        {offer.matches.map((match, i) => <VirtualMatchView key={match.item_id} match={match} first={i === 0} picks={picks} onSelect={selectOdd} now={now ?? Date.parse(offer.at)} />)}
                       </div>
                       <div className="virtual-results-live mt-2 flex flex-wrap items-center gap-3 p-3">
                         <strong>LAST 3 RESULTS</strong>
@@ -441,13 +453,13 @@ function Index() {
                     <div data-ce="app-virtual-soccer-sidebar">
                       <div className="virtual-soccer-sidebar">
                         <div data-ce="app-virtual-soccer-tracker">
-                          <div className="virtual-viewer">
+                          <div className={`virtual-viewer ${expanded ? "is-expanded" : ""}`}>
                             <div role="tablist" aria-label="Virtual match viewer" className="flex">
                               <Button variant="ghost" role="tab" aria-selected={view === "stream"} className="virtual-view-tab" onClick={() => setView("stream")}>Stream</Button>
                               <Button variant="ghost" role="tab" aria-selected={view === "tracker"} className="virtual-view-tab" onClick={() => setView("tracker")}>Tracker</Button>
                             </div>
-                            <iframe key={viewerUrl} src={viewerUrl} title={view === "stream" ? "Virtual soccer stream" : "Virtual soccer tracker"} className="virtual-view-frame" allow="autoplay; fullscreen" allowFullScreen />
-                            <Button className="virtual-expand" onClick={() => setExpanded(true)}><Maximize />Expand {view}</Button>
+                            <div className="virtual-view-stage"><iframe key={viewerUrl} src={viewerUrl} title={view === "stream" ? "Virtual soccer stream" : "Virtual soccer tracker"} className="virtual-view-frame" allow="autoplay; fullscreen" allowFullScreen /></div>
+                            <Button className="virtual-expand" aria-expanded={expanded} onClick={() => setExpanded(value => !value)}>{expanded ? <X /> : <Maximize />}{expanded ? "Collapse" : "Expand"} {view}</Button>
                           </div>
                         </div>
                         <div data-ce="app-virtual-soccer-ticket">
@@ -456,7 +468,17 @@ function Index() {
                               <div>BET SLIP - VIRTUAL SOCCER</div>
                               <div />
                             </div>
-                            <div className="virtual-ticket-content-empty text-center [font-weight:400] [margin-top:calc(10px_*_var(--factor))] [min-height:calc(10px_*_var(--factor))]"> Real-money betting is unavailable here. </div>
+                            {picks.length === 0 ? <div className="virtual-ticket-content-empty text-center p-3">Your Ticket is still empty</div> : <div className="virtual-slip-preview">
+                              {picks.map((pick, i) => <div className="virtual-slip-pick" key={pick.matchId}>
+                                <div className="flex items-center justify-between gap-2"><strong>{i + 1}. {pick.dailyId}: {pick.home} vs {pick.away}</strong><Button variant="ghost" size="icon" aria-label={`Remove ${pick.home} selection`} onClick={() => setPicks(current => current.filter(p => p.matchId !== pick.matchId))}><X /></Button></div>
+                                <div>{pick.market}</div><div className="flex justify-between"><span>{virtualOddLabel(pick.odd)}</span><strong>{pick.odd.odds_val.toFixed(2)}</strong></div>
+                              </div>)}
+                              <div className="flex justify-between py-2"><span>Total odds</span><strong>{total.toFixed(2)}</strong></div>
+                              <label className="flex items-center justify-between gap-2">Stake (UGX)<input aria-label="Virtual preview stake" className="virtual-stake" type="number" min="0" value={stake} onChange={e => setStake(e.target.value)} /></label>
+                              <div className="flex justify-between py-2"><span>Possible win</span><strong>{(Math.max(0, Number(stake) || 0) * total).toLocaleString("en-UG", { maximumFractionDigits: 0 })} UGX</strong></div>
+                              <Button variant="outline" className="virtual-clear" onClick={() => setPicks([])}>Clear ticket</Button>
+                              <p className="mt-2 text-center text-xs">Preview only · Not placed</p>
+                            </div>}
                           </div>
                         </div>
                       </div>
@@ -541,22 +563,13 @@ function Index() {
           </div>
         </div>
       </div>
-      <Dialog.Root open={expanded} onOpenChange={setExpanded}>
-        <Dialog.Portal><Dialog.Overlay className="fixed inset-0 z-[1000] bg-account-overlay" />
-          <Dialog.Content className="virtual-expanded fixed left-1/2 top-1/2 z-[1001] w-[calc(100%-24px)] max-w-[900px] -translate-x-1/2 -translate-y-1/2">
-            <div className="flex items-center justify-between bg-brand-600 p-2"><Dialog.Title>Virtual Soccer · {view}</Dialog.Title><Dialog.Close asChild><Button variant="ghost" size="icon" aria-label="Close virtual viewer"><X /></Button></Dialog.Close></div>
-            <Dialog.Description className="sr-only">Live virtual soccer match viewer</Dialog.Description>
-            <iframe src={expanded ? viewerUrl : undefined} title="Expanded virtual soccer viewer" className="h-[min(70dvh,640px)] w-full border-0" allow="autoplay; fullscreen" allowFullScreen />
-          </Dialog.Content>
-        </Dialog.Portal>
-      </Dialog.Root>
       <img style={{ position: "absolute", width: "1px", height: "1px", left: "0px", bottom: "0px", opacity: "0" }} src="/site-assets/b7c11b29322e4de2.gif" />
     </>
   );
 }
 
 
-function VirtualMatchView({ match, first }: { match: VirtualMatch; first: boolean }) {
+function VirtualMatchView({ match, first, picks, onSelect, now }: { match: VirtualMatch; first: boolean; picks: VirtualPick[]; onSelect: (match: VirtualMatch, odd: VirtualOdd, market: string) => void; now: number }) {
   const groups = [
     { title: "FULL TIME RESULT", markets: ["1"], ids: [1, 2, 3], cols: 3 },
     { title: "1ST HALF RESULT", markets: ["2"], ids: [6, 7, 8], cols: 3 },
@@ -572,7 +585,7 @@ function VirtualMatchView({ match, first }: { match: VirtualMatch; first: boolea
       const sorted = group.ids ? group.ids.flatMap(id => odds.filter(odd => odd.id === id)) : odds;
       return <div key={group.title} className={`virtual-market-grid ${group.cols === 3 ? "virtual-three" : "virtual-two"}`}>
         <div className="virtual-market-title">{group.title}</div>
-        {sorted.map(odd => <div key={odd.id} className={`virtual-odd-display ${odd.id === 28 ? "virtual-wide" : ""}`}><span>{virtualOddLabel(odd)}</span><strong>{Number.isFinite(odd.odds_val) && odd.odds_val > 0 ? odd.odds_val.toFixed(2) : "—"}</strong></div>)}
+        {sorted.map(odd => <Button variant="ghost" key={odd.id} aria-label={`${match.home} ${group.title} ${virtualOddLabel(odd)}`} aria-pressed={picks.some(p => p.matchId === match.item_id && p.odd.id === odd.id)} disabled={Date.parse(match.item_time) <= now || !Number.isFinite(odd.odds_val) || odd.odds_val <= 0} onClick={() => onSelect(match, odd, group.title)} className={`virtual-odd-display ${odd.id === 28 ? "virtual-wide" : ""}`}><span>{virtualOddLabel(odd)}</span><strong>{Number.isFinite(odd.odds_val) && odd.odds_val > 0 ? odd.odds_val.toFixed(2) : "—"}</strong></Button>)}
       </div>;
     })}
   </div></div>;
