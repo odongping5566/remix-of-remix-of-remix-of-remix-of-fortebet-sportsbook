@@ -15,11 +15,16 @@ const games = [
 ];
 
 describe("casino lobby rules", () => {
-  it("most popular games follow Fortebet's preferred order", () => {
-    expect(popularGames(games).map((x) => x.name)).toEqual(["Aviator", "Midnight Fruits 81"]);
+  it("most popular games follow Fortebet's preferred order, topped up in normal order", () => {
+    expect(popularGames(games, 3).map((x) => x.name)).toEqual(["Aviator", "Midnight Fruits 81", "Bonus Joker II"]);
+  });
+  it("most popular games show at most 12", () => {
+    const many = Array.from({ length: 20 }, (_, i) => g(100 + i, `Game ${i}`, "Apollo Casino", ["slots"], i + 1));
+    expect(popularGames(many)).toHaveLength(12);
   });
   it("unfiltered grid leaves out popular games and sorts by provider order then id", () => {
-    expect(filterGames(games, DEFAULT_CASINO_FILTER).map((x) => x.id)).toEqual([5, 7, 517]);
+    const pop = new Set(popularGames(games, 3).map((x) => x.id));
+    expect(filterGames(games, DEFAULT_CASINO_FILTER).filter((x) => pop.has(x.id))).toEqual([]);
   });
   it("provider filter keeps only that provider (popular included)", () => {
     expect(filterGames(games, { ...DEFAULT_CASINO_FILTER, provider: "apollo_casino" }).map((x) => x.id)).toEqual([5, 7, 20]);

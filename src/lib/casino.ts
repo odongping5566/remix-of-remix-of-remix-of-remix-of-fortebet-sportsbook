@@ -27,9 +27,12 @@ export const DEFAULT_CASINO_FILTER: CasinoFilter = { provider: "all", category: 
 
 const byOrder = (a: CasinoGame, b: CasinoGame) => a.sortOrder - b.sortOrder || a.id - b.id;
 
-/** "Most popular games": games Fortebet marks as web-preferred, in that order (max 12). */
+/** "Most popular games": games Fortebet marks as web-preferred, in that order, topped up from the normal order to 12. */
 export function popularGames(games: CasinoGame[], max = 12): CasinoGame[] {
-  return games.filter((g) => g.popular != null).sort((a, b) => a.popular! - b.popular! || a.id - b.id).slice(0, max);
+  const pref = games.filter((g) => g.popular != null).sort((a, b) => a.popular! - b.popular! || a.id - b.id).slice(0, max);
+  if (pref.length >= max) return pref;
+  const ids = new Set(pref.map((g) => g.id));
+  return [...pref, ...games.filter((g) => !ids.has(g.id)).sort(byOrder).slice(0, max - pref.length)];
 }
 
 export function isFiltered(f: CasinoFilter) {
