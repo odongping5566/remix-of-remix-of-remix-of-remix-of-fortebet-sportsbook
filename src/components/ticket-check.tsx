@@ -3,10 +3,11 @@ import { useServerFn } from "@tanstack/react-start";
 import { checkTicket, type TicketDTO, type TicketResult } from "@/lib/fortebet.functions";
 
 const G = "rgb(0,166,90)";
-const WIN_BG = "#2fd36f";
-const LOST_BG = "#e0433a";
+const WIN_BG = "#3dff3c";
+const LOST_BG = "#ff4a3d";
+const DARK = "#2e3139";
 const PANEL = "#3d3f49";
-const LIST = "#2e3038";
+const LIST = "#2e3139";
 const LINE = "rgba(255,255,255,0.08)";
 
 /** Grey padlock used for suspended odds (same shape as Fortebet's lock). */
@@ -18,13 +19,35 @@ export function LockIcon({ size = 12, color = "#8b8d96" }: { size?: number; colo
   );
 }
 
+/** Round result marker: filled circle with a thin dark mark, like Fortebet's ticket ticks. */
 function StatusDot({ status }: { status: string }) {
-  const base: CSSProperties = { width: 18, height: 18, borderRadius: 99, display: "inline-flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 900, flexShrink: 0 };
-  if (status === "LOCKED") return <span style={{ ...base, background: "#25262c" }}><LockIcon size={11} /></span>;
-  if (status === "WIN") return <span style={{ ...base, background: WIN_BG }} aria-label="Won">✓</span>;
-  if (status === "LOST") return <span style={{ ...base, background: LOST_BG }} aria-label="Lost">✕</span>;
-  if (status === "VOID" || status === "CANCELED" || status === "CANCELLED") return <span style={{ ...base, background: "#8b8d96" }} aria-label="Void">–</span>;
-  return <span style={{ ...base, border: "2px solid #8b8d96", width: 14, height: 14 }} aria-label="Open" />;
+  const wrap: CSSProperties = { display: "inline-block", flexShrink: 0, verticalAlign: "middle" };
+  if (status === "LOCKED") return <span style={{ ...wrap, width: 19, height: 19, borderRadius: 99, background: "#25262c", display: "inline-flex", alignItems: "center", justifyContent: "center" }}><LockIcon size={11} /></span>;
+  const mark = (fill: string, label: string, d: string | null) => (
+    <svg width="19" height="19" viewBox="0 0 20 20" role="img" aria-label={label} style={wrap}>
+      <circle cx="10" cy="10" r="9.5" fill={fill} />
+      {d && <path d={d} fill="none" stroke={DARK} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />}
+    </svg>
+  );
+  if (status === "WIN") return mark(WIN_BG, "Won", "M5.6 10.4l3 3 5.8-6.2");
+  if (status === "LOST") return mark(LOST_BG, "Lost", "M6.8 6.8l6.4 6.4M13.2 6.8l-6.4 6.4");
+  if (status === "VOID" || status === "CANCELED" || status === "CANCELLED") return mark("#8b8d96", "Void", "M6 10h8");
+  return (
+    <svg width="19" height="19" viewBox="0 0 20 20" role="img" aria-label="Open" style={wrap}>
+      <circle cx="10" cy="10" r="8.5" fill="none" stroke="#8b8d96" strokeWidth="2" />
+    </svg>
+  );
+}
+
+/** Grey paper ticket with a torn stub on the left, as in the Fortebet ticket header. */
+function TicketGlyph() {
+  return (
+    <svg width="50" height="28" viewBox="0 0 50 28" aria-hidden="true">
+      <path fill="#d8d8d8" d="M2.5 0H9v28H2.5A2.5 2.5 0 0 1 0 25.5V17.5a3.5 3.5 0 0 0 0-7V2.5A2.5 2.5 0 0 1 2.5 0z" />
+      <path fill="#d8d8d8" d="M11 0h36.5A2.5 2.5 0 0 1 50 2.5v23a2.5 2.5 0 0 1-2.5 2.5H11z" />
+      <path fill="#b4b4b6" d="M0 23.5h9V28H2.5A2.5 2.5 0 0 1 0 25.5zM11 23.5h39v2a2.5 2.5 0 0 1-2.5 2.5H11z" />
+    </svg>
+  );
 }
 
 export const fmtMoney = (n: number, d = 0) => n.toLocaleString("en-US", { minimumFractionDigits: d, maximumFractionDigits: d });
@@ -97,20 +120,20 @@ export function TicketSheet({ title, items, status, rows, number, actions, onClo
             </div>
           </div>
           <div style={{ display: "flex", flexDirection: "column", minHeight: 0, overflowY: "auto" }}>
-            <div style={{ display: "flex", alignItems: "stretch", borderBottom: "1px solid #1f2025", minHeight: 50 }}>
-              <div style={{ flex: 1, display: "flex", alignItems: "center", padding: "0 14px" }}>
-                <svg width="48" height="26" viewBox="0 0 47 26" aria-hidden="true"><rect x="0" y="0" width="47" height="26" rx="3" fill="#c9cacf" /><rect x="4" y="0" width="5" height="26" fill="#9a9ba2" /></svg>
+            <div style={{ display: "flex", alignItems: "stretch", borderBottom: "2px solid #25272e", height: 50, flexShrink: 0 }}>
+              <div style={{ flex: 1, display: "flex", alignItems: "center", padding: "0 13px" }}>
+                <TicketGlyph />
               </div>
-              <div style={{ display: "flex", alignItems: "center", padding: "0 10px", fontWeight: 700, fontSize: 13 }}>STATUS:</div>
-              <div style={{ minWidth: 80, display: "flex", alignItems: "center", justifyContent: "center", background: statusBg, color: "#1f2025", fontSize: 18, padding: "0 12px" }}>{status}</div>
+              <div style={{ display: "flex", alignItems: "center", padding: "0 11px", fontWeight: 700, fontSize: 14, color: "#d8d8da" }}>STATUS:</div>
+              <div style={{ width: 80, display: "flex", alignItems: "center", justifyContent: "center", background: statusBg, color: "#333", fontSize: 20, fontWeight: 400, letterSpacing: 0.3, padding: "0 6px", whiteSpace: "nowrap" }}>{status}</div>
             </div>
-            <div style={{ padding: "10px 12px", borderBottom: "1px solid #1f2025", lineHeight: 1.75, fontSize: 12, fontWeight: 700 }}>
+            <div style={{ padding: "9px 13px 10px", background: LIST, borderBottom: "2px solid #25272e", lineHeight: "21px", fontSize: 13, fontWeight: 700, color: "#e3e3e5" }}>
               {rows.map((r) => (
                 <div key={r.label} style={{ display: "flex", justifyContent: "space-between", color: r.accent ? "#22d47e" : undefined }}><span>{r.label}</span><span>{r.value}</span></div>
               ))}
             </div>
-            {actions && <div style={{ padding: 12, borderBottom: "1px solid #1f2025", display: "grid", gap: 8 }}>{actions}</div>}
-            {number && <div style={{ margin: 12, background: "#e9e9eb", color: "#333", textAlign: "center", fontSize: 13, padding: "3px 6px" }}>Ticket No. {number}</div>}
+            {actions && <div style={{ padding: "10px 13px", borderBottom: "2px solid #25272e", display: "grid", gap: 8 }}>{actions}</div>}
+            {number && <div style={{ margin: "14px 13px", background: "#eaeaea", color: "#444", textAlign: "center", fontSize: 14, lineHeight: "24px", padding: "0 6px", letterSpacing: 0.1 }}>Ticket No. {number}</div>}
           </div>
         </div>
       </div>
@@ -118,12 +141,13 @@ export function TicketSheet({ title, items, status, rows, number, actions, onClo
   );
 }
 
-export const sheetBtn: CSSProperties = { display: "flex", alignItems: "center", gap: 10, background: "#d9d9dc", color: "#222", border: 0, borderRadius: 3, padding: "8px 14px", fontWeight: 700, fontSize: 13, cursor: "pointer", width: "100%" };
+export const sheetBtn: CSSProperties = { display: "flex", alignItems: "center", gap: 0, height: 38, background: "#d7d7d9", color: "#3a3c44", border: 0, borderRadius: 3, padding: "0 16px", fontWeight: 700, fontSize: 15, cursor: "pointer", width: "100%", textAlign: "left" };
 
 function ShareIcon() {
   return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#333" strokeWidth="2" aria-hidden="true">
-      <circle cx="18" cy="5" r="3" /><circle cx="6" cy="12" r="3" /><circle cx="18" cy="19" r="3" /><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4" />
+    <svg width="18" height="20" viewBox="0 0 18 20" fill="none" stroke="#3a3c44" strokeWidth="1.6" aria-hidden="true" style={{ marginRight: 22, flexShrink: 0 }}>
+      <circle cx="14.5" cy="3.5" r="2.4" /><circle cx="3.5" cy="10" r="2.4" /><circle cx="14.5" cy="16.5" r="2.4" />
+      <path d="M5.6 8.8l6.8-4M5.6 11.2l6.8 4" />
     </svg>
   );
 }
