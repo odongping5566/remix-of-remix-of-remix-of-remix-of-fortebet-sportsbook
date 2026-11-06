@@ -48,7 +48,7 @@ export function LoginModal() {
   };
 
   const field =
-    "h-11 w-full rounded-md border border-white/15 bg-black/25 px-3 text-[15px] text-site-import-foreground outline-none placeholder:text-site-import-muted-foreground focus:border-brand-500";
+    "box-border h-11 w-full rounded-md border border-white/15 bg-black/25 px-3 text-[15px] text-site-import-foreground outline-none placeholder:text-site-import-muted-foreground focus:border-brand-500";
 
   return (
     <div
@@ -65,7 +65,7 @@ export function LoginModal() {
           type="button"
           aria-label="Close"
           onClick={closeLogin}
-          className="absolute right-3 top-3 grid size-8 cursor-pointer place-items-center rounded text-site-import-muted-foreground hover:bg-white/10 hover:text-white"
+          className="absolute right-3 top-3 grid border-0 bg-transparent size-8 cursor-pointer place-items-center rounded text-site-import-muted-foreground hover:bg-white/10 hover:text-white"
         >
           <X size={18} />
         </button>
@@ -137,7 +137,7 @@ export function LoginModal() {
                   type="button"
                   aria-label={show ? "Hide password" : "Show password"}
                   onClick={() => setShow((s) => !s)}
-                  className="absolute right-2 top-1/2 grid size-8 -translate-y-1/2 cursor-pointer place-items-center text-site-import-muted-foreground hover:text-white"
+                  className="absolute right-2 top-1/2 grid border-0 bg-transparent size-8 -translate-y-1/2 cursor-pointer place-items-center text-site-import-muted-foreground hover:text-white"
                 >
                   {show ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
@@ -147,7 +147,7 @@ export function LoginModal() {
 
             <button
               type="submit"
-              className="h-11 w-full cursor-pointer rounded-md bg-brand-500 text-sm font-black uppercase text-white hover:bg-brand-700"
+              className="h-11 w-full cursor-pointer rounded-md border-0 bg-brand-500 text-sm font-black uppercase text-white hover:bg-brand-700"
             >
               Login
             </button>
@@ -156,7 +156,7 @@ export function LoginModal() {
               <a href={OFFICIAL} target="_blank" rel="noopener noreferrer" className="text-site-import-muted-foreground underline hover:text-white">
                 Forgot password?
               </a>
-              <a href={OFFICIAL} target="_blank" rel="noopener noreferrer" className="font-bold text-brand-500 hover:underline">
+              <a href={OFFICIAL} target="_blank" rel="noopener noreferrer" className="font-bold !text-brand-500 hover:underline">
                 Register
               </a>
             </div>
