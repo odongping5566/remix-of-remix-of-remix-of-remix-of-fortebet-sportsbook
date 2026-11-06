@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { BannerSlider, BetSlip, useSels, OfferCenter, HeaderClock, LiveOddsFeed } from "@/components/fortebet-live";
+import { openLogin } from "@/lib/login-modal";
 import { TicketSearch } from "@/components/ticket-check";
 import { OfferSearch, DateFilter, OddsRange, TopBetsList, MySelection, SportsList } from "@/components/offer-sidebar";
 import { OfferFilterProvider } from "@/components/offer-context";

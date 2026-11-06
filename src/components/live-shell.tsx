@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { HeaderClock, LiveOddsFeed } from "@/components/fortebet-live";
 import { TicketSearch } from "@/components/ticket-check";
+import { openLogin } from "@/lib/login-modal";
 import capturedCSS from "../styles/pages/live.preview.css?raw";
 
 const ImportedNativeTag0 = "innerscroll" as import("react").ElementType;
