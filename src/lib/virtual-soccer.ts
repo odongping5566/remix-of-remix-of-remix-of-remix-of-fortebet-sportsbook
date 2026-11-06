@@ -9,6 +9,17 @@ export type VirtualResult = {
   result_ft: { home: number; away: number }; result_ht: { home: number; away: number };
 };
 export type VirtualOffer = { at: string; matches: VirtualMatch[]; results: VirtualResult[]; error: string | null };
+export type VirtualPick = { matchId: number; dailyId: number; home: string; away: string; start: string; market: string; odd: VirtualOdd };
+
+export function toggleVirtualPick(picks: VirtualPick[], pick: VirtualPick) {
+  const same = picks.some(p => p.matchId === pick.matchId && p.odd.id === pick.odd.id);
+  const remaining = picks.filter(p => p.matchId !== pick.matchId);
+  return same ? remaining : [...remaining, pick];
+}
+
+export function virtualClock(now: number) {
+  return new Date(now).toLocaleTimeString("en-GB", { timeZone: "Africa/Kampala", hour: "2-digit", minute: "2-digit", second: "2-digit" });
+}
 
 export function kickoffCountdown(start: string | undefined, now: number) {
   const target = start ? Date.parse(start) : NaN;
