@@ -351,10 +351,10 @@ function Index() {
                     <a {...({ "_ngcontent-oky-c202": "", translate: "" } as any)}>HOW TO REGISTER</a>
                   </div>
                   <div className="buttons register" {...({ "_ngcontent-oky-c202": "" } as any)}>
-                    <Button variant="ghost" className="h-auto rounded-none p-0 font-black hover:bg-transparent" onClick={openRegister}>Register</Button>
+                    <Button variant="ghost" className="account-header-button" onClick={openRegister}>Register</Button>
                   </div>
                   <div className="buttons login" {...({ "_ngcontent-oky-c202": "" } as any)}>
-                    <Button variant="ghost" className="h-auto rounded-none p-0 font-black hover:bg-transparent" onClick={openLogin}><span className="ico login h15" {...({ "_ngcontent-oky-c202": "" } as any)} />Login</Button>
+                    <Button variant="ghost" className="account-header-button" onClick={openLogin}><span className="ico login h15" {...({ "_ngcontent-oky-c202": "" } as any)} />Login</Button>
                   </div>
                 </div>
               </div>
