@@ -12,4 +12,6 @@
 - [x] Bet slip follows odds changes (accept changes, locked picks, limits, VIP points, saved tickets)
 - [x] Ticking clock in the header
 - [x] Tests for filter and ticket rules
-- [ ] Real bet placement / Save i-Ticket / Ticket search — blocked: needs an authorized Fortebet account connection
+- [x] Ticket search: real Fortebet ticket check in a floating ticket window (share link ?ticket=)
+- [x] Ticket preview uses the same ticket window; grey padlock for suspended odds
+- [ ] Real bet placement / Save i-Ticket — blocked: needs an authorized Fortebet account connection
