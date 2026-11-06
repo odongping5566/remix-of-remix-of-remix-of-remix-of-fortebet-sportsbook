@@ -236,3 +236,80 @@ export function StatsModal({ id, onClose }: { id: string; live?: boolean; onClos
     </div>
   );
 }
+
+export function useSels() {
+  const [sels, setSels] = useState<Sel[]>([]);
+  const toggle = (sel: Sel) =>
+    setSels((s) => (s.some((x) => x.key === sel.key) ? s.filter((x) => x.key !== sel.key) : [...s.filter((x) => x.eventId !== sel.eventId), sel]));
+  return { sels, toggle, remove: (k: string) => setSels((s) => s.filter((x) => x.key !== k)), clear: () => setSels([]) };
+}
+
+export function LivePreviewList({ sels, toggle }: { sels: Sel[]; toggle: (s: Sel) => void }) {
+  const q = useQuery(liveQuery);
+  const [statsId, setStatsId] = useState<string | null>(null);
+  const list: Match[] = q.data?.matches ?? [];
+  const groups: [string, Match[]][] = [];
+  for (const m of list) {
+    const g = groups.find((x) => x[0] === m.league);
+    if (g) g[1].push(m); else groups.push([m.league, [m]]);
+  }
+  return (
+    <div className="live">
+      <div className="live__head live__head--space" />
+      <div data-ce="live-preview">
+        <div className="match headOdds uppercase [font-weight:700]">
+          <div><span className="ico soccer" /></div>
+          <div>Live matches</div>
+          <div className="matchOdds"> Full Time Result </div>
+          <div className="matchOdds"> Double Chance </div>
+          <div />
+        </div>
+        {q.isLoading && <div className="match tournament"><div /><div>Loading live matches…</div></div>}
+        {q.isError && <div className="match tournament"><div /><div>Could not load live matches. Retrying…</div></div>}
+        {!q.isLoading && !q.isError && list.length === 0 && <div className="match tournament"><div /><div>No live matches right now.</div></div>}
+        {groups.map(([league, ms]) => (
+          <div key={league} style={{ display: "contents" }}>
+            <div className="match tournament [font-weight:700]">
+              <div><span className="ico soccer" /></div>
+              <div><span>{league}</span><span> ({ms.length})</span></div>
+              <div className="matchOdds"><div>1 </div><div>X </div><div>2 </div></div>
+              <div className="matchOdds"><div>1X </div><div>X2 </div><div>12 </div></div>
+              <div />
+            </div>
+            {ms.map((m) => (
+              <div key={m.id} className="data match [font-weight:700]">
+                <Link to="/live/event/$id" params={{ id: m.id }} className="matchInfo curPointer" style={{ color: "inherit" }}>
+                  <div className="app-widget-event-set">
+                    <div className="starFavorite"><span className="ico chart h13 opa06 curPointer" role="button" aria-label="Match statistics" style={{ display: "inline-block", minWidth: 14, minHeight: 13 }} onClick={(e) => { e.preventDefault(); e.stopPropagation(); setStatsId(m.id); }} /></div>
+                    <div className="teamsName"><span> {m.home} </span><span> {m.away} </span></div>
+                    <div className="teamsScore"><div>{m.score ?? "0 : 0"}</div><div /></div>
+                    <div className="status"><i>{m.status ?? "Live"}</i></div>
+                  </div>
+                </Link>
+                <div className="app-widget-market-set">
+                  {[0, 1].map((g) => (
+                    <div className="odds" key={g}>
+                      {m.odds.slice(g * 3, g * 3 + 3).map((o, j) => {
+                        const k = g * 3 + j;
+                        const key = `${m.id}-${k}`;
+                        const on = sels.some((s) => s.key === key);
+                        return (
+                          <div key={k} className="curPointer" style={on ? { background: "rgb(0,166,90)", color: "#fff" } : undefined}
+                            onClick={() => o && toggle({ key, eventId: m.id, match: `${m.home} - ${m.away}`, pick: PICKS[k] ?? "", odds: o })}>
+                            {o ? ` ${o.toFixed(2)} ` : " - "}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ))}
+                </div>
+                <Link to="/live/event/$id" params={{ id: m.id }} className="curPointer" style={{ color: "inherit" }}> +{m.extra} </Link>
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
+      {statsId && <StatsModal id={statsId} live onClose={() => setStatsId(null)} />}
+    </div>
+  );
+}
