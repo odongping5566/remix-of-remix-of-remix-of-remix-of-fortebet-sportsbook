@@ -32,6 +32,13 @@ function StatusDot({ status }: { status: string }) {
   if (status === "WIN") return mark(WIN_BG, "Won", "M5.6 10.4l3 3 5.8-6.2");
   if (status === "LOST") return mark(LOST_BG, "Lost", "M6.8 6.8l6.4 6.4M13.2 6.8l-6.4 6.4");
   if (status === "VOID" || status === "CANCELED" || status === "CANCELLED") return mark("#8b8d96", "Void", "M6 10h8");
+  if (status === "PREPARING") return (
+    <svg width="19" height="19" viewBox="0 0 20 20" role="img" aria-label="Not played yet" style={wrap}>
+      <circle cx="10" cy="10" r="9.5" fill="#d8d8d8" />
+      <path d="M7.4 7.6a2.7 2.7 0 0 1 5.2.9c0 1.8-2.6 2.2-2.6 3.8" fill="none" stroke={DARK} strokeWidth="2" strokeLinecap="round" />
+      <circle cx="10" cy="15.1" r="1.2" fill={DARK} />
+    </svg>
+  );
   return (
     <svg width="19" height="19" viewBox="0 0 20 20" role="img" aria-label="Open" style={wrap}>
       <circle cx="10" cy="10" r="8.5" fill="none" stroke="#8b8d96" strokeWidth="2" />
@@ -40,15 +47,22 @@ function StatusDot({ status }: { status: string }) {
 }
 
 /** Grey paper ticket with a torn stub on the left, as in the Fortebet ticket header. */
-function TicketGlyph() {
+function TicketGlyph({ label }: { label?: string | undefined }) {
   return (
-    <svg width="50" height="28" viewBox="0 0 50 28" aria-hidden="true">
+    <svg width="50" height="28" viewBox="0 0 50 28" aria-hidden={label ? undefined : true} role={label ? "img" : undefined} aria-label={label ? `Short number ${label}` : undefined}>
       <path fill="#d8d8d8" d="M2.5 0H9v28H2.5A2.5 2.5 0 0 1 0 25.5V17.5a3.5 3.5 0 0 0 0-7V2.5A2.5 2.5 0 0 1 2.5 0z" />
       <path fill="#d8d8d8" d="M11 0h36.5A2.5 2.5 0 0 1 50 2.5v23a2.5 2.5 0 0 1-2.5 2.5H11z" />
       <path fill="#b4b4b6" d="M0 23.5h9V28H2.5A2.5 2.5 0 0 1 0 25.5zM11 23.5h39v2a2.5 2.5 0 0 1-2.5 2.5H11z" />
+      {label && <text x="30.5" y="17.5" textAnchor="middle" fontSize="13" fontWeight="700" fill="#222" fontFamily="inherit">{label}</text>}
     </svg>
   );
 }
+
+const RELATIVE_DAY = (d: Date) => {
+  const day = (x: Date) => new Date(x.getFullYear(), x.getMonth(), x.getDate()).getTime();
+  const diff = Math.round((day(d) - day(new Date())) / 86400000);
+  return diff === 0 ? "Today" : diff === 1 ? "Tomorrow" : null;
+};
 
 export const fmtMoney = (n: number, d = 0) => n.toLocaleString("en-US", { minimumFractionDigits: d, maximumFractionDigits: d });
 const fmtStamp = (ts: string) => {
@@ -56,22 +70,29 @@ const fmtStamp = (ts: string) => {
   if (Number.isNaN(d.getTime())) return "";
   return `${d.toLocaleDateString("en-US", { month: "short", day: "2-digit" })} ${d.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", second: "2-digit" })}`;
 };
-const fmtItemTime = (ts: string) => {
+const fmtItemTime = (ts: string, relative = false) => {
   const d = new Date(ts);
   if (Number.isNaN(d.getTime())) return "";
-  return `${d.toLocaleDateString("en-US", { month: "short", day: "2-digit" })} | ${d.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}`;
+  const date = (relative && RELATIVE_DAY(d)) || d.toLocaleDateString("en-US", { month: "short", day: "2-digit" });
+  return `${date} | ${d.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}`;
 };
 
-export type SheetItem = { key: string; time: string; match: string; market: string; outcome: string; odds: number; oldOdds?: number | undefined; result?: string | null; status: string };
-export type SheetRow = { label: string; value: string; accent?: boolean };
+export type SheetItem = { key: string; time: string; match: string; market: string; outcome: string; odds: number; oldOdds?: number | undefined; result?: string | null; status: string; league?: string | undefined };
+export type SheetRow = { label: ReactNode; value: string; accent?: boolean };
 
 /** Shared ticket layout: header bar, picks on the left, status and totals on the right. */
-export function TicketSheet({ title, items, status, rows, number, actions, onClose }: {
+export function TicketSheet({ title, items, status, rows, number, shortNumber, note, relativeDays = false, actions, onClose }: {
   title: string;
   items: SheetItem[];
   status: string;
   rows: SheetRow[];
   number?: string | undefined;
+  /** Short ticket number printed on the ticket icon (e.g. 609). */
+  shortNumber?: string | undefined;
+  /** Small right-aligned notes under the totals. */
+  note?: ReactNode;
+  /** Show "Today" / "Tomorrow" instead of the date (bet slip preview). */
+  relativeDays?: boolean;
   actions?: ReactNode;
   onClose: () => void;
 }) {
@@ -82,7 +103,7 @@ export function TicketSheet({ title, items, status, rows, number, actions, onClo
     return () => window.removeEventListener("keydown", k);
   }, [onClose]);
   const list = useMemo(() => (byTime ? [...items].sort((a, b) => a.time.localeCompare(b.time)) : items), [items, byTime]);
-  const statusBg = status === "WIN" ? WIN_BG : status === "LOST" ? LOST_BG : status === "OPEN" || status === "ACTIVE" ? "#f0b429" : "#6b6d76";
+  const statusBg = status === "WIN" || status.includes("CASHOUT") ? WIN_BG : status === "LOST" ? LOST_BG : status === "OPEN" || status === "ACTIVE" ? "#f0b429" : status === "PREPARING" ? "#e9e9eb" : "#6b6d76";
   return (
     <div onClick={onClose} style={{ position: "fixed", inset: 0, zIndex: 1000, background: "rgba(0,0,0,0.65)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
       <div onClick={(e) => e.stopPropagation()} role="dialog" aria-label="Ticket detail"
