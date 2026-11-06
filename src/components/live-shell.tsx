@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { HeaderClock, LiveOddsFeed } from "@/components/fortebet-live";
 import capturedCSS from "../styles/pages/live.preview.css?raw";
 
 const ImportedNativeTag0 = "innerscroll" as import("react").ElementType;
@@ -7,6 +8,7 @@ export function LiveShell({ children, slip }: { children: ReactNode; slip: React
   return (
     <>
       <style>{capturedCSS}</style>
+      <LiveOddsFeed />
       <div data-ce="app-root" {...({ "ng-version": "13.3.0" } as any)}>
         <div data-ce="app-svg-loader" {...({ "_nghost-wbi-c201": "" } as any)}>
           <svg xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" {...({ "_ngcontent-wbi-c201": "" } as any)}>
@@ -315,7 +317,7 @@ export function LiveShell({ children, slip }: { children: ReactNode; slip: React
               <div className="header [top:0px]" {...({ "_ngcontent-wbi-c202": "" } as any)}>
                 <h1 {...({ "_ngcontent-wbi-c202": "" } as any)}>Fortebet</h1>
                 <div {...({ "_ngcontent-wbi-c202": "" } as any)}>
-                  <div className="timer [font-weight:900] [top:calc(2px_*_var(--factor))]" {...({ "_ngcontent-wbi-c202": "" } as any)}><span className="ico clock h12" {...({ "_ngcontent-wbi-c202": "" } as any)} /> Nov 06 2026, 01:22:59 AM </div>
+                  <div className="timer [font-weight:900] [top:calc(2px_*_var(--factor))]" {...({ "_ngcontent-wbi-c202": "" } as any)}><span className="ico clock h12" {...({ "_ngcontent-wbi-c202": "" } as any)} /><HeaderClock /></div>
                   <div className="buttons hover [font-weight:900]" {...({ "_ngcontent-wbi-c202": "" } as any)}>
                     <a href="/contact" {...({ "_ngcontent-wbi-c202": "" } as any)}>CONTACT US</a>
                   </div>

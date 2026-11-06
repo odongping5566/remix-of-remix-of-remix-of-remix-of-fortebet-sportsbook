@@ -17,8 +17,8 @@ export const Route = createFileRoute("/live_/preview")({
 function LivePage() {
   const s = useSels();
   return (
-    <LiveShell slip={<BetSlip title="Live" sels={s.sels} remove={s.remove} clear={s.clear} active={s.active} setActive={s.setActive} counts={s.counts} />}>
-      <LivePreviewList sels={s.sels} toggle={s.toggle} />
+    <LiveShell slip={<BetSlip title="Live" slip={s} />}>
+      <LivePreviewList slip={s} />
     </LiveShell>
   );
 }
