@@ -16,7 +16,6 @@ export const Route = createFileRoute("/")({
     { name: "twitter:card", content: "summary_large_image" },
   ] }),
   staticData: { importedDocument: { html: { "lang": "en" }, body: { "data-site-import-responsive-incomplete": "scroll" } } },
-  loader: ({ context }) => context.queryClient.ensureQueryData(homeQuery).catch(() => null),
   component: Index,
 });
 
