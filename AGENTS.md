@@ -30,3 +30,6 @@ use the editor.
 <!-- LOVABLE:END -->
 
 - Live betting data comes from the public Fortebet feeds, fetched through server functions in src/lib/fortebet.functions.ts (with a short cache) because the browser cannot call those feeds directly.
+- Real-time odds/score changes come from the public Fortebet Socket.IO feed opened in the browser (src/lib/odds-feed.ts); snapshot data seeds the same store, and the newest timestamp wins, so every odds button and the bet slip read one source.
+- Offer filtering and ticket maths live as pure functions (src/lib/offer-filters.ts, src/lib/ticket.ts) with tests in src/test/offer-rules.test.ts, so rules stay checkable without the UI.
+- Bet slips are stored in the browser (src/lib/tickets-store.ts); real bet placement needs an authorized Fortebet account and is not wired.
