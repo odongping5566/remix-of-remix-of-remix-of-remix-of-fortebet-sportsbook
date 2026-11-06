@@ -37,4 +37,4 @@ use the editor.
 - Same-site <a href> clicks are turned into router navigation by one listener in src/routes/__root.tsx, so the imported pages' plain links never reload the app.
 - Casino lobby and jackpot-counter rules live in src/lib/casino.ts (tested in src/test/casino-rules.test.ts); games launch through the playCasinoGame server function in fun mode, since real mode needs a signed-in Fortebet session.
 - Account windows share one root-mounted dialog and an open/mode store; their forms validate locally without network requests or durable storage, keeping the preview disconnected.
-- Virtual Soccer keeps the imported route layout, reads its public offer through a cached server function, and embeds the public Stream/Tracker viewers; no wagering actions are connected.
+- Virtual Soccer keeps the imported route layout, reads its public offer through a cached server function, and scales one persistent Stream/Tracker iframe when expanded; local preview picks never submit wagers.

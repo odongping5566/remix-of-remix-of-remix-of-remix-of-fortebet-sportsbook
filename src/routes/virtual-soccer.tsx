@@ -4,7 +4,6 @@ import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { LogIn, Maximize, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { openLogin, openRegister } from "@/lib/login-modal";
-import { HeaderClock } from "@/components/fortebet-live";
 import { getVirtualOffer } from "@/lib/virtual-soccer.functions";
 import { kickoffCountdown, virtualOddLabel, virtualClock, toggleVirtualPick, type VirtualMatch, type VirtualOdd, type VirtualPick } from "@/lib/virtual-soccer";
 import capturedCSS from "../styles/pages/virtual-soccer.css?raw";
@@ -357,7 +356,7 @@ function Index() {
               <div className="header items-center [height:calc(54px_*_var(--factor))] [top:0px]" {...({ "_ngcontent-bdf-c202": "" } as any)}>
                 <h1 {...({ "_ngcontent-bdf-c202": "" } as any)}>Fortebet</h1>
                 <div {...({ "_ngcontent-bdf-c202": "" } as any)}>
-                  <div className="timer [font-weight:900] [margin-left:calc(44px_*_var(--factor))] [margin-right:calc(13px_*_var(--factor))] [top:calc(2px_*_var(--factor))]" {...({ "_ngcontent-bdf-c202": "" } as any)}><span className="ico clock h12" {...({ "_ngcontent-bdf-c202": "" } as any)} /><HeaderClock /></div>
+                  <div className="timer virtual-header-clock" {...({ "_ngcontent-bdf-c202": "" } as any)}><span className="ico clock h12" {...({ "_ngcontent-bdf-c202": "" } as any)} /><time>{now ? `${new Date(now).toLocaleDateString("en-GB", { timeZone: "Africa/Kampala", day: "2-digit", month: "short", year: "numeric" })}, ${virtualClock(now)}` : "—"}</time></div>
                   <div className="buttons hover [font-weight:900] [margin-left:calc(8px_*_var(--factor))]" {...({ "_ngcontent-bdf-c202": "" } as any)}>
                     <a href="/contact" {...({ "_ngcontent-bdf-c202": "" } as any)}>CONTACT US</a>
                   </div>
