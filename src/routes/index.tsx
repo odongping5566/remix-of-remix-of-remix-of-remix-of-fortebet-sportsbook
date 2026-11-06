@@ -739,14 +739,14 @@ function EventDetail({ id, live, onClose, sels, toggle }: { id: string; live: bo
         <div className="active"><a>{ev ? `${ev.home} - ${ev.away}` : "Loading…"}</a></div>
         <div><a onClick={onClose} className="curPointer">← BACK</a></div>
       </div>
-      <div className="offerHead" style={{ justifyContent: "space-between" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 12px", background: "rgba(255,255,255,0.08)", color: "#e6e6e8", fontWeight: 700, fontSize: 13, marginTop: 6 }}>
         <div>{ev ? `${ev.league} · ${fmtTime(ev.startTs).day} ${fmtTime(ev.startTs).time}` : ""}</div>
         <div><a href={`https://fortebet-ug.24liveresults.com/match-widget/${num}?displayMode=kiosk&utm_source=fortebet&utm_medium=web&utm_campaign=match_detail&language=en&lang=en`} target="_blank" rel="noopener noreferrer" className="textOrange">Match statistics ↗</a></div>
       </div>
-      {q.isError && <div className="offerHead"><div>Odds for this match are not available right now.</div></div>}
+      {q.isError && <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 12px", background: "rgba(255,255,255,0.08)", color: "#e6e6e8", fontWeight: 700, fontSize: 13, marginTop: 6 }}><div>Odds for this match are not available right now.</div></div>}
       {ev?.markets.map((mk, mi) => (
         <div key={mi}>
-          <div className="offerHead"><div>{mk.name}</div></div>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 12px", background: "rgba(255,255,255,0.08)", color: "#e6e6e8", fontWeight: 700, fontSize: 13, marginTop: 6 }}><span>{mk.name}</span></div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(170px, 1fr))", gap: 6, padding: 8 }}>
             <div style={{ display: "contents" }}>
               {mk.outcomes.map((o, oi) => {
