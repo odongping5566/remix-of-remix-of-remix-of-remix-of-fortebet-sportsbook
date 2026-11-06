@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { TopBetsList, SportsList, BannerSlider, MatchesPanel, BetSlip, type Sel } from "@/components/fortebet-live";
+import { TopBetsList, SportsList, BannerSlider, MatchesPanel, BetSlip, useSels } from "@/components/fortebet-live";
 import capturedCSS from "../styles/site.css?raw";
 
 const ImportedNativeTag0 = "sbticket" as import("react").ElementType;
@@ -20,9 +20,8 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   const [mode, setMode] = useState<"home" | "live">("home");
-  const [sels, setSels] = useState<Sel[]>([]);
-  const toggle = (sel: Sel) =>
-    setSels((s) => (s.some((x) => x.key === sel.key) ? s.filter((x) => x.key !== sel.key) : [...s.filter((x) => x.eventId !== sel.eventId), sel]));
+  const slip = useSels();
+  const { sels, toggle } = slip;
   return (
     <>
       <style>{capturedCSS}</style>
@@ -523,7 +522,7 @@ function Index() {
                   </div>
                   <div className="staticModul" id="app-rightbar">
                     <ImportedNativeTag0 {...({ "_nghost-oky-c53": "" } as any)}>
-                      <BetSlip sels={sels} remove={(k) => setSels((s) => s.filter((x) => x.key !== k))} clear={() => setSels([])} />
+                      <BetSlip sels={sels} remove={slip.remove} clear={slip.clear} active={slip.active} setActive={slip.setActive} counts={slip.counts} />
                     </ImportedNativeTag0>
                     <div data-ce="sbticket-search" {...({ "_nghost-oky-c54": "" } as any)}>
                       <div className="ticketSearch" {...({ "_ngcontent-oky-c54": "" } as any)}>
