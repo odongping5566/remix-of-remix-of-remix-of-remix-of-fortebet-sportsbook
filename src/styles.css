@@ -193,6 +193,12 @@
 
 :root {
   --account-surface: oklch(1 0 0);
+  --brand-500: #00a65a;
+  --brand-600: #006e42;
+  --brand-700: #00894a;
+  --brand-800: #006b3a;
+  --brand-900: #004d2a;
+  --brand-glow: oklch(0.63 0.16 153 / 35%);
   --account-field: oklch(0.97 0 0);
   --account-line: oklch(0.78 0 0);
   --account-ink: oklch(0.25 0.01 278);
@@ -201,6 +207,9 @@
   --account-login-hover: oklch(0.79 0.1252 86.81);
   --account-overlay: oklch(0.08 0 0 / 75%);
   --account-shadow: 0 20px 70px oklch(0.08 0 0 / 45%);
+  --virtual-panel: oklch(0.43 0.025 275);
+  --virtual-field: oklch(0.36 0.015 275);
+  --virtual-text: oklch(0.96 0 0);
 }
 @theme inline {
   --color-account-surface: var(--account-surface);
@@ -300,4 +309,41 @@
   height: 16px;
   fill: none;
   stroke: currentColor;
+}
+
+.virtual-market-grid { display: grid; gap: 2px; padding: 0 5px; background: var(--virtual-panel); }
+.virtual-three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.virtual-two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.virtual-market-title { grid-column: 1 / -1; min-height: 30px; display: flex; align-items: center; justify-content: center; text-align: center; font-size: 11px; color: var(--virtual-text); }
+.virtual-odd-display { display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; gap: 4px; min-height: 30px; padding: 2px 8px; background: var(--virtual-field); color: var(--virtual-text); }
+.virtual-odd-display strong { color: var(--brand-500); }
+.virtual-wide { grid-column: 1 / -1; }
+.virtual-viewer { width: 100%; color: var(--virtual-text); }
+#app-content-main .virtual-viewer .virtual-view-tab { flex: 1; border: 0; border-radius: 4px 4px 0 0; background: var(--virtual-panel); color: var(--virtual-text); text-transform: uppercase; }
+#app-content-main .virtual-viewer .virtual-view-tab[aria-selected="true"] { background: var(--brand-500); }
+.virtual-view-frame { width: 100%; height: 242px; border: 0; display: block; }
+#app-content-main .virtual-viewer .virtual-expand { width: 100%; border: 0; border-radius: 0 0 4px 4px; background: var(--brand-500); color: var(--virtual-text); text-transform: uppercase; }
+.virtual-expand svg, .virtual-expanded svg { fill: none; stroke: currentColor; }
+.virtual-results-live { background: var(--virtual-panel); color: var(--virtual-text); }
+.virtual-expanded { background: var(--virtual-field); color: var(--virtual-text); }
+body:has(.virtual-viewer) #app-header .header { background: var(--brand-500); }
+.virtual-ticket > div:first-child { color: var(--brand-600); }
+.virtual-ticket .virtual-ticket-content-empty { color: var(--account-ink); }
+@media (max-width: 800px) {
+  body:has(.virtual-viewer) #mainContainer { grid-template-columns: 8px minmax(0, 1fr) 8px; grid-template-rows: auto 50px 1fr auto; }
+  body:has(.virtual-viewer) #app-header .header { flex-wrap: wrap; height: auto; gap: 8px; padding: 10px 8px; }
+  body:has(.virtual-viewer) #app-header .header > div:first-of-type { display: none; }
+  body:has(.virtual-viewer) #app-header .header > div:last-of-type { margin-left: auto; }
+  body:has(.virtual-viewer) #app-header .buttons.hover { display: none; }
+  body:has(.virtual-viewer) #app-secheader { min-width: 0; overflow-x: auto; }
+  body:has(.virtual-viewer) .secHeader { min-width: 800px; }
+  body:has(.virtual-viewer) #app-footer { overflow: hidden; min-width: 0; }
+  #app-content-main .virtual-soccer-main { grid-template-columns: minmax(0, 1fr); }
+  #app-content-main .virtual-soccer-main > :nth-child(1) { grid-column: 1; }
+  #app-content-main .virtual-soccer-main > :nth-child(2) { padding: 0 8px; }
+  #app-content-main .virtual-soccer-offer { grid-template-columns: minmax(0, 1fr); row-gap: 10px; }
+  #app-content-main .virtual-soccer-sidebar { width: auto; margin-top: 16px; }
+  #app-content-main .virtual-soccer-offer-header { flex-wrap: wrap; justify-content: center; gap: 12px; }
+  .virtual-soccer-offer-header > div:nth-of-type(2) { order: -1; width: 100%; justify-content: center; }
+  .virtual-soccer-offer-header > div:nth-of-type(1), .virtual-soccer-offer-header > div:nth-of-type(3) { font-size: 12px; }
 }
