@@ -73,6 +73,14 @@ function normalise(d: Raw, at: number, live: boolean): Offer {
     const entry = Object.entries<Raw>(ml[sid]).find(([, v]) => v.main);
     if (!entry) continue;
     const outs = Object.entries<Raw>(entry[1].outcome ?? {}).sort((a, b) => (a[1].order ?? 0) - (b[1].order ?? 0));
+    // Live soccer splits Double Chance into its own market (10): show it next to 1X2 like the real site.
+    const dcDef = ml[sid]?.["10"];
+    if (outs.length === 3 && entry[1].template === "3WAY" && dcDef?.outcome) {
+      for (const short of DC_SHORTS) {
+        const hit = Object.entries<Raw>(dcDef.outcome).find(([, o]) => o.short === short);
+        if (hit) outs.push([`dc:${hit[0]}`, hit[1]]);
+      }
+    }
     mainDef[sid] = { id: Number(entry[0]), def: entry[1], outs };
   }
 
@@ -114,6 +122,11 @@ function normalise(d: Raw, at: number, live: boolean): Offer {
         const hit = Object.entries<Raw>(m.odds ?? {}).find(([, o]) => o.outcomeId === outcomeId);
         return hit ? ({ id: Number(hit[0]), v: Number(hit[1].odds), ...(hit[1].locked ? { l: 1 as const } : {}) }) : null;
       };
+      if (oid.startsWith("dc:")) {
+        const c = dc ? pick(dc[1], Number(oid.slice(3))) : null;
+        if (c && dc && !mk.includes(Number(dc[0]))) mk.push(Number(dc[0]));
+        return c;
+      }
       let cell = main ? pick(main[1], Number(oid)) : null;
       if (!cell && dc && dcDef && DC_SHORTS.includes(od.short)) {
         const alt = Object.entries<Raw>(dcDef.outcome ?? {}).find(([, o]) => o.short === od.short);
