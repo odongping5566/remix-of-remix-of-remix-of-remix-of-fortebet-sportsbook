@@ -19,7 +19,7 @@ function LiveEventPage() {
   const nav = useNavigate();
   const s = useSels();
   return (
-    <LiveShell slip={<BetSlip title="Live" sels={s.sels} remove={s.remove} clear={s.clear} active={s.active} setActive={s.setActive} counts={s.counts} />}>
+    <LiveShell slip={<BetSlip title="Live" slip={s} />}>
       <LiveEventHeader id={id} onBack={() => nav({ to: "/live/preview" })} />
       <EventDetail id={id} live onClose={() => nav({ to: "/live/preview" })} sels={s.sels} toggle={s.toggle} />
     </LiveShell>
