@@ -232,9 +232,9 @@ export function BetSlip({ sels, remove, clear, title = "Sportsbook" }: { sels: S
           <div style={{ background: "#fff", padding: "8px 12px", color: "#333" }}>
             <div style={{ textAlign: "center", marginBottom: 6 }}>STAKE</div>
             <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
-              <a className="curPointer" onClick={() => setStake((v) => Math.max(1000, v - 1000))} style={{ background: G, color: "#fff", width: 24, height: 24, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 3 }}>-</a>
-              <input type="number" min={1000} value={stake} onChange={(e) => setStake(Math.max(0, Number(e.target.value)))} aria-label="Stake" style={{ flex: 1, border: "1px solid #ccc", padding: "4px 8px", textAlign: "right", fontSize: 15, borderRadius: 3 }} />
-              <a className="curPointer" onClick={() => setStake((v) => v + 1000)} style={{ background: G, color: "#fff", width: 24, height: 24, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 3 }}>+</a>
+              <a className="curPointer" onClick={() => setStake((v) => Math.max(1000, v - 1000))} style={{ background: G, color: "#fff", width: 24, minWidth: 24, flexShrink: 0, height: 24, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 3 }}>-</a>
+              <input type="number" min={1000} value={stake} onChange={(e) => setStake(Math.max(0, Number(e.target.value)))} aria-label="Stake" style={{ flex: 1, minWidth: 0, width: "100%", border: "1px solid #ccc", padding: "4px 8px", textAlign: "right", fontSize: 15, borderRadius: 3 }} />
+              <a className="curPointer" onClick={() => setStake((v) => v + 1000)} style={{ background: G, color: "#fff", width: 24, minWidth: 24, flexShrink: 0, height: 24, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 3 }}>+</a>
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 3, marginTop: 6 }}>
               {[10000, 50000, 250000].map((v) => <div key={v} style={btn} onClick={() => setStake(v)}>{v.toLocaleString("en-US")}</div>)}
