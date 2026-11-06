@@ -835,47 +835,21 @@ function BetSlip({ sels, remove, clear }: { sels: Sel[]; remove: (k: string) => 
   );
 }
 
-function StatsModal({ id, live, onClose }: { id: string; live: boolean; onClose: () => void }) {
-  const q = useQuery({ queryKey: ["fb-ev", id, live], queryFn: () => getEventDetail({ data: { id, live } }), refetchInterval: 20_000 });
-  const ev = q.data;
+function StatsModal({ id, onClose }: { id: string; live?: boolean; onClose: () => void }) {
+  const num = id.replace(/\D/g, "");
   useEffect(() => {
     const k = (e: KeyboardEvent) => e.key === "Escape" && onClose();
     window.addEventListener("keydown", k);
     return () => window.removeEventListener("keydown", k);
   }, [onClose]);
-  const t = ev ? fmtTime(ev.startTs) : null;
-  const main = ev?.markets[0];
-  const row: CSSProperties = { display: "flex", justifyContent: "space-between", padding: "8px 16px", borderBottom: "1px solid rgba(255,255,255,0.06)", fontSize: 13 };
   return (
     <div onClick={onClose} style={{ position: "fixed", inset: 0, zIndex: 1000, background: "rgba(0,0,0,0.65)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
-      <div onClick={(e) => e.stopPropagation()} role="dialog" aria-label="Statistics center" style={{ width: "min(520px, 100%)", maxHeight: "90vh", overflow: "auto", background: "#2a2b31", color: "#e6e6e8", borderRadius: 4, boxShadow: "0 10px 40px rgba(0,0,0,0.6)" }}>
+      <div onClick={(e) => e.stopPropagation()} role="dialog" aria-label="Statistics center" style={{ width: "min(520px, 100%)", height: "min(780px, 92vh)", display: "flex", flexDirection: "column", background: "#2a2b31", color: "#e6e6e8", borderRadius: 4, boxShadow: "0 10px 40px rgba(0,0,0,0.6)", overflow: "hidden" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 14px", background: "#1f2025", fontWeight: 700, fontSize: 13 }}>
           <span>STATISTICS CENTER</span>
           <button onClick={onClose} aria-label="Close" style={{ background: "none", border: 0, color: "#e6e6e8", fontSize: 20, cursor: "pointer", lineHeight: 1 }}>×</button>
         </div>
-        {q.isLoading && <div style={{ padding: 30, textAlign: "center" }}>Loading…</div>}
-        {q.isError && <div style={{ padding: 30, textAlign: "center" }}>Statistics are not available right now.</div>}
-        {ev && <>
-          <div style={{ padding: "8px 14px", fontSize: 12, fontWeight: 700, background: "rgba(255,255,255,0.04)" }}>{ev.league}</div>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr auto 1fr", alignItems: "center", gap: 10, padding: "24px 14px", textAlign: "center" }}>
-            <div style={{ fontWeight: 700 }}>{ev.home}</div>
-            <div><div style={{ fontSize: 11, opacity: 0.7 }}>{t?.day} {t?.time}</div><div style={{ fontSize: 22, fontWeight: 800 }}>{(ev as any).score ?? "- : -"}</div><div style={{ fontSize: 11, opacity: 0.7 }}>{live ? "Live" : "Not started"}</div></div>
-            <div style={{ fontWeight: 700 }}>{ev.away}</div>
-          </div>
-          {main && <div style={{ display: "flex", justifyContent: "space-around", paddingBottom: 18 }}>
-            {main.outcomes.slice(0, 3).map((o, i) => <div key={i} style={{ fontWeight: 700 }}><span style={{ background: "rgb(0,166,90)", color: "#fff", padding: "1px 6px", borderRadius: 2, marginRight: 6, fontSize: 11 }}>{o.name}</span>{o.odds ? o.odds.toFixed(2) : "-"}</div>)}
-          </div>}
-          <div style={{ padding: "8px 16px", fontWeight: 700, fontSize: 12, textAlign: "center", background: "#1f2025" }}>DETAILS</div>
-          <div style={row}><span>Start</span><span>{t?.day} {t?.time}</span></div>
-          <div style={row}><span>Competition</span><span>{ev.league}</span></div>
-          <div style={row}><span>Markets available</span><span>{ev.markets.length}</span></div>
-          {ev.markets.slice(1, 6).map((mk, i) => (
-            <div key={i}>
-              <div style={{ padding: "8px 16px", fontWeight: 700, fontSize: 12, background: "rgba(255,255,255,0.04)" }}>{mk.name}</div>
-              {mk.outcomes.map((o, j) => <div key={j} style={row}><span>{o.name}</span><span className="textOrange">{o.odds ? o.odds.toFixed(2) : "-"}</span></div>)}
-            </div>
-          ))}
-        </>}
+        <iframe title="Match statistics" src={`https://fortebet-ug.24liveresults.com/match-widget/${num}?displayMode=kiosk&utm_source=fortebet&utm_medium=web&utm_campaign=match_detail&language=en&lang=en`} style={{ flex: 1, width: "100%", border: 0, background: "#2a2b31" }} />
       </div>
     </div>
   );
