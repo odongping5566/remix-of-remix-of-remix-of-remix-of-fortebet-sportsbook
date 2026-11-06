@@ -23,10 +23,10 @@ export const Route = createFileRoute("/")({
 function Index() {
   const [mode, setMode] = useState<"home" | "live">("home");
   const slip = useSels();
-  const { sels, toggle } = slip;
   return (
     <>
       <style>{capturedCSS}</style>
+      <LiveOddsFeed />
       <div data-ce="app-root" {...({ "ng-version": "13.3.0" } as any)}>
         <div data-ce="app-svg-loader" {...({ "_nghost-oky-c201": "" } as any)}>
           <svg xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" {...({ "_ngcontent-oky-c201": "" } as any)}>
@@ -397,6 +397,7 @@ function Index() {
             </div>
             <div id="app-content-main" {...({ "_ngcontent-oky-c209": "" } as any)}>
               <div data-ce="prematch-index">
+                <OfferFilterProvider>
                 <div className="simSubGrid [column-gap:calc(10px_*_var(--factor))]">
                   <div className="staticModul" id="app-leftbar">
                     <div className="eventsFilter [gap:calc(8px_*_var(--factor))]">
@@ -430,7 +431,7 @@ function Index() {
                   </div>
                   <div className="staticModul" id="app-rightbar">
                     <ImportedNativeTag0 {...({ "_nghost-oky-c53": "" } as any)}>
-                      <BetSlip sels={sels} remove={slip.remove} clear={slip.clear} active={slip.active} setActive={slip.setActive} counts={slip.counts} />
+                      <BetSlip slip={slip} />
                     </ImportedNativeTag0>
                     <div data-ce="sbticket-search" {...({ "_nghost-oky-c54": "" } as any)}>
                       <div className="ticketSearch" {...({ "_ngcontent-oky-c54": "" } as any)}>
@@ -444,6 +445,7 @@ function Index() {
                     </div>
                   </div>
                 </div>
+                </OfferFilterProvider>
               </div>
             </div>
             <div data-ce="app-footer" id="app-footer" {...({ "_ngcontent-oky-c209": "", "_nghost-oky-c207": "" } as any)}>
