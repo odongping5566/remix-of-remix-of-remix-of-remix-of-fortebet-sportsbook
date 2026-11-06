@@ -702,7 +702,7 @@ function MatchRow({ m, sels, toggle, open, stats }: { m: Match; sels: Sel[]; tog
     <div className="offerMatch">
       <div className="app-widget-event-set curPointer" onClick={() => open(m.id)}>
         <span className="matchName"><span> {m.home} </span> - <span> {m.away} </span><span className="tooltip">{m.league}</span></span>
-        <div><span><span className="ico star h13 opa06 deadSpace" /><span className="liveIco">Live</span><span className="ico chart h13 opa06 deadSpace curPointer" role="button" aria-label="Match statistics" onClick={(e) => { e.stopPropagation(); stats(m.id); }} /><span className="ico hearth h13 opa06 deadSpace" /></span></div>
+        <div><span><span className="ico star h13 opa06 deadSpace" /><span className="liveIco">Live</span><span className="ico chart h13 opa06 deadSpace curPointer" role="button" aria-label="Match statistics" style={{ display: "inline-block", minWidth: 14, minHeight: 13 }} onClick={(e) => { e.stopPropagation(); stats(m.id); }} /><span className="ico hearth h13 opa06 deadSpace" /></span></div>
       </div>
       <div className="app-widget-time-set">
         <div>{m.score ? <><span className="textOrange"> {m.score} </span> | {m.status ?? "LIVE"}</> : <><span className="textOrange"> {t.day} </span> | {t.time}</>}</div>
