@@ -187,28 +187,66 @@ export function MatchesPanel({ mode, sels, toggle }: { mode: "home" | "live"; se
 }
 
 export function BetSlip({ sels, remove, clear, title = "Sportsbook" }: { sels: Sel[]; remove: (k: string) => void; clear: () => void; title?: string }) {
-  const [stake, setStake] = useState(1000);
+  const [stake, setStake] = useState(2000);
   const total = sels.reduce((a, s) => a * s.odds, 1);
+  const G = "rgb(0,166,90)";
+  const describe = (s: Sel) => {
+    if (s.pick.includes(": ")) { const [m, ...o] = s.pick.split(": "); return [m, o.join(": ")]; }
+    const [h, a] = s.match.split(" - ");
+    const map: Record<string, [string, string]> = { "1": ["Full Time Result", h], X: ["Full Time Result", "Draw"], "2": ["Full Time Result", a], "1X": ["Double Chance", `${h} or Draw`], X2: ["Double Chance", `Draw or ${a}`], "12": ["Double Chance", "No Draw"] };
+    return map[s.pick] ?? ["", s.pick];
+  };
+  const btn: CSSProperties = { background: "#e4e4e6", color: "#333", fontWeight: 700, fontSize: 12, padding: "6px 0", textAlign: "center", cursor: "pointer" };
   return (
     <div className="ticket">
       <div className="ticketHead"> Bet slip - {title} <div /></div>
-      <div className="betSlipMenu"><div><a className="active"> 1 <span>{sels.length}</span></a><a> 2 <span>0</span></a><a> 3 <span>0</span></a><a> 4 <span>0</span></a></div></div>
+      <div className="betSlipMenu" style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <div><a className="active"> 1 <span>{sels.length}</span></a><a> 2 <span>0</span></a><a> 3 <span>0</span></a><a> 4 <span>0</span></a></div>
+        {sels.length > 0 && <a className="curPointer" onClick={clear} aria-label="Clear ticket" style={{ fontSize: 18, color: "#777", paddingRight: 6 }}>🗑</a>}
+      </div>
       {sels.length === 0 ? (
         <div className="empty"> Your Ticket is still empty </div>
       ) : (
-        <div style={{ padding: 10, color: "#333", fontSize: 13 }}>
-          {sels.map((s) => (
-            <div key={s.key} style={{ display: "flex", justifyContent: "space-between", gap: 8, padding: "6px 0", borderBottom: "1px solid #ddd" }}>
-              <div><b>{s.match}</b><div>{s.pick}</div></div>
-              <div style={{ textAlign: "right" }}><b>{s.odds.toFixed(2)}</b><div><a className="curPointer" onClick={() => remove(s.key)} aria-label="Remove">✕</a></div></div>
+        <div style={{ fontSize: 12, fontWeight: 700 }}>
+          <div style={{ background: G, color: "#fff" }}>
+            {sels.map((s, i) => {
+              const [mk, out] = describe(s);
+              return (
+                <div key={s.key} style={{ padding: "6px 8px", borderBottom: "1px solid rgba(255,255,255,0.35)" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 13 }}>
+                    <span><span style={{ display: "inline-flex", width: 15, height: 15, borderRadius: 99, background: "#fff", color: G, fontSize: 10, alignItems: "center", justifyContent: "center", marginRight: 5 }}>{i + 1}</span>{s.match}</span>
+                    <a className="curPointer" onClick={() => remove(s.key)} aria-label="Remove" style={{ color: "#fff", fontSize: 15 }}>✕</a>
+                  </div>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr auto", gap: 6, marginTop: 4, alignItems: "center", color: "rgba(255,255,255,0.85)" }}>
+                    <span>{mk}</span><span style={{ textAlign: "right" }}>{out}</span><b style={{ color: "#fff", minWidth: 34, textAlign: "right" }}>{s.odds.toFixed(2)}</b>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          <div style={{ background: "#3d3f49", color: "#fff", padding: "10px 12px", lineHeight: 1.7 }}>
+            <div style={{ display: "flex", justifyContent: "space-between" }}><span>TOTAL ODDS</span><span>{total.toFixed(2)}</span></div>
+            <div style={{ display: "flex", justifyContent: "space-between" }}><span>STAKE</span><span>{stake.toLocaleString("en-US")} UGX</span></div>
+            <div style={{ display: "flex", justifyContent: "space-between", color: "#22d47e" }}><span>POSSIBLE WIN</span><span>{(stake * total).toLocaleString("en-US", { maximumFractionDigits: 0 })} UGX</span></div>
+          </div>
+          <div style={{ background: "#fff", padding: "8px 12px", color: "#333" }}>
+            <div style={{ textAlign: "center", marginBottom: 6 }}>STAKE</div>
+            <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+              <a className="curPointer" onClick={() => setStake((v) => Math.max(1000, v - 1000))} style={{ background: G, color: "#fff", width: 24, height: 24, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 3 }}>-</a>
+              <input type="number" min={1000} value={stake} onChange={(e) => setStake(Math.max(0, Number(e.target.value)))} aria-label="Stake" style={{ flex: 1, border: "1px solid #ccc", padding: "4px 8px", textAlign: "right", fontSize: 15, borderRadius: 3 }} />
+              <a className="curPointer" onClick={() => setStake((v) => v + 1000)} style={{ background: G, color: "#fff", width: 24, height: 24, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 3 }}>+</a>
             </div>
-          ))}
-          <div style={{ display: "flex", justifyContent: "space-between", marginTop: 8 }}><span>Total odds</span><b>{total.toFixed(2)}</b></div>
-          <label style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 6 }}>Stake (UGX)
-            <input type="number" min={1000} value={stake} onChange={(e) => setStake(Number(e.target.value))} style={{ width: 110, border: "1px solid #ccc", padding: 4 }} />
-          </label>
-          <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6 }}><span>Possible win</span><b>{(stake * total).toLocaleString("en-US", { maximumFractionDigits: 0 })} UGX</b></div>
-          <div className="buttons" style={{ marginTop: 8 }}><a className="curPointer" onClick={clear}>Clear ticket</a></div>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 3, marginTop: 6 }}>
+              {[10000, 50000, 250000].map((v) => <div key={v} style={btn} onClick={() => setStake(v)}>{v.toLocaleString("en-US")}</div>)}
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 3, marginTop: 6 }}>
+              <div style={{ ...btn, background: G, color: "#fff" }}>UGX</div><div style={btn}>VIP POINTS</div>
+            </div>
+            <div style={{ ...btn, background: "#3d3f49", color: "#fff", marginTop: 6 }}>TICKET PREVIEW</div>
+            <div style={{ ...btn, background: "#cea642", color: "#fff", fontSize: 15, padding: "9px 0", marginTop: 6, borderRadius: 3 }}>SAVE i-TICKET</div>
+            <div style={{ textAlign: "center", color: "#888", margin: "4px 0", fontSize: 11 }}>- OR -</div>
+            <div style={{ ...btn, background: "#d0d0d2", color: "#999", fontSize: 15, padding: "9px 0", borderRadius: 3, cursor: "not-allowed" }} title="Log in with Fortebet to place a bet">PLACE BET</div>
+          </div>
         </div>
       )}
     </div>
