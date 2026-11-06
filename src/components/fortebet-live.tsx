@@ -333,7 +333,7 @@ export function MarketsDropdown({ id, live, sels, toggle }: { id: string; live: 
   const q = useQuery({ queryKey: ["fb-ev", id, live], queryFn: () => getEventDetail({ data: { id, live } }), refetchInterval: live ? 10_000 : 20_000 });
   const ev = q.data;
   const [closed, setClosed] = useState<number[]>([]);
-  const box: CSSProperties = { gridColumn: "1 / -1", width: "100%", background: "#2e3139", color: "#e6e6e8", fontSize: 12, padding: "4px 6px 8px", marginBottom: 2 };
+  const box: CSSProperties = { display: "block", height: "auto", gridColumn: "1 / -1", width: "100%", background: "#2e3139", color: "#e6e6e8", fontSize: 12, padding: "4px 6px 8px", marginBottom: 2 };
   if (q.isLoading) return <div style={box}>Loading odds…</div>;
   if (q.isError || !ev) return <div style={box}>Odds for this match are not available right now.</div>;
   return (
@@ -342,7 +342,7 @@ export function MarketsDropdown({ id, live, sels, toggle }: { id: string; live: 
         const isClosed = closed.includes(mi);
         const cols = mk.outcomes.length % 3 === 0 && mk.outcomes.length <= 9 ? 3 : 2;
         return (
-          <div key={mi} style={{ background: "#3a3d47", marginTop: 6, borderRadius: 2 }}>
+          <div key={mi} style={{ display: "block", height: "auto", background: "#3a3d47", marginTop: 6, borderRadius: 2 }}>
             <div className="curPointer" onClick={() => setClosed((c) => (isClosed ? c.filter((x) => x !== mi) : [...c, mi]))}
               style={{ display: "flex", justifyContent: "space-between", padding: "8px 10px", fontWeight: 700, textTransform: "uppercase" }}>
               <span>{mk.name}</span><span>{isClosed ? "▾" : "▴"}</span>
