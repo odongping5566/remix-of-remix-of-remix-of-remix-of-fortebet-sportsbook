@@ -193,6 +193,12 @@
 
 :root {
   --account-surface: oklch(1 0 0);
+  --brand-500: #00a65a;
+  --brand-600: #006e42;
+  --brand-700: #00894a;
+  --brand-800: #006b3a;
+  --brand-900: #004d2a;
+  --brand-glow: oklch(0.63 0.16 153 / 35%);
   --account-field: oklch(0.97 0 0);
   --account-line: oklch(0.78 0 0);
   --account-ink: oklch(0.25 0.01 278);
