@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { LogIn } from "lucide-react";
 import { HeaderClock, LiveOddsFeed } from "@/components/fortebet-live";
 import { TicketSearch } from "@/components/ticket-check";
 import { openLogin, openRegister } from "@/lib/login-modal";
@@ -339,7 +340,7 @@ export function LiveShell({ children, slip, active = "live", layout = "ticket" }
                     <Button variant="ghost" className="account-header-button" onClick={openRegister}>Register</Button>
                   </div>
                   <div className="buttons login [font-weight:900]" {...({ "_ngcontent-wbi-c202": "" } as any)}>
-                    <Button variant="ghost" className="account-header-button" onClick={openLogin}><span className="ico login h15" {...({ "_ngcontent-wbi-c202": "" } as any)} />Login</Button>
+                    <Button variant="ghost" className="account-header-button" onClick={openLogin}><LogIn aria-hidden="true" />Login</Button>
                   </div>
                 </div>
               </div>
