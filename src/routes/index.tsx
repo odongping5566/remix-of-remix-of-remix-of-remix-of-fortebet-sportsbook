@@ -734,11 +734,11 @@ function EventDetail({ id, live, onClose, sels, toggle }: { id: string; live: bo
   const num = id.replace(/\D/g, "");
   const ev = q.data;
   return (
-    <div className="mainOffer">
-      <div className="offerMenu baseLeft center">
+    <div style={{ display: "block" }}>
+      <div className="mainOffer"><div className="offerMenu baseLeft center">
         <div className="active"><a>{ev ? `${ev.home} - ${ev.away}` : "Loading…"}</a></div>
         <div><a onClick={onClose} className="curPointer">← BACK</a></div>
-      </div>
+      </div></div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 12px", background: "rgba(255,255,255,0.08)", color: "#e6e6e8", fontWeight: 700, fontSize: 13, marginTop: 6 }}>
         <div>{ev ? `${ev.league} · ${fmtTime(ev.startTs).day} ${fmtTime(ev.startTs).time}` : ""}</div>
         <div><a href={`https://fortebet-ug.24liveresults.com/match-widget/${num}?displayMode=kiosk&utm_source=fortebet&utm_medium=web&utm_campaign=match_detail&language=en&lang=en`} target="_blank" rel="noopener noreferrer" className="textOrange">Match statistics ↗</a></div>
