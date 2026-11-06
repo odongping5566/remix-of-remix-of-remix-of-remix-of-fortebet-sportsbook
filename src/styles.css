@@ -326,6 +326,9 @@
 .virtual-expand svg, .virtual-expanded svg { fill: none; stroke: currentColor; }
 .virtual-results-live { background: var(--virtual-panel); color: var(--virtual-text); }
 .virtual-expanded { background: var(--virtual-field); color: var(--virtual-text); }
+body:has(.virtual-viewer) #app-header .header { background: var(--brand-500); }
+.virtual-ticket > div:first-child { color: var(--brand-600); }
+.virtual-ticket .virtual-ticket-content-empty { color: var(--account-ink); }
 @media (max-width: 800px) {
   body:has(.virtual-viewer) #mainContainer { grid-template-columns: 8px minmax(0, 1fr) 8px; grid-template-rows: auto 50px 1fr auto; }
   body:has(.virtual-viewer) #app-header .header { flex-wrap: wrap; height: auto; gap: 8px; padding: 10px 8px; }
