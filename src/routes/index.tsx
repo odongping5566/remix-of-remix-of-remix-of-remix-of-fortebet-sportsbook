@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type CSSProperties } from "react";
 import { queryOptions, useQuery } from "@tanstack/react-query";
 import { getHomeData, getLiveData, getEventDetail, type Match } from "@/lib/fortebet.functions";
 import capturedCSS from "../styles/site.css?raw";
@@ -695,14 +695,14 @@ function BannerSlider() {
   );
 }
 
-function MatchRow({ m, sels, toggle, open }: { m: Match; sels: Sel[]; toggle: (s: Sel) => void; open: (id: string) => void }) {
+function MatchRow({ m, sels, toggle, open, stats }: { m: Match; sels: Sel[]; toggle: (s: Sel) => void; open: (id: string) => void; stats: (id: string) => void }) {
   const t = fmtTime(m.startTs);
   const fav = Math.min(...[m.odds[0], m.odds[2]].filter((x): x is number => x != null));
   return (
     <div className="offerMatch">
       <div className="app-widget-event-set curPointer" onClick={() => open(m.id)}>
         <span className="matchName"><span> {m.home} </span> - <span> {m.away} </span><span className="tooltip">{m.league}</span></span>
-        <div><span><span className="ico star h13 opa06 deadSpace" /><span className="liveIco">Live</span><span className="ico chart h13 opa06 deadSpace" /><span className="ico hearth h13 opa06 deadSpace" /></span></div>
+        <div><span><span className="ico star h13 opa06 deadSpace" /><span className="liveIco">Live</span><span className="ico chart h13 opa06 deadSpace curPointer" role="button" aria-label="Match statistics" style={{ display: "inline-block", minWidth: 14, minHeight: 13 }} onClick={(e) => { e.stopPropagation(); stats(m.id); }} /><span className="ico hearth h13 opa06 deadSpace" /></span></div>
       </div>
       <div className="app-widget-time-set">
         <div>{m.score ? <><span className="textOrange"> {m.score} </span> | {m.status ?? "LIVE"}</> : <><span className="textOrange"> {t.day} </span> | {t.time}</>}</div>
@@ -731,7 +731,7 @@ function MatchRow({ m, sels, toggle, open }: { m: Match; sels: Sel[]; toggle: (s
 
 function EventDetail({ id, live, onClose, sels, toggle }: { id: string; live: boolean; onClose: () => void; sels: Sel[]; toggle: (s: Sel) => void }) {
   const q = useQuery({ queryKey: ["fb-ev", id, live], queryFn: () => getEventDetail({ data: { id, live } }), refetchInterval: 20_000 });
-  const num = id.replace(/\D/g, "");
+  const [stats, setStats] = useState(false);
   const ev = q.data;
   return (
     <div style={{ display: "block" }}>
@@ -741,7 +741,8 @@ function EventDetail({ id, live, onClose, sels, toggle }: { id: string; live: bo
       </div></div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 12px", background: "rgba(255,255,255,0.08)", color: "#e6e6e8", fontWeight: 700, fontSize: 13, marginTop: 6 }}>
         <div>{ev ? `${ev.league} · ${fmtTime(ev.startTs).day} ${fmtTime(ev.startTs).time}` : ""}</div>
-        <div><a href={`https://fortebet-ug.24liveresults.com/match-widget/${num}?displayMode=kiosk&utm_source=fortebet&utm_medium=web&utm_campaign=match_detail&language=en&lang=en`} target="_blank" rel="noopener noreferrer" className="textOrange">Match statistics ↗</a></div>
+        <div><a onClick={() => setStats(true)} className="textOrange curPointer">Match statistics</a></div>
+        {stats && <StatsModal id={id} live={live} onClose={() => setStats(false)} />}
       </div>
       {q.isError && <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 12px", background: "rgba(255,255,255,0.08)", color: "#e6e6e8", fontWeight: 700, fontSize: 13, marginTop: 6 }}><div>Odds for this match are not available right now.</div></div>}
       {ev?.markets.map((mk, mi) => (
@@ -778,6 +779,7 @@ function MatchesPanel({ mode, sels, toggle }: { mode: "home" | "live"; sels: Sel
   const [tab, setTab] = useState(0);
   const [limit, setLimit] = useState(8);
   const [open, setOpen] = useState<string | null>(null);
+  const [statsId, setStatsId] = useState<string | null>(null);
   useEffect(() => setOpen(null), [mode]);
   if (open) return <EventDetail id={open} live={mode === "live"} onClose={() => setOpen(null)} sels={sels} toggle={toggle} />;
   const tabs = mode === "live" ? ["LIVE MATCHES"] : ["MOST POPULAR MATCHES", "SOCCER ODDS UNDER 1.30", "LOW SOCCER ODDS (1.31 - 1.50)"];
@@ -795,7 +797,8 @@ function MatchesPanel({ mode, sels, toggle }: { mode: "home" | "live"; sels: Sel
       {q.isLoading && <div className="offerHead"><div>Loading matches…</div></div>}
       {q.isError && <div className="offerHead"><div>Could not load matches. Retrying…</div></div>}
       {!q.isLoading && list.length === 0 && !q.isError && <div className="offerHead"><div>No matches right now.</div></div>}
-      {list.slice(0, limit).map((m) => <MatchRow key={m.id} m={m} sels={sels} toggle={toggle} open={setOpen} />)}
+      {list.slice(0, limit).map((m) => <MatchRow key={m.id} m={m} sels={sels} toggle={toggle} open={setOpen} stats={setStatsId} />)}
+      {statsId && <StatsModal id={statsId} live={mode === "live"} onClose={() => setStatsId(null)} />}
       <div className="offerButtons">
         {limit < list.length && <div className="buttons empty"><a className="curPointer" onClick={() => setLimit((l) => l + 10)}>SHOW MORE</a></div>}
       </div>
@@ -828,6 +831,52 @@ function BetSlip({ sels, remove, clear }: { sels: Sel[]; remove: (k: string) => 
           <div className="buttons" style={{ marginTop: 8 }}><a className="curPointer" onClick={clear}>Clear ticket</a></div>
         </div>
       )}
+    </div>
+  );
+}
+
+function StatsModal({ id, live, onClose }: { id: string; live: boolean; onClose: () => void }) {
+  const q = useQuery({ queryKey: ["fb-ev", id, live], queryFn: () => getEventDetail({ data: { id, live } }), refetchInterval: 20_000 });
+  const ev = q.data;
+  useEffect(() => {
+    const k = (e: KeyboardEvent) => e.key === "Escape" && onClose();
+    window.addEventListener("keydown", k);
+    return () => window.removeEventListener("keydown", k);
+  }, [onClose]);
+  const t = ev ? fmtTime(ev.startTs) : null;
+  const main = ev?.markets[0];
+  const row: CSSProperties = { display: "flex", justifyContent: "space-between", padding: "8px 16px", borderBottom: "1px solid rgba(255,255,255,0.06)", fontSize: 13 };
+  return (
+    <div onClick={onClose} style={{ position: "fixed", inset: 0, zIndex: 1000, background: "rgba(0,0,0,0.65)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
+      <div onClick={(e) => e.stopPropagation()} role="dialog" aria-label="Statistics center" style={{ width: "min(520px, 100%)", maxHeight: "90vh", overflow: "auto", background: "#2a2b31", color: "#e6e6e8", borderRadius: 4, boxShadow: "0 10px 40px rgba(0,0,0,0.6)" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 14px", background: "#1f2025", fontWeight: 700, fontSize: 13 }}>
+          <span>STATISTICS CENTER</span>
+          <button onClick={onClose} aria-label="Close" style={{ background: "none", border: 0, color: "#e6e6e8", fontSize: 20, cursor: "pointer", lineHeight: 1 }}>×</button>
+        </div>
+        {q.isLoading && <div style={{ padding: 30, textAlign: "center" }}>Loading…</div>}
+        {q.isError && <div style={{ padding: 30, textAlign: "center" }}>Statistics are not available right now.</div>}
+        {ev && <>
+          <div style={{ padding: "8px 14px", fontSize: 12, fontWeight: 700, background: "rgba(255,255,255,0.04)" }}>{ev.league}</div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr auto 1fr", alignItems: "center", gap: 10, padding: "24px 14px", textAlign: "center" }}>
+            <div style={{ fontWeight: 700 }}>{ev.home}</div>
+            <div><div style={{ fontSize: 11, opacity: 0.7 }}>{t?.day} {t?.time}</div><div style={{ fontSize: 22, fontWeight: 800 }}>{(ev as any).score ?? "- : -"}</div><div style={{ fontSize: 11, opacity: 0.7 }}>{live ? "Live" : "Not started"}</div></div>
+            <div style={{ fontWeight: 700 }}>{ev.away}</div>
+          </div>
+          {main && <div style={{ display: "flex", justifyContent: "space-around", paddingBottom: 18 }}>
+            {main.outcomes.slice(0, 3).map((o, i) => <div key={i} style={{ fontWeight: 700 }}><span style={{ background: "rgb(0,166,90)", color: "#fff", padding: "1px 6px", borderRadius: 2, marginRight: 6, fontSize: 11 }}>{o.name}</span>{o.odds ? o.odds.toFixed(2) : "-"}</div>)}
+          </div>}
+          <div style={{ padding: "8px 16px", fontWeight: 700, fontSize: 12, textAlign: "center", background: "#1f2025" }}>DETAILS</div>
+          <div style={row}><span>Start</span><span>{t?.day} {t?.time}</span></div>
+          <div style={row}><span>Competition</span><span>{ev.league}</span></div>
+          <div style={row}><span>Markets available</span><span>{ev.markets.length}</span></div>
+          {ev.markets.slice(1, 6).map((mk, i) => (
+            <div key={i}>
+              <div style={{ padding: "8px 16px", fontWeight: 700, fontSize: 12, background: "rgba(255,255,255,0.04)" }}>{mk.name}</div>
+              {mk.outcomes.map((o, j) => <div key={j} style={row}><span>{o.name}</span><span className="textOrange">{o.odds ? o.odds.toFixed(2) : "-"}</span></div>)}
+            </div>
+          ))}
+        </>}
+      </div>
     </div>
   );
 }
