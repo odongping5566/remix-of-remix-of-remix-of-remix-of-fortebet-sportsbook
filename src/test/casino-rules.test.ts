@@ -23,8 +23,8 @@ describe("casino lobby rules", () => {
     expect(popularGames(many)).toHaveLength(12);
   });
   it("unfiltered grid leaves out popular games and sorts by provider order then id", () => {
-    const pop = new Set(popularGames(games, 3).map((x) => x.id));
-    expect(filterGames(games, DEFAULT_CASINO_FILTER).filter((x) => pop.has(x.id))).toEqual([]);
+    const many = [...Array.from({ length: 12 }, (_, i) => g(100 + i, `Pop ${i}`, "Spribe", ["crash"], i + 1)), g(9, "Late", "Pragmatic Play", ["slots"], null, 30), g(8, "Early", "Apollo Casino", ["slots"])];
+    expect(filterGames(many, DEFAULT_CASINO_FILTER).map((x) => x.name)).toEqual(["Early", "Late"]);
   });
   it("provider filter keeps only that provider (popular included)", () => {
     expect(filterGames(games, { ...DEFAULT_CASINO_FILTER, provider: "apollo_casino" }).map((x) => x.id)).toEqual([5, 7, 20]);
