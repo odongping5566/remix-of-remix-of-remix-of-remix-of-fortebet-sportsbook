@@ -11,7 +11,6 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as LivePreviewRouteImport } from './routes/live_.preview'
-import { Route as LiveEventMa763001341b04f0f168704066RouteImport } from './routes/live_.event_.ma76300134-1b04f0f168704066'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -23,45 +22,31 @@ const LivePreviewRoute = LivePreviewRouteImport.update({
   path: '/live/preview',
   getParentRoute: () => rootRouteImport,
 } as any)
-const LiveEventMa763001341b04f0f168704066Route =
-  LiveEventMa763001341b04f0f168704066RouteImport.update({
-    id: '/live_/event_/ma76300134-1b04f0f168704066',
-    path: '/live/event/ma76300134-1b04f0f168704066',
-    getParentRoute: () => rootRouteImport,
-  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/live/preview': typeof LivePreviewRoute
-  '/live/event/ma76300134-1b04f0f168704066': typeof LiveEventMa763001341b04f0f168704066Route
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/live/preview': typeof LivePreviewRoute
-  '/live/event/ma76300134-1b04f0f168704066': typeof LiveEventMa763001341b04f0f168704066Route
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/live_/preview': typeof LivePreviewRoute
-  '/live_/event_/ma76300134-1b04f0f168704066': typeof LiveEventMa763001341b04f0f168704066Route
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/live/preview' | '/live/event/ma76300134-1b04f0f168704066'
+  fullPaths: '/' | '/live/preview'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/live/preview' | '/live/event/ma76300134-1b04f0f168704066'
-  id:
-    | '__root__'
-    | '/'
-    | '/live_/preview'
-    | '/live_/event_/ma76300134-1b04f0f168704066'
+  to: '/' | '/live/preview'
+  id: '__root__' | '/' | '/live_/preview'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   LivePreviewRoute: typeof LivePreviewRoute
-  LiveEventMa763001341b04f0f168704066Route: typeof LiveEventMa763001341b04f0f168704066Route
 }
 
 declare module '@tanstack/react-router' {
@@ -80,21 +65,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LivePreviewRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/live_/event_/ma76300134-1b04f0f168704066': {
-      id: '/live_/event_/ma76300134-1b04f0f168704066'
-      path: '/live/event/ma76300134-1b04f0f168704066'
-      fullPath: '/live/event/ma76300134-1b04f0f168704066'
-      preLoaderRoute: typeof LiveEventMa763001341b04f0f168704066RouteImport
-      parentRoute: typeof rootRouteImport
-    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   LivePreviewRoute: LivePreviewRoute,
-  LiveEventMa763001341b04f0f168704066Route:
-    LiveEventMa763001341b04f0f168704066Route,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
