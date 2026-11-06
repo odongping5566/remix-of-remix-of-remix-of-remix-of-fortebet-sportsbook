@@ -1,11 +1,10 @@
 import { useCallback } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { LiveShell } from "@/components/live-shell";
-import { CasinoLobby, GameModal, casinoGamesQuery } from "@/components/casino";
+import { GameModal, casinoGamesQuery } from "@/components/casino";
 
 type Search = { mode?: "fun" | "real" };
 
-export const Route = createFileRoute("/slots_/game/$ident")({
+export const Route = createFileRoute("/slots/game/$ident")({
   validateSearch: (s: Record<string, unknown>): Search => (s.mode === "real" ? { mode: "real" } : {}),
   head: ({ params }) => ({ meta: [
     { title: `Play ${params.ident} - All Games | Fortebet` },
@@ -23,16 +22,13 @@ function GamePage() {
   const { ident } = Route.useParams();
   const { mode = "fun" } = Route.useSearch();
   const nav = useNavigate();
-  const close = useCallback(() => nav({ to: "/slots" }), [nav]);
+  const close = useCallback(() => nav({ to: "/slots", resetScroll: false }), [nav]);
   return (
-    <LiveShell active="slots" layout="full">
-      <CasinoLobby />
-      <GameModal
-        ident={ident}
-        mode={mode}
-        onClose={close}
-        onMode={(m) => nav({ to: "/slots/game/$ident", params: { ident }, search: m === "real" ? { mode: "real" } : {}, replace: true })}
-      />
-    </LiveShell>
+    <GameModal
+      ident={ident}
+      mode={mode}
+      onClose={close}
+      onMode={(m) => nav({ to: "/slots/game/$ident", params: { ident }, search: m === "real" ? { mode: "real" } : {}, replace: true, resetScroll: false })}
+    />
   );
 }

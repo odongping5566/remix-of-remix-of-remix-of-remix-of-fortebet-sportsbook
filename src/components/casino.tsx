@@ -97,7 +97,7 @@ export function CasinoLobby() {
   const popular = useMemo(() => popularGames(games), [games]);
   const list = useMemo(() => filterGames(games, f), [games, f]);
   const avail = useMemo(() => availableKeys(games, f), [games, f]);
-  const play = (g: CasinoGame) => nav({ to: "/slots/game/$ident", params: { ident: g.ident } });
+  const play = (g: CasinoGame) => nav({ to: "/slots/game/$ident", params: { ident: g.ident }, resetScroll: false });
 
   return (
     <div className="fbCasino">
@@ -146,6 +146,7 @@ export function GameModal({ ident, mode, onMode, onClose }: { ident: string; mod
   const game = data?.games.find((g) => g.ident === ident || g.ident.toLowerCase() === ident.toLowerCase());
   const start = useServerFn(playCasinoGame);
   const [launch, setLaunch] = useState<Launch>({ state: "loading" });
+  const [tries, setTries] = useState(0);
 
   useEffect(() => {
     if (!game) return;
@@ -156,7 +157,7 @@ export function GameModal({ ident, mode, onMode, onClose }: { ident: string; mod
       .then((r) => { if (live) setLaunch(r.ok ? { state: "ready", url: r.url } : r.error === "LOGIN_REQUIRED" ? { state: "login" } : { state: "error" }); })
       .catch(() => { if (live) setLaunch({ state: "error" }); });
     return () => { live = false; };
-  }, [game?.id, mode]);
+  }, [game?.id, mode, tries]);
 
   useEffect(() => {
     const k = (e: KeyboardEvent) => e.key === "Escape" && onClose();
@@ -198,7 +199,7 @@ export function GameModal({ ident, mode, onMode, onClose }: { ident: string; mod
             <div className="msg">
               <h3>Game unavailable</h3>
               {mode === "fun" && !game.playFun ? "This game has no free demo." : "The game could not be started. Please try again."}
-              <div className="btns"><button type="button" onClick={() => onMode(mode)}>Try again</button><button type="button" className="ghost" onClick={onClose}>Back to all games</button></div>
+              <div className="btns"><button type="button" onClick={() => setTries((t) => t + 1)}>Try again</button><button type="button" className="ghost" onClick={onClose}>Back to all games</button></div>
             </div>
           )}
         </div>

@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Outlet } from "@tanstack/react-router";
 import { LiveShell } from "@/components/live-shell";
 import { CasinoLobby, casinoGamesQuery } from "@/components/casino";
 
@@ -19,6 +19,7 @@ function SlotsPage() {
   return (
     <LiveShell active="slots" layout="full">
       <CasinoLobby />
+      <Outlet />
     </LiveShell>
   );
 }
