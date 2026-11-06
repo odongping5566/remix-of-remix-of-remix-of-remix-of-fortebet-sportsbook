@@ -596,8 +596,6 @@ export function BetSlip({ slip, title = "Sportsbook" }: { slip: Slip; title?: st
         const lives = sels.filter((s) => s.live).length;
         const mode = lives === 0 ? "PREMATCH" : lives === sels.length ? "LIVE" : "PREMATCH + LIVE";
         const kind = sels.length > 1 ? "COMBO" : "SINGLE";
-        const now = new Date();
-        const stamp = `${now.toLocaleDateString("en-US", { month: "short", day: "2-digit" })} ${now.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", second: "2-digit" })}`;
         return (
           <TicketSheet
             title={`${mode} | ${kind} ${sels.length} event${sels.length === 1 ? "" : "s"}`}
