@@ -2,8 +2,8 @@
 // (Socket.IO v4, namespace /liveodds, room OFFER). Payloads are "ZB64 <base64 deflate JSON>".
 import { useEffect, useState, useSyncExternalStore } from "react";
 
-type OddsState = { v: number; l: boolean; at: number; prev?: number; changedAt?: number };
-type EventState = { sc?: string; st?: string; at: number; gone?: boolean };
+type OddsState = { v: number; l: boolean; at: number; prev?: number | undefined; changedAt?: number | undefined };
+type EventState = { sc?: string | undefined; st?: string | undefined; at: number; gone?: boolean };
 
 const odds = new Map<number, OddsState>();
 const lockedMarkets = new Map<number, { l: boolean; at: number }>();
