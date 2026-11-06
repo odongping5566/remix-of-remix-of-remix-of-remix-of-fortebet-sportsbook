@@ -277,7 +277,8 @@ export function LivePreviewList({ sels, toggle }: { sels: Sel[]; toggle: (s: Sel
               <div />
             </div>
             {ms.map((m) => (
-              <div key={m.id} className="data match [font-weight:700]">
+              <div key={m.id} style={{ display: "contents" }}>
+              <div className="data match [font-weight:700]">
                 <div className="matchInfo curPointer" onClick={() => go(m.id)}>
                   <div className="app-widget-event-set">
                     <div className="starFavorite"><span className="ico chart h13 opa06 curPointer" role="button" aria-label="Match statistics" style={{ display: "inline-block", minWidth: 14, minHeight: 13 }} onClick={(e) => { e.preventDefault(); e.stopPropagation(); setStatsId(m.id); }} /></div>
@@ -306,6 +307,7 @@ export function LivePreviewList({ sels, toggle }: { sels: Sel[]; toggle: (s: Sel
                 <div className="curPointer" onClick={() => go(m.id)}> +{m.extra} </div>
               </div>
               {open === m.id && <MarketsDropdown id={m.id} live sels={sels} toggle={toggle} />}
+              </div>
             ))}
           </div>
         ))}
