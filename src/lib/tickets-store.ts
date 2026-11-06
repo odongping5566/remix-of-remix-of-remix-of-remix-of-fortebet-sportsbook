@@ -13,6 +13,7 @@ export type Sel = {
   at: number; // when they were accepted
   live: boolean;
   start: string;
+  league?: string | undefined;
 };
 
 type State = { tickets: Sel[][]; stakes: number[]; active: number };

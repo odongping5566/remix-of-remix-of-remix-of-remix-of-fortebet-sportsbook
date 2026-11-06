@@ -82,7 +82,7 @@ type OddProps = {
   mk?: number[] | undefined;
   sels: Sel[];
   toggle: (s: Sel) => void;
-  info: { eventId: string; match: string; market: string; outcome: string; live: boolean; start: string };
+  info: { eventId: string; match: string; market: string; outcome: string; live: boolean; start: string; league?: string | undefined };
   variant?: "grid" | "chip" | "live";
   label?: string;
   favorite?: boolean;
@@ -160,7 +160,7 @@ export function MatchRow({ e, at, cells, mk, cols, market, sels, toggle, open, s
             <div className="odds" key={k}>
               {L.cols[k] || c ? (
                 <OddBtn cell={c} at={at} mk={mk ?? e.mk} sels={sels} toggle={toggle} favorite={fav != null && c != null && c.v === fav && k !== 1}
-                  info={{ eventId: e.id, match, market: mkName, outcome: out, live, start: e.s }} />
+                  info={{ eventId: e.id, match, market: mkName, outcome: out, live, start: e.s, league }} />
               ) : <div style={{ visibility: "hidden" }}> - </div>}
             </div>
           );
@@ -457,7 +457,7 @@ export function MarketsDropdown({ id, live, sels, toggle }: { id: string; live: 
               <div style={{ display: "grid", gridTemplateColumns: `repeat(${cols}, 1fr)`, gap: 3, padding: "0 10px 10px" }}>
                 {mk.outcomes.map((o) => (
                   <OddBtn key={o.id} variant="chip" label={o.name} cell={o.odds ? { id: o.id, v: o.odds, ...(o.locked ? { l: 1 as const } : {}) } : null} at={ev.at} mk={[mk.id]} sels={sels} toggle={toggle}
-                    info={{ eventId: id, match: `${ev.home} - ${ev.away}`, market: mk.name, outcome: o.name, live, start: ev.startTs }} />
+                    info={{ eventId: id, match: `${ev.home} - ${ev.away}`, market: mk.name, outcome: o.name, live, start: ev.startTs, league: ev.league }} />
                 ))}
               </div>
             )}
@@ -596,24 +596,26 @@ export function BetSlip({ slip, title = "Sportsbook" }: { slip: Slip; title?: st
         const lives = sels.filter((s) => s.live).length;
         const mode = lives === 0 ? "PREMATCH" : lives === sels.length ? "LIVE" : "PREMATCH + LIVE";
         const kind = sels.length > 1 ? "COMBO" : "SINGLE";
-        const now = new Date();
-        const stamp = `${now.toLocaleDateString("en-US", { month: "short", day: "2-digit" })} ${now.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", second: "2-digit" })}`;
         return (
           <TicketSheet
-            title={`TICKET PREVIEW | ${mode} | ${kind} ${sels.length} event${sels.length === 1 ? "" : "s"} | ${stamp}`}
-            status="NOT PLACED"
+            title={`${mode} | ${kind} ${sels.length} event${sels.length === 1 ? "" : "s"}`}
+            status="PREPARING"
+            relativeDays
             onClose={() => setPreview(false)}
-            items={items.map(({ s, cur, locked, changed: ch }) => ({ key: s.key, time: s.start, match: s.match, market: s.market, outcome: s.outcome, odds: cur, oldOdds: ch ? s.odds : undefined, status: locked ? "LOCKED" : "OPEN" }))}
+            items={items.map(({ s, cur, locked, changed: ch }) => ({ key: s.key, time: s.start, match: s.match, market: s.market, outcome: s.outcome, odds: cur, oldOdds: ch ? s.odds : undefined, status: locked ? "LOCKED" : "PREPARING", league: s.league }))}
             rows={[
               { label: "TOTAL ODDS", value: fmt(total, 2) },
               { label: "STAKE", value: `${fmt(stake)} UGX` },
-              { label: "POSSIBLE WIN", value: `${fmt(win)} UGX`, accent: true },
-              { label: "VIP POINTS", value: `+${fmt(vip)}` },
+              { label: "POSSIBLE WIN", value: `${fmt(win)} UGX` },
             ]}
+            note={vip > 0 ? <div>+{fmt(vip)} VIP PTS if the ticket wins</div> : null}
             actions={<>
               {err && <div style={{ color: "#ffb4b4", fontSize: 12 }}>{err}</div>}
               {lockedCount > 0 && <div style={{ color: "#c9cacf", fontSize: 12, display: "flex", gap: 6, alignItems: "center" }}><LockIcon size={12} /> {lockedCount} pick{lockedCount > 1 ? "s are" : " is"} suspended</div>}
-              <button style={sheetBtn} onClick={() => setPreview(false)}>Back to bet slip</button>
+              <button style={sheetBtn} onClick={() => setPreview(false)}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3a3c44" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={{ marginRight: 22, flexShrink: 0 }}><path d="M3 12a9 9 0 1 0 3-6.7L3 8" /><path d="M3 3v5h5" /><path d="M12 7v5l3 2" /></svg>
+                Back to bet slip
+              </button>
             </>}
           />
         );
@@ -648,6 +650,8 @@ function LiveRow({ e, o, slip, open, onOpen, onStats }: { e: OfferEvent; o: Offe
   const ev = useLiveEvent(e.id, { sc: e.sc, st: e.st }, o.at);
   const sp = o.sports.find((s) => s.id === e.sp);
   const L = layout(e.c, sp?.cols ?? ["1", "X", "2"]);
+  const tour = o.tournaments.find((t) => t.id === e.t);
+  const league = [o.categories.find((c) => c.id === tour?.categoryId)?.name, tour?.name].filter(Boolean).join(" / ");
   if (ev.gone) return null;
   return (
     <div style={{ display: "contents" }}>
@@ -666,7 +670,7 @@ function LiveRow({ e, o, slip, open, onOpen, onStats }: { e: OfferEvent; o: Offe
               {L.cells.slice(g * 3, g * 3 + 3).map((c, j) => {
                 const k = g * 3 + j;
                 const [mk, out] = MAIN_NAMES(L.cols[k] ?? "", e.h, e.a, sp?.market ?? "Full Time Result");
-                return L.cols[k] || c ? <OddBtn key={k} cell={c} at={o.at} mk={e.mk} sels={slip.sels} toggle={slip.toggle} info={{ eventId: e.id, match: `${e.h} - ${e.a}`, market: mk, outcome: out, live: true, start: e.s }} /> : <div key={k} />;
+                return L.cols[k] || c ? <OddBtn key={k} cell={c} at={o.at} mk={e.mk} sels={slip.sels} toggle={slip.toggle} info={{ eventId: e.id, match: `${e.h} - ${e.a}`, market: mk, outcome: out, live: true, start: e.s, league }} /> : <div key={k} />;
               })}
             </div>
           ))}

@@ -32,6 +32,13 @@ function StatusDot({ status }: { status: string }) {
   if (status === "WIN") return mark(WIN_BG, "Won", "M5.6 10.4l3 3 5.8-6.2");
   if (status === "LOST") return mark(LOST_BG, "Lost", "M6.8 6.8l6.4 6.4M13.2 6.8l-6.4 6.4");
   if (status === "VOID" || status === "CANCELED" || status === "CANCELLED") return mark("#8b8d96", "Void", "M6 10h8");
+  if (status === "PREPARING") return (
+    <svg width="19" height="19" viewBox="0 0 20 20" role="img" aria-label="Not played yet" style={wrap}>
+      <circle cx="10" cy="10" r="9.5" fill="#d8d8d8" />
+      <path d="M7.4 7.6a2.7 2.7 0 0 1 5.2.9c0 1.8-2.6 2.2-2.6 3.8" fill="none" stroke={DARK} strokeWidth="2" strokeLinecap="round" />
+      <circle cx="10" cy="15.1" r="1.2" fill={DARK} />
+    </svg>
+  );
   return (
     <svg width="19" height="19" viewBox="0 0 20 20" role="img" aria-label="Open" style={wrap}>
       <circle cx="10" cy="10" r="8.5" fill="none" stroke="#8b8d96" strokeWidth="2" />
@@ -40,15 +47,22 @@ function StatusDot({ status }: { status: string }) {
 }
 
 /** Grey paper ticket with a torn stub on the left, as in the Fortebet ticket header. */
-function TicketGlyph() {
+function TicketGlyph({ label }: { label?: string | undefined }) {
   return (
-    <svg width="50" height="28" viewBox="0 0 50 28" aria-hidden="true">
+    <svg width="50" height="28" viewBox="0 0 50 28" aria-hidden={label ? undefined : true} role={label ? "img" : undefined} aria-label={label ? `Short number ${label}` : undefined}>
       <path fill="#d8d8d8" d="M2.5 0H9v28H2.5A2.5 2.5 0 0 1 0 25.5V17.5a3.5 3.5 0 0 0 0-7V2.5A2.5 2.5 0 0 1 2.5 0z" />
       <path fill="#d8d8d8" d="M11 0h36.5A2.5 2.5 0 0 1 50 2.5v23a2.5 2.5 0 0 1-2.5 2.5H11z" />
       <path fill="#b4b4b6" d="M0 23.5h9V28H2.5A2.5 2.5 0 0 1 0 25.5zM11 23.5h39v2a2.5 2.5 0 0 1-2.5 2.5H11z" />
+      {label && <text x="30.5" y="17.5" textAnchor="middle" fontSize="13" fontWeight="700" fill="#222" fontFamily="inherit">{label}</text>}
     </svg>
   );
 }
+
+const RELATIVE_DAY = (d: Date) => {
+  const day = (x: Date) => new Date(x.getFullYear(), x.getMonth(), x.getDate()).getTime();
+  const diff = Math.round((day(d) - day(new Date())) / 86400000);
+  return diff === 0 ? "Today" : diff === 1 ? "Tomorrow" : null;
+};
 
 export const fmtMoney = (n: number, d = 0) => n.toLocaleString("en-US", { minimumFractionDigits: d, maximumFractionDigits: d });
 const fmtStamp = (ts: string) => {
@@ -56,22 +70,29 @@ const fmtStamp = (ts: string) => {
   if (Number.isNaN(d.getTime())) return "";
   return `${d.toLocaleDateString("en-US", { month: "short", day: "2-digit" })} ${d.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", second: "2-digit" })}`;
 };
-const fmtItemTime = (ts: string) => {
+const fmtItemTime = (ts: string, relative = false) => {
   const d = new Date(ts);
   if (Number.isNaN(d.getTime())) return "";
-  return `${d.toLocaleDateString("en-US", { month: "short", day: "2-digit" })} | ${d.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}`;
+  const date = (relative && RELATIVE_DAY(d)) || d.toLocaleDateString("en-US", { month: "short", day: "2-digit" });
+  return `${date} | ${d.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}`;
 };
 
-export type SheetItem = { key: string; time: string; match: string; market: string; outcome: string; odds: number; oldOdds?: number | undefined; result?: string | null; status: string };
-export type SheetRow = { label: string; value: string; accent?: boolean };
+export type SheetItem = { key: string; time: string; match: string; market: string; outcome: string; odds: number; oldOdds?: number | undefined; result?: string | null; status: string; league?: string | undefined };
+export type SheetRow = { label: ReactNode; value: string; accent?: boolean };
 
 /** Shared ticket layout: header bar, picks on the left, status and totals on the right. */
-export function TicketSheet({ title, items, status, rows, number, actions, onClose }: {
+export function TicketSheet({ title, items, status, rows, number, shortNumber, note, relativeDays = false, actions, onClose }: {
   title: string;
   items: SheetItem[];
   status: string;
   rows: SheetRow[];
   number?: string | undefined;
+  /** Short ticket number printed on the ticket icon (e.g. 609). */
+  shortNumber?: string | undefined;
+  /** Small right-aligned notes under the totals. */
+  note?: ReactNode;
+  /** Show "Today" / "Tomorrow" instead of the date (bet slip preview). */
+  relativeDays?: boolean;
   actions?: ReactNode;
   onClose: () => void;
 }) {
@@ -82,7 +103,7 @@ export function TicketSheet({ title, items, status, rows, number, actions, onClo
     return () => window.removeEventListener("keydown", k);
   }, [onClose]);
   const list = useMemo(() => (byTime ? [...items].sort((a, b) => a.time.localeCompare(b.time)) : items), [items, byTime]);
-  const statusBg = status === "WIN" ? WIN_BG : status === "LOST" ? LOST_BG : status === "OPEN" || status === "ACTIVE" ? "#f0b429" : "#6b6d76";
+  const statusBg = status === "WIN" || status.includes("CASHOUT") ? WIN_BG : status === "LOST" ? LOST_BG : status === "OPEN" || status === "ACTIVE" ? "#f0b429" : status === "PREPARING" ? "#e9e9eb" : "#6b6d76";
   return (
     <div onClick={onClose} style={{ position: "fixed", inset: 0, zIndex: 1000, background: "rgba(0,0,0,0.65)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
       <div onClick={(e) => e.stopPropagation()} role="dialog" aria-label="Ticket detail"
@@ -104,7 +125,11 @@ export function TicketSheet({ title, items, status, rows, number, actions, onClo
               {list.map((it) => (
                 <div key={it.key} style={{ padding: "10px 0", borderBottom: `1px solid ${LINE}` }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 13 }}>
-                    <span>{fmtItemTime(it.time)} <span className="ico soccer h12 opa06" style={{ display: "inline-block", marginLeft: 6 }} /></span>
+                    <span style={{ display: "flex", alignItems: "center", gap: 6, minWidth: 0 }}>
+                      <span style={{ whiteSpace: "nowrap" }}>{fmtItemTime(it.time, relativeDays)}</span>
+                      <span className="ico soccer h12 opa06" style={{ display: "inline-block", flexShrink: 0 }} />
+                      {it.league && <span style={{ fontSize: 12, color: "#b9bac0", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{it.league.replace(/\s*\/\s*/g, " - ")}</span>}
+                    </span>
                     <StatusDot status={it.status} />
                   </div>
                   <div style={{ fontWeight: 700, textTransform: "uppercase", fontSize: 12, margin: "6px 0 5px" }}>{it.match}</div>
@@ -122,15 +147,16 @@ export function TicketSheet({ title, items, status, rows, number, actions, onClo
           <div style={{ display: "flex", flexDirection: "column", minHeight: 0, overflowY: "auto" }}>
             <div style={{ display: "flex", alignItems: "stretch", borderBottom: "2px solid #25272e", height: 50, flexShrink: 0 }}>
               <div style={{ flex: 1, display: "flex", alignItems: "center", padding: "0 13px" }}>
-                <TicketGlyph />
+                <TicketGlyph label={shortNumber} />
               </div>
               <div style={{ display: "flex", alignItems: "center", padding: "0 11px", fontWeight: 700, fontSize: 14, color: "#d8d8da" }}>STATUS:</div>
-              <div style={{ width: 80, display: "flex", alignItems: "center", justifyContent: "center", background: statusBg, color: "#333", fontSize: 20, fontWeight: 400, letterSpacing: 0.3, padding: "0 6px", whiteSpace: "nowrap" }}>{status}</div>
+              <div style={{ minWidth: 80, display: "flex", alignItems: "center", justifyContent: "center", background: statusBg, color: "#333", fontSize: 20, fontWeight: 400, letterSpacing: 0.3, padding: "0 8px", whiteSpace: "nowrap" }}>{status}</div>
             </div>
             <div style={{ padding: "9px 13px 10px", background: LIST, borderBottom: "2px solid #25272e", lineHeight: "21px", fontSize: 13, fontWeight: 700, color: "#e3e3e5" }}>
-              {rows.map((r) => (
-                <div key={r.label} style={{ display: "flex", justifyContent: "space-between", color: r.accent ? "#22d47e" : undefined }}><span>{r.label}</span><span>{r.value}</span></div>
+              {rows.map((r, k) => (
+                <div key={k} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", color: r.accent ? "#22d47e" : undefined }}><span style={{ display: "flex" }}>{r.label}</span><span>{r.value}</span></div>
               ))}
+              {note && <div style={{ textAlign: "right", fontSize: 12, fontWeight: 400, lineHeight: "19px", marginTop: 3, color: "#d8d8da" }}>{note}</div>}
             </div>
             {actions && <div style={{ padding: "10px 13px", borderBottom: "2px solid #25272e", display: "grid", gap: 8 }}>{actions}</div>}
             {number && <div style={{ margin: "14px 13px", background: "#eaeaea", color: "#444", textAlign: "center", fontSize: 14, lineHeight: "24px", padding: "0 6px", letterSpacing: 0.1 }}>Ticket No. {number}</div>}
@@ -152,6 +178,25 @@ function ShareIcon() {
   );
 }
 
+function CalcIcon() {
+  return (
+    <svg width="16" height="20" viewBox="0 0 16 20" fill="none" stroke="#fff" strokeWidth="1.5" aria-hidden="true" style={{ marginRight: 24, flexShrink: 0 }}>
+      <rect x="1" y="1" width="14" height="18" rx="1.5" /><rect x="3.5" y="3.5" width="9" height="3.5" />
+      {[0, 1, 2].flatMap((r) => [0, 1, 2].map((c) => <rect key={`${r}${c}`} x={3.3 + c * 3.4} y={9.3 + r * 3.2} width="1.6" height="1.4" fill="#fff" stroke="none" />))}
+    </svg>
+  );
+}
+
+/** "FAIR | CASHOUT" label, white then green, as on Fortebet. */
+function CashoutBadge({ fair }: { fair: boolean }) {
+  return (
+    <span style={{ display: "inline-flex", fontSize: 12, fontWeight: 900, lineHeight: "20px", borderRadius: 2, overflow: "hidden" }}>
+      {fair && <span style={{ background: "#fff", color: "#222", padding: "0 5px" }}>FAIR</span>}
+      <span style={{ background: G, color: "#fff", padding: "0 6px" }}>CASHOUT</span>
+    </span>
+  );
+}
+
 const MODE_LABEL: Record<TicketDTO["mode"], string> = { PREMATCH: "PREMATCH", LIVE: "LIVE", MIXED: "PREMATCH + LIVE", VIRTUAL: "VIRTUAL SOCCER" };
 
 export function TicketDetailModal({ ticket, onClose }: { ticket: TicketDTO; onClose: () => void }) {
@@ -167,23 +212,48 @@ export function TicketDetailModal({ ticket, onClose }: { ticket: TicketDTO; onCl
       /* user cancelled */
     }
   };
-  const type = ticket.type === "COMBI" ? "COMBO" : ticket.type;
+  const [explain, setExplain] = useState(false);
+  const type = ticket.type.replace(/^(LIVE|PREMATCH|MIXED)_/, "").replace(/^COMBI$/, "COMBO");
+  const co = ticket.cashout;
+  const fair = co?.type === "FCO";
   const rows: SheetRow[] = [
     { label: "TOTAL ODDS", value: fmtMoney(ticket.totalOdds, 2) },
     { label: "STAKE", value: `${fmtMoney(ticket.stake)} UGX` },
-    { label: ticket.status === "WIN" ? "REAL WIN" : "POSSIBLE WIN", value: `${fmtMoney(ticket.status === "WIN" ? ticket.payout : ticket.possible)} UGX`, accent: true },
   ];
-  if (ticket.taxRate > 0) rows.push({ label: `WIN TAX ${Math.round(ticket.taxRate * 100)}%`, value: `${fmtMoney(ticket.tax)} UGX` });
-  rows.push({ label: "TOTAL PAYOUT", value: `${fmtMoney(ticket.payout)} UGX` });
+  let note: ReactNode = null;
+  if (co) {
+    rows.push({ label: "ORIGINAL POSSIBLE WIN", value: `${fmtMoney(ticket.possible)} UGX` });
+    rows.push({ label: <CashoutBadge fair={fair} />, value: `${fmtMoney(ticket.payout)} UGX *`, accent: true });
+    note = <>
+      {co.fee > 0 && <div>* FEE of {fmtMoney(co.fee)} UGX applied</div>}
+      {ticket.vipPoints <= 0 && <div>NO VIP PTS credited</div>}
+    </>;
+  } else {
+    rows.push({ label: ticket.status === "WIN" ? "REAL WIN" : "POSSIBLE WIN", value: `${fmtMoney(ticket.status === "WIN" ? ticket.payout : ticket.possible)} UGX`, accent: true });
+    if (ticket.taxRate > 0) rows.push({ label: `WIN TAX ${Math.round(ticket.taxRate * 100)}%`, value: `${fmtMoney(ticket.tax)} UGX` });
+    rows.push({ label: "TOTAL PAYOUT", value: `${fmtMoney(ticket.payout)} UGX` });
+  }
   return (
     <TicketSheet
       title={`${MODE_LABEL[ticket.mode]} | ${type} ${ticket.items.length} event${ticket.items.length === 1 ? "" : "s"} | ${fmtStamp(ticket.placedAt)}`}
-      status={ticket.status}
+      status={co ? (fair ? "FAIR CASHOUT" : "CASHOUT") : ticket.status}
+      shortNumber={ticket.shortNumber ? String(ticket.shortNumber) : undefined}
       rows={rows}
+      note={note}
       number={ticket.number}
       onClose={onClose}
       items={ticket.items.map((i, k) => ({ key: String(k), time: i.time, match: i.match, market: i.market, outcome: i.outcome, odds: i.odds, result: i.result, status: i.status }))}
-      actions={<button style={sheetBtn} onClick={share}><ShareIcon /> {copied ? "Link copied" : "Share ticket"}</button>}
+      actions={<>
+        {co && <button style={{ ...sheetBtn, background: G, color: "#fff" }} onClick={() => setExplain((v) => !v)}><CalcIcon /> How we count it</button>}
+        {co && explain && (
+          <div style={{ background: LIST, borderRadius: 3, padding: "8px 12px", fontSize: 12, lineHeight: 1.5, color: "#d8d8da" }}>
+            This ticket was cashed out{fair ? " with Fair Cashout" : ""} for <b>{fmtMoney(ticket.payout)} UGX</b> instead of waiting for all {ticket.items.length} matches to finish.
+            {co.fee > 0 && <> A {Math.round(co.feeRate * 100)}% fee of <b>{fmtMoney(co.fee)} UGX</b> was applied.</>}
+            {ticket.vipPoints <= 0 && <> Cashed-out tickets do not earn VIP points.</>}
+          </div>
+        )}
+        <button style={sheetBtn} onClick={share}><ShareIcon /> {copied ? "Link copied" : "Share ticket"}</button>
+      </>}
     />
   );
 }
