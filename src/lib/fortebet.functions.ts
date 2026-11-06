@@ -280,3 +280,93 @@ export const getEventDetail = createServerFn({ method: "GET" })
       markets: markets.map(({ id, name, outcomes }) => ({ id, name, outcomes })),
     };
   });
+
+// ---------- Ticket check (public /ticket/sbt-detail) ----------
+export type TicketItemDTO = {
+  time: string;
+  match: string;
+  sport: string;
+  league: string;
+  market: string;
+  outcome: string;
+  odds: number;
+  result: string | null;
+  status: string; // WIN | LOST | VOID | OPEN ...
+  live: boolean;
+};
+export type TicketDTO = {
+  number: string;
+  status: string;
+  type: string;
+  mode: "PREMATCH" | "LIVE" | "MIXED" | "VIRTUAL";
+  placedAt: string;
+  settledAt: string | null;
+  totalOdds: number;
+  stake: number;
+  win: number;
+  taxRate: number;
+  tax: number;
+  payout: number;
+  possible: number;
+  items: TicketItemDTO[];
+};
+export type TicketResult = { ok: true; ticket: TicketDTO } | { ok: false; error: "SHORT" | "NOT_FOUND" | "UNAVAILABLE" };
+
+export const checkTicket = createServerFn({ method: "POST" })
+  .inputValidator((input: { number: string }) => ({ number: String(input?.number ?? "").replace(/\D/g, "").slice(0, 30) }))
+  .handler(async ({ data }): Promise<TicketResult> => {
+    const n = data.number;
+    if (n.length < 14) return { ok: false, error: "SHORT" };
+    const virtual = n[0] === "4" || n[0] === "5";
+    try {
+      const res = await fetch(BASE + (virtual ? "/virtual-soccer/ticket-detail" : "/ticket/sbt-detail"), {
+        method: "POST",
+        headers: { "User-Agent": "Mozilla/5.0", Accept: "application/json", "Content-Type": "application/json" },
+        body: JSON.stringify({ number: n }),
+      });
+      const j: Raw = await res.json().catch(() => null);
+      if (!j || j.status !== "OK" || !j.data || !j.data.number) {
+        return { ok: false, error: j?.code === "ERR_TICKET_NOT_FOUND" || res.status === 404 ? "NOT_FOUND" : j?.code === "ERR_INTERNAL" ? "NOT_FOUND" : "UNAVAILABLE" };
+      }
+      const d = j.data;
+      const f = d.finance ?? {};
+      const items: TicketItemDTO[] = (d.items ?? []).map((i: Raw) => ({
+        time: String(i.time ?? ""),
+        match: String(i.event ?? [i.t1, i.t2].filter(Boolean).join(" - ")).replace(/\s+/g, " ").trim(),
+        sport: String(i.sport ?? ""),
+        league: [i.category, i.tournament].filter(Boolean).join(" / "),
+        market: String(i.market ?? "").replace(/\s+/g, " ").trim(),
+        outcome: String(i.outcome ?? "").replace(/\s+/g, " ").trim(),
+        odds: Number(i.oddsPayout ?? i.odds) || 0,
+        result: i.result ? String(i.result) : null,
+        status: String(i.statusReal ?? i.status ?? "OPEN").toUpperCase(),
+        live: !!i.live || i.offer?.offerMode === "live",
+      }));
+      const lives = items.filter((i) => i.live).length;
+      const mode: TicketDTO["mode"] = virtual ? "VIRTUAL" : lives === 0 ? "PREMATCH" : lives === items.length ? "LIVE" : "MIXED";
+      const stake = Number(f.stake ?? d.amountIn) || 0;
+      const win = Number(f.win ?? f.btto_evk ?? d.amountPossible) || 0;
+      return {
+        ok: true,
+        ticket: {
+          number: String(d.number),
+          status: String(d.status ?? "Open").toUpperCase(),
+          type: String(d.type ?? (items.length > 1 ? "COMBI" : "SINGLE")).toUpperCase(),
+          mode,
+          placedAt: String(d.timestampIn ?? ""),
+          settledAt: d.timestampOut ? String(d.timestampOut) : null,
+          totalOdds: Number(d.totalOdds) || 0,
+          stake,
+          win,
+          taxRate: Number(f.tax_out_rate) || 0,
+          tax: Number(f.tax_out_value) || 0,
+          payout: Number(f.to_pay ?? d.amountOut) || 0,
+          possible: Number(d.amountPossible) || win,
+          items,
+        },
+      };
+    } catch (e) {
+      console.error("ticket check failed", e);
+      return { ok: false, error: "UNAVAILABLE" };
+    }
+  });
