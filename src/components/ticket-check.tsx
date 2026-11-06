@@ -125,7 +125,11 @@ export function TicketSheet({ title, items, status, rows, number, shortNumber, n
               {list.map((it) => (
                 <div key={it.key} style={{ padding: "10px 0", borderBottom: `1px solid ${LINE}` }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 13 }}>
-                    <span>{fmtItemTime(it.time)} <span className="ico soccer h12 opa06" style={{ display: "inline-block", marginLeft: 6 }} /></span>
+                    <span style={{ display: "flex", alignItems: "center", gap: 6, minWidth: 0 }}>
+                      <span style={{ whiteSpace: "nowrap" }}>{fmtItemTime(it.time, relativeDays)}</span>
+                      <span className="ico soccer h12 opa06" style={{ display: "inline-block", flexShrink: 0 }} />
+                      {it.league && <span style={{ fontSize: 12, color: "#b9bac0", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{it.league.replace(/\s*\/\s*/g, " - ")}</span>}
+                    </span>
                     <StatusDot status={it.status} />
                   </div>
                   <div style={{ fontWeight: 700, textTransform: "uppercase", fontSize: 12, margin: "6px 0 5px" }}>{it.match}</div>
@@ -143,10 +147,10 @@ export function TicketSheet({ title, items, status, rows, number, shortNumber, n
           <div style={{ display: "flex", flexDirection: "column", minHeight: 0, overflowY: "auto" }}>
             <div style={{ display: "flex", alignItems: "stretch", borderBottom: "2px solid #25272e", height: 50, flexShrink: 0 }}>
               <div style={{ flex: 1, display: "flex", alignItems: "center", padding: "0 13px" }}>
-                <TicketGlyph />
+                <TicketGlyph label={shortNumber} />
               </div>
               <div style={{ display: "flex", alignItems: "center", padding: "0 11px", fontWeight: 700, fontSize: 14, color: "#d8d8da" }}>STATUS:</div>
-              <div style={{ width: 80, display: "flex", alignItems: "center", justifyContent: "center", background: statusBg, color: "#333", fontSize: 20, fontWeight: 400, letterSpacing: 0.3, padding: "0 6px", whiteSpace: "nowrap" }}>{status}</div>
+              <div style={{ minWidth: 80, display: "flex", alignItems: "center", justifyContent: "center", background: statusBg, color: "#333", fontSize: 20, fontWeight: 400, letterSpacing: 0.3, padding: "0 8px", whiteSpace: "nowrap" }}>{status}</div>
             </div>
             <div style={{ padding: "9px 13px 10px", background: LIST, borderBottom: "2px solid #25272e", lineHeight: "21px", fontSize: 13, fontWeight: 700, color: "#e3e3e5" }}>
               {rows.map((r) => (
