@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { HeaderClock, LiveOddsFeed } from "@/components/fortebet-live";
 import { TicketSearch } from "@/components/ticket-check";
+import { openLogin } from "@/lib/login-modal";
 import capturedCSS from "../styles/pages/live.preview.css?raw";
 
 const ImportedNativeTag0 = "innerscroll" as import("react").ElementType;
@@ -337,7 +338,7 @@ export function LiveShell({ children, slip, active = "live", layout = "ticket" }
                     <a {...({ "_ngcontent-wbi-c202": "", translate: "" } as any)}>Register</a>
                   </div>
                   <div className="buttons login [font-weight:900]" {...({ "_ngcontent-wbi-c202": "" } as any)}>
-                    <a {...({ "_ngcontent-wbi-c202": "" } as any)}><span className="ico login h15" {...({ "_ngcontent-wbi-c202": "" } as any)} />Login</a>
+                    <a role="button" onClick={openLogin} {...({ "_ngcontent-wbi-c202": "" } as any)}><span className="ico login h15" {...({ "_ngcontent-wbi-c202": "" } as any)} />Login</a>
                   </div>
                 </div>
               </div>
