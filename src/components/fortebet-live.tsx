@@ -191,8 +191,8 @@ export function BetSlip({ sels, remove, clear, title = "Sportsbook" }: { sels: S
   const total = sels.reduce((a, s) => a * s.odds, 1);
   const G = "rgb(0,166,90)";
   const describe = (s: Sel) => {
-    if (s.pick.includes(": ")) { const [m, ...o] = s.pick.split(": "); return [m, o.join(": ")]; }
-    const [h, a] = s.match.split(" - ");
+    if (s.pick.includes(": ")) { const [m = "", ...o] = s.pick.split(": "); return [m, o.join(": ")]; }
+    const [h = "", a = ""] = s.match.split(" - ");
     const map: Record<string, [string, string]> = { "1": ["Full Time Result", h], X: ["Full Time Result", "Draw"], "2": ["Full Time Result", a], "1X": ["Double Chance", `${h} or Draw`], X2: ["Double Chance", `Draw or ${a}`], "12": ["Double Chance", "No Draw"] };
     return map[s.pick] ?? ["", s.pick];
   };
